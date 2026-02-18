@@ -10,7 +10,7 @@ import com.twix.task_certification.R
 import com.twix.task_certification.detail.model.TaskCertificationDetailIntent
 import com.twix.task_certification.detail.model.TaskCertificationDetailSideEffect
 import com.twix.task_certification.detail.model.TaskCertificationDetailUiState
-import com.twix.task_certification.detail.model.toUiModel
+import com.twix.task_certification.detail.model.toUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.TaskCertificationRefreshBus
@@ -24,28 +24,23 @@ class TaskCertificationDetailViewModel(
 ) : BaseViewModel<TaskCertificationDetailUiState, TaskCertificationDetailIntent, TaskCertificationDetailSideEffect>(
         TaskCertificationDetailUiState(),
     ) {
-    private val goalId: Long =
+    private val argGoalId: Long =
         savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_GOAL_ID]
             ?: error(GOAL_ID_NOT_FOUND)
 
-    private val targetDate: String =
+    private val argTargetDate: String =
         savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_DATE]
             ?: error(TARGET_DATE_NOT_FOUND)
 
     init {
-        reduceGoalId()
         fetchPhotolog()
         collectEventBus()
     }
 
-    private fun reduceGoalId() = reduce { copy(currentGoalId = goalId) }
-
     private fun fetchPhotolog() {
         launchResult(
-            block = { photologRepository.fetchPhotoLogs(targetDate) },
-            onSuccess = {
-                reduce { copy(photoLogs = it.toUiModel()) }
-            },
+            block = { photologRepository.fetchPhotoLogs(argTargetDate) },
+            onSuccess = { reduce { it.toUiState(argGoalId) } },
             onError = {
                 emitSideEffect(
                     TaskCertificationDetailSideEffect.ShowToast(

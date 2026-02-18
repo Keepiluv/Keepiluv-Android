@@ -84,7 +84,7 @@ fun TaskCertificationDetailRoute(
         ) { granted ->
 
             if (granted) {
-                navigateToUpload(uiState.currentGoalId)
+                navigateToUpload(uiState.goalId)
                 return@rememberLauncherForActivityResult
             }
 
@@ -131,7 +131,7 @@ fun TaskCertificationDetailRoute(
         onClickReaction = { viewModel.dispatch(TaskCertificationDetailIntent.Reaction(it)) },
         onClickUpload = {
             if (hasCameraPermission(currentContext)) {
-                navigateToUpload(uiState.currentGoalId)
+                navigateToUpload(uiState.goalId)
             } else {
                 permissionLauncher.launch(Manifest.permission.CAMERA)
             }
@@ -159,7 +159,7 @@ fun TaskCertificationDetailScreen(
     ) {
         TaskCertificationDetailTopBar(
             showModify = uiState.canModify,
-            goalTitle = uiState.currentGoal.goalName,
+            goalTitle = uiState.goalName,
             onBack = onBack,
             onClickModify = onClickModify,
         )
@@ -193,11 +193,7 @@ fun TaskCertificationDetailScreen(
             ) {
                 ForegroundCard(
                     isCertificated = uiState.isDisplayedGoalCertificated,
-                    nickName =
-                        when (uiState.currentShow) {
-                            BetweenUs.ME -> uiState.photoLogs.myNickname
-                            BetweenUs.PARTNER -> uiState.photoLogs.partnerNickname
-                        },
+                    nickName = uiState.displayedNickname,
                     imageUrl = uiState.displayedGoalImageUrl,
                     comment = uiState.displayedGoalComment,
                     currentShow = uiState.currentShow,

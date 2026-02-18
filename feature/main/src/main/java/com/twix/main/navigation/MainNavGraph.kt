@@ -31,12 +31,18 @@ object MainNavGraph : NavGraphContributor {
                             launchSingleTop = true
                         }
                     },
-                    navigateToCertificationDetail = {
-                        navController.navigate(NavRoutes.TaskCertificationDetailRoute.createRoute(it)) {
-                        }
-                    },
                     navigateToSettings = {
                         navController.navigate(NavRoutes.SettingsRoute.route) {
+                            launchSingleTop = true
+                        }
+                    },
+                    navigateToCertificationDetail = { goalId, date ->
+                        navController.navigate(
+                            NavRoutes.TaskCertificationDetailRoute.createRoute(
+                                goalId,
+                                date,
+                            ),
+                        ) {
                             launchSingleTop = true
                         }
                     },

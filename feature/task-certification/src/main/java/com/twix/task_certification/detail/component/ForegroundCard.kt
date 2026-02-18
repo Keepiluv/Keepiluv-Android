@@ -10,12 +10,14 @@ import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.domain.model.enums.BetweenUs
 import com.twix.task_certification.R
-import com.twix.task_certification.detail.model.PhotologDetailUiModel
 import com.twix.designsystem.R as DesR
 
 @Composable
 internal fun ForegroundCard(
-    uiModel: PhotologDetailUiModel,
+    isCertificated: Boolean,
+    nickName: String,
+    imageUrl: String?,
+    comment: String?,
     currentShow: BetweenUs,
     rotation: Float,
 ) {
@@ -24,16 +26,15 @@ internal fun ForegroundCard(
         background = CommonColor.White,
         borderColor = GrayColor.C500,
     ) {
-        if (uiModel.isCertificated) {
-            CertificatedCard(uiModel)
+        if (isCertificated) {
+            CertificatedCard(imageUrl, comment)
         } else {
             AppText(
                 text =
                     when (currentShow) {
                         BetweenUs.ME -> stringResource(DesR.string.keep_it_up)
                         BetweenUs.PARTNER ->
-                            stringResource(R.string.task_certification_detail_partner_not_task_certification)
-                                .format(uiModel.nickName)
+                            stringResource(R.string.task_certification_detail_partner_not_task_certification).format(nickName)
                     },
                 style = AppTextStyle.H2,
                 color = GrayColor.C500,
@@ -47,17 +48,10 @@ internal fun ForegroundCard(
 private fun ForegroundCardPreview() {
     TwixTheme {
         ForegroundCard(
-            uiModel =
-                PhotologDetailUiModel(
-                    nickName = "페토",
-                    goalId = 1,
-                    photologId = 1,
-                    imageUrl = "",
-                    comment = "아이수크림",
-                    verificationDate = "",
-                    uploaderName = "참치",
-                    uploadedAt = "1시간 전",
-                ),
+            isCertificated = true,
+            nickName = "닉네임",
+            imageUrl = "https://picsum.photos/200/300",
+            comment = null,
             currentShow = BetweenUs.ME,
             rotation = -8f,
         )

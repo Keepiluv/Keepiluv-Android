@@ -2,11 +2,10 @@ package com.twix.network.service
 
 import com.twix.network.model.request.photolog.model.PhotologRequest
 import com.twix.network.model.response.photo.model.PhotoLogUploadUrlResponse
-import com.twix.network.model.response.photolog.PhotoLogResponse
+import com.twix.network.model.response.photolog.PhotoLogsResponse
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
 import de.jensklingenberg.ktorfit.http.POST
-import de.jensklingenberg.ktorfit.http.Path
 import de.jensklingenberg.ktorfit.http.Query
 
 interface PhotoLogService {
@@ -20,8 +19,8 @@ interface PhotoLogService {
         @Body request: PhotologRequest,
     )
 
-    @GET("api/v1/photologs/goals/{goalId}")
+    @GET("api/v1/photologs")
     suspend fun fetchPhotoLogs(
-        @Path("goalId") goalId: Long,
-    ): PhotoLogResponse
+        @Query("targetDate") request: String,
+    ): PhotoLogsResponse
 }

@@ -29,8 +29,8 @@ fun MainRoute(
     viewModel: MainViewModel = koinViewModel(),
     navigateToGoalEditor: () -> Unit,
     navigateToGoalManage: (LocalDate) -> Unit,
-    navigateToCertificationDetail: (Long) -> Unit,
     navigateToSettings: () -> Unit,
+    navigateToCertificationDetail: (Long, LocalDate) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val homeViewModel: HomeViewModel = koinViewModel()
@@ -53,8 +53,8 @@ private fun MainScreen(
     onTabClick: (MainTab) -> Unit,
     navigateToGoalEditor: () -> Unit,
     navigateToGoalManage: (LocalDate) -> Unit,
-    navigateToCertificationDetail: (Long) -> Unit,
     navigateToSettings: () -> Unit,
+    navigateToCertificationDetail: (Long, LocalDate) -> Unit,
 ) {
     val calendarState by homeViewModel.calendarState.collectAsStateWithLifecycle()
     var showCalendarBottomSheet by remember { mutableStateOf(false) }

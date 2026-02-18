@@ -23,13 +23,13 @@ import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.task_certification.R
-import com.twix.task_certification.detail.model.PhotologDetailUiModel
 import com.twix.ui.extension.noRippleClickable
 import com.twix.designsystem.R as DesR
 
 @Composable
 fun BackgroundCard(
-    uiModel: PhotologDetailUiModel,
+    isCertificated: Boolean,
+    uploadedAt: String,
     buttonTitle: String,
     onClick: () -> Unit,
     rotation: Float,
@@ -40,9 +40,9 @@ fun BackgroundCard(
             borderColor = GrayColor.C500,
             rotation = rotation,
         )
-        if (uiModel.isCertificated) {
+        if (isCertificated) {
             AppText(
-                text = uiModel.uploadedAt,
+                text = uploadedAt,
                 style = AppTextStyle.B4,
                 color = GrayColor.C500,
                 modifier =
@@ -87,11 +87,9 @@ fun PreviewBackgroundCard() {
     TwixTheme {
         BackgroundCard(
             buttonTitle = stringResource(R.string.task_certification_detail_partner_sting),
-            uiModel =
-                PhotologDetailUiModel(
-                    uploadedAt = "2023.10.31 23:59",
-                ),
+            uploadedAt = "2023.10.31 23:59",
             onClick = {},
+            isCertificated = true,
             rotation = -8f,
         )
     }

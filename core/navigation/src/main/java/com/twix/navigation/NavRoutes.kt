@@ -31,10 +31,15 @@ sealed class NavRoutes(
      * */
     object TaskCertificationGraph : NavRoutes("task_certification_graph")
 
-    object TaskCertificationDetailRoute : NavRoutes("task_certification_detail/{goalId}") {
+    object TaskCertificationDetailRoute :
+        NavRoutes("task_certification_detail/{goalId}/{date}") {
         const val ARG_GOAL_ID = "goalId"
+        const val ARG_DATE = "date"
 
-        fun createRoute(goalId: Long) = "task_certification_detail/$goalId"
+        fun createRoute(
+            goalId: Long,
+            date: LocalDate,
+        ) = "task_certification_detail/$goalId/$date"
     }
 
     object TaskCertificationRoute : NavRoutes("task_certification/{goalId}") {

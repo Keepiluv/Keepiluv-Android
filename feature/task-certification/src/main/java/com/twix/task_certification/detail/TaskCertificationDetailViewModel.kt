@@ -3,6 +3,7 @@ package com.twix.task_certification.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.components.toast.model.ToastType
+import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalReactionType
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
@@ -10,7 +11,7 @@ import com.twix.task_certification.R
 import com.twix.task_certification.detail.model.TaskCertificationDetailIntent
 import com.twix.task_certification.detail.model.TaskCertificationDetailSideEffect
 import com.twix.task_certification.detail.model.TaskCertificationDetailUiState
-import com.twix.task_certification.detail.model.toUiModel
+import com.twix.task_certification.detail.model.toUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.TaskCertificationRefreshBus
@@ -24,14 +25,32 @@ class TaskCertificationDetailViewModel(
 ) : BaseViewModel<TaskCertificationDetailUiState, TaskCertificationDetailIntent, TaskCertificationDetailSideEffect>(
         TaskCertificationDetailUiState(),
     ) {
-    private val goalId: Long =
+    private val argGoalId: Long =
         savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_GOAL_ID]
-            ?: throw IllegalArgumentException(GOAL_ID_NOT_FOUND)
+            ?: error(GOAL_ID_NOT_FOUND)
+
+    private val argTargetDate: String =
+        savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_DATE]
+            ?: error(TARGET_DATE_NOT_FOUND)
 
     init {
         fetchPhotolog()
-
         collectEventBus()
+    }
+
+    private fun fetchPhotolog() {
+        launchResult(
+            block = { photologRepository.fetchPhotoLogs(argTargetDate) },
+            onSuccess = { reduce { it.toUiState(argGoalId) } },
+            onError = {
+                emitSideEffect(
+                    TaskCertificationDetailSideEffect.ShowToast(
+                        R.string.task_certification_detail_fetch_photolog_fail,
+                        ToastType.ERROR,
+                    ),
+                )
+            },
+        )
     }
 
     private fun collectEventBus() {
@@ -51,32 +70,25 @@ class TaskCertificationDetailViewModel(
         }
     }
 
-    private fun fetchPhotolog() {
-        launchResult(
-            block = { photologRepository.fetchPhotoLogs(goalId) },
-            onSuccess = {
-                reduce { copy(photoLogs = it.toUiModel()) }
-            },
-            onError = {
-                emitSideEffect(
-                    TaskCertificationDetailSideEffect.ShowToast(
-                        R.string.task_certification_detail_fetch_photolog_fail,
-                        ToastType.ERROR,
-                    ),
-                )
-            },
-        )
-    }
-
     private fun reduceReaction(reaction: GoalReactionType) {
-        reduce { updatePartnerReaction(reaction) }
+        reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(reaction)) }
     }
 
     private fun reduceShownCard() {
         reduce { toggleBetweenUs() }
     }
 
+    private fun toggleBetweenUs(): TaskCertificationDetailUiState =
+        currentState.copy(
+            currentShow =
+                when (currentState.currentShow) {
+                    BetweenUs.ME -> BetweenUs.PARTNER
+                    BetweenUs.PARTNER -> BetweenUs.ME
+                },
+        )
+
     companion object {
         private const val GOAL_ID_NOT_FOUND = "Goal Id Argument Not Found"
+        private const val TARGET_DATE_NOT_FOUND = "Target Date Argument Not Found"
     }
 }

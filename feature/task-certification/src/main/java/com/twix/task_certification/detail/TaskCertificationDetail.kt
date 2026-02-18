@@ -84,7 +84,7 @@ fun TaskCertificationDetailRoute(
         ) { granted ->
 
             if (granted) {
-                navigateToUpload(uiState.photoLogs.goalId)
+                navigateToUpload(uiState.goalId)
                 return@rememberLauncherForActivityResult
             }
 
@@ -131,7 +131,7 @@ fun TaskCertificationDetailRoute(
         onClickReaction = { viewModel.dispatch(TaskCertificationDetailIntent.Reaction(it)) },
         onClickUpload = {
             if (hasCameraPermission(currentContext)) {
-                navigateToUpload(uiState.photoLogs.goalId)
+                navigateToUpload(uiState.goalId)
             } else {
                 permissionLauncher.launch(Manifest.permission.CAMERA)
             }
@@ -159,7 +159,7 @@ fun TaskCertificationDetailScreen(
     ) {
         TaskCertificationDetailTopBar(
             showModify = uiState.canModify,
-            goalTitle = uiState.photoLogs.goalTitle,
+            goalTitle = uiState.goalName,
             onBack = onBack,
             onClickModify = onClickModify,
         )
@@ -168,11 +168,8 @@ fun TaskCertificationDetailScreen(
 
         Box(Modifier.fillMaxWidth()) {
             BackgroundCard(
-                uiModel =
-                    when (uiState.currentShow) {
-                        BetweenUs.ME -> uiState.photoLogs.myPhotologs
-                        BetweenUs.PARTNER -> uiState.photoLogs.partnerPhotologs
-                    },
+                isCertificated = uiState.isDisplayedGoalCertificated,
+                uploadedAt = uiState.displayedGoalUpdateAt,
                 buttonTitle =
                     when (uiState.currentShow) {
                         BetweenUs.ME -> stringResource(R.string.task_certification_take_picture)
@@ -195,11 +192,10 @@ fun TaskCertificationDetailScreen(
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 ForegroundCard(
-                    uiModel =
-                        when (uiState.currentShow) {
-                            BetweenUs.ME -> uiState.photoLogs.myPhotologs
-                            BetweenUs.PARTNER -> uiState.photoLogs.partnerPhotologs
-                        },
+                    isCertificated = uiState.isDisplayedGoalCertificated,
+                    nickName = uiState.displayedNickname,
+                    imageUrl = uiState.displayedGoalImageUrl,
+                    comment = uiState.displayedGoalComment,
                     currentShow = uiState.currentShow,
                     rotation =
                         when (uiState.currentShow) {

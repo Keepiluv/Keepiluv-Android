@@ -51,8 +51,8 @@ fun HomeRoute(
     onShowCalendarBottomSheet: () -> Unit,
     navigateToGoalEditor: () -> Unit,
     navigateToGoalManage: (LocalDate) -> Unit,
-    navigateToCertificationDetail: (Long) -> Unit,
     navigateToSettings: () -> Unit,
+    navigateToCertificationDetail: (Long, LocalDate) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -66,7 +66,7 @@ fun HomeRoute(
         onShowCalendarBottomSheet = onShowCalendarBottomSheet,
         onAddNewGoal = navigateToGoalEditor,
         onEditClick = { navigateToGoalManage(uiState.selectedDate) },
-        onVerificationClick = navigateToCertificationDetail,
+        onVerificationClick = { navigateToCertificationDetail(it, uiState.selectedDate) },
         onSettingClick = navigateToSettings,
     )
 }

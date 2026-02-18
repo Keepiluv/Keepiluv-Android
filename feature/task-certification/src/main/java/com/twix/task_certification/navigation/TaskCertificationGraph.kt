@@ -2,6 +2,7 @@ package com.twix.task_certification.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
@@ -27,6 +28,9 @@ object TaskCertificationGraph : NavGraphContributor {
                     listOf(
                         navArgument(NavRoutes.TaskCertificationDetailRoute.ARG_GOAL_ID) {
                             defaultValue = -1L
+                        },
+                        navArgument(NavRoutes.TaskCertificationDetailRoute.ARG_DATE) {
+                            type = NavType.StringType
                         },
                     ),
             ) {

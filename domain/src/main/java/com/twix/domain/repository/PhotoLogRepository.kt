@@ -16,5 +16,5 @@ interface PhotoLogRepository {
         contentType: String,
     ): AppResult<String>
 
-    suspend fun fetchPhotoLogs(goalId: Long): AppResult<PhotoLogs>
+    suspend fun fetchPhotoLogs(targetDate: String): AppResult<PhotoLogs>
 }

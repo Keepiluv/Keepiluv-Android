@@ -16,25 +16,27 @@ import coil3.request.crossfade
 import com.twix.designsystem.components.comment.CommentTextField
 import com.twix.designsystem.components.comment.model.CommentUiModel
 import com.twix.designsystem.theme.TwixTheme
-import com.twix.task_certification.detail.model.PhotologDetailUiModel
 
 @Composable
-internal fun CertificatedCard(uiModel: PhotologDetailUiModel) {
+internal fun CertificatedCard(
+    imageUrl: String?,
+    comment: String?,
+) {
     Box(Modifier.fillMaxSize()) {
         AsyncImage(
             model =
                 ImageRequest
                     .Builder(LocalContext.current)
-                    .data(uiModel.imageUrl)
+                    .data(imageUrl)
                     .crossfade(true)
                     .build(),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize(),
         )
-        if (uiModel.comment?.isNotEmpty() == true) {
+        if (comment?.isNotEmpty() == true) {
             CommentTextField(
-                uiModel = CommentUiModel(uiModel.comment),
+                uiModel = CommentUiModel(comment),
                 enabled = false,
                 modifier =
                     Modifier
@@ -50,11 +52,8 @@ internal fun CertificatedCard(uiModel: PhotologDetailUiModel) {
 fun CertificatedCardPreview() {
     TwixTheme {
         CertificatedCard(
-            uiModel =
-                PhotologDetailUiModel(
-                    imageUrl = "https://picsum.photos/200/300",
-                    comment = "아이수크림",
-                ),
+            imageUrl = "https://picsum.photos/200/300",
+            comment = "아이수크림",
         )
     }
 }

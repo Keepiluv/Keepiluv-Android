@@ -18,6 +18,7 @@ import com.twix.util.bus.TaskCertificationRefreshBus
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -71,7 +72,7 @@ class TaskCertificationDetailViewModel(
             reactionFlow
                 .distinctUntilChanged()
                 .debounce(DEBOUNCE_INTERVAL)
-                .collect { reaction ->
+                .collectLatest { reaction ->
                     reactToPhotolog(reaction)
                 }
         }

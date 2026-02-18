@@ -12,4 +12,8 @@
     <string name="task_certification_detail_partner_not_task_certification">%s님은\n아직…</string>
     <string name="task_certification_detail_fetch_photolog_fail">인증샷 조회에 실패했습니다.</string>
     <string name="task_certification_detail_partner_sting">찌르기</string>
+    <string name="task_certification_detail_reaction_fail">리액션 요청에 실패했어요.</string>
+
+    <string name="task_certification_camera_permission_denied_permanently">인증샷 촬영을 위해서 카메라 권한이 필요해요.</string>
+    <string name="move_to_setting">설정</string>
 </resources>

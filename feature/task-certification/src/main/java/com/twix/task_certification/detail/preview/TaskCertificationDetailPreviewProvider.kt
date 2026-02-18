@@ -33,6 +33,7 @@ class TaskCertificationDetailPreviewProvider : PreviewParameterProvider<TaskCert
             TaskCertificationDetailUiState(
                 goalId = 1,
                 currentShow = BetweenUs.PARTNER,
+                goalName = "아이스크림 먹기",
                 myNickname = "나",
                 partnerNickname = "민정",
                 icon = GoalIconType.EXERCISE,

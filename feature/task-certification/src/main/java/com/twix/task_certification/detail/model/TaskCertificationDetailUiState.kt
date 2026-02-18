@@ -1,6 +1,5 @@
 package com.twix.task_certification.detail.model
 
-import android.util.Log
 import androidx.compose.runtime.Immutable
 import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalIconType
@@ -74,7 +73,6 @@ data class TaskCertificationDetailUiState(
 }
 
 fun PhotoLogs.toUiState(goalId: Long): TaskCertificationDetailUiState {
-    Log.d("Dasdsa", "$goalId vs ${this.goals.map { it.goalId }} ")
     val currentGoalPhotolog =
         goals.firstOrNull {
             it.goalId == goalId

@@ -86,7 +86,7 @@ fun TaskCertificationDetailRoute(
         ) { granted ->
 
             if (granted) {
-                navigateToCertification(uiState.currentGoalId, uiState.selectedDate)
+                navigateToCertification(uiState.goalId, uiState.selectedDate)
                 return@rememberLauncherForActivityResult
             }
             val activity = currentContext.findActivity() ?: return@rememberLauncherForActivityResult
@@ -118,7 +118,7 @@ fun TaskCertificationDetailRoute(
         onClickReaction = { viewModel.dispatch(TaskCertificationDetailIntent.Reaction(it)) },
         onClickUpload = {
             if (currentContext.hasCameraPermission()) {
-                navigateToCertification(uiState.currentGoalId, uiState.selectedDate)
+                navigateToCertification(uiState.goalId, uiState.selectedDate)
             } else {
                 permissionLauncher.launch(Manifest.permission.CAMERA)
             }
@@ -141,7 +141,7 @@ fun TaskCertificationDetailScreen(
     Scaffold(
         topBar = {
             TaskCertificationDetailTopBar(
-                goalTitle = uiState.currentGoal.goalName,
+                goalTitle = uiState.goalName,
                 onBack = onBack,
                 actionTitle = if (uiState.canModify) stringResource(DesR.string.word_modify) else null,
                 onClickModify = if (uiState.canModify) onClickModify else null,
@@ -166,7 +166,7 @@ fun TaskCertificationDetailScreen(
                     buttonTitle =
                         when (uiState.currentShow) {
                             BetweenUs.ME -> stringResource(R.string.task_certification_take_picture)
-                            BetweenUs.PARTNER -> stringResource(DesR.string.word_sting)
+                            BetweenUs.PARTNER -> stringResource(R.string.task_certification_detail_partner_sting)
                         },
                     rotation =
                         when (uiState.currentShow) {
@@ -186,11 +186,7 @@ fun TaskCertificationDetailScreen(
                 ) {
                     ForegroundCard(
                         isCertificated = uiState.isDisplayedGoalCertificated,
-                        nickName =
-                            when (uiState.currentShow) {
-                                BetweenUs.ME -> uiState.photoLogs.myNickname
-                                BetweenUs.PARTNER -> uiState.photoLogs.partnerNickname
-                            },
+                        nickName = uiState.displayedNickname,
                         imageUrl = uiState.displayedGoalImageUrl,
                         comment = uiState.displayedGoalComment,
                         currentShow = uiState.currentShow,
@@ -205,7 +201,7 @@ fun TaskCertificationDetailScreen(
 
             ReactionSection(
                 visible = uiState.canReaction,
-                reaction = uiState.currentGoal.partnerPhotolog?.reaction,
+                reaction = uiState.partnerPhotolog?.reaction,
                 onClickReaction = onClickReaction,
             )
         }

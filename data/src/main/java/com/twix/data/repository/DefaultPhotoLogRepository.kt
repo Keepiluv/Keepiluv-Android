@@ -6,9 +6,9 @@ import com.twix.domain.model.photo.PhotologParam
 import com.twix.domain.model.photolog.PhotoLogs
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.network.execute.safeApiCall
+import com.twix.network.model.request.ReactionRequest
 import com.twix.network.model.request.photolog.mapper.toRequest
 import com.twix.network.model.request.photolog.model.PhotologModifyRequest
-import com.twix.network.model.request.toRequest
 import com.twix.network.model.response.photo.mapper.toDomain
 import com.twix.network.model.response.photolog.mapper.toDomain
 import com.twix.network.service.PhotoLogService
@@ -59,7 +59,7 @@ class DefaultPhotoLogRepository(
     override suspend fun reactToPhotolog(
         photologId: Long,
         reaction: GoalReactionType,
-    ): AppResult<Unit> = safeApiCall { service.reactToPhotolog(photologId, reaction.toRequest()) }
+    ): AppResult<Unit> = safeApiCall { service.reactToPhotolog(photologId, ReactionRequest(reaction.toApi())) }
 
     override suspend fun modifyPhotolog(
         photologId: Long,

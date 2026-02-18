@@ -17,4 +17,8 @@
     <string name="task_certification_editor_modify_success">코멘트가 수정 되었어요.</string>
     <string name="task_certification_editor_not_modified">코멘트가 수정되지 않았어요.</string>
     <string name="task_certification_editor_modify_fail">코멘트 수정에 실패했어요.</string>
+    <string name="task_certification_detail_partner_sting">찌르기</string>
+    <string name="task_certification_detail_reaction_fail">리액션 요청에 실패했어요.</string>
+
+    <string name="task_certification_camera_permission_denied_permanently">인증샷 촬영을 위해서 카메라 권한이 필요해요.</string>
 </resources>

@@ -3,6 +3,7 @@ package com.twix.task_certification.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.components.toast.model.ToastType
+import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalReactionType
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
@@ -10,13 +11,14 @@ import com.twix.task_certification.R
 import com.twix.task_certification.detail.model.TaskCertificationDetailIntent
 import com.twix.task_certification.detail.model.TaskCertificationDetailSideEffect
 import com.twix.task_certification.detail.model.TaskCertificationDetailUiState
-import com.twix.task_certification.detail.model.toUiModel
+import com.twix.task_certification.detail.model.toUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.TaskCertificationRefreshBus
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -30,19 +32,21 @@ class TaskCertificationDetailViewModel(
 ) : BaseViewModel<TaskCertificationDetailUiState, TaskCertificationDetailIntent, TaskCertificationDetailSideEffect>(
         TaskCertificationDetailUiState(),
     ) {
-    private val goalId: Long =
+    private val argGoalId: Long =
         savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_GOAL_ID]
             ?: error(GOAL_ID_NOT_FOUND)
 
-    private val selectedDate: LocalDate =
+    private val argTargetDate: LocalDate =
         LocalDate.parse(
             savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_DATE]
                 ?: error(TARGET_DATE_NOT_FOUND),
         )
 
-    private val betweenUs: String =
+    private val argBetweenUs: String =
         savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_BETWEEN_US]
             ?: error(BETWEEN_US_NOT_FOUND)
+
+    private var lastReaction: GoalReactionType? = null
 
     private val reactionFlow =
         MutableSharedFlow<GoalReactionType>(
@@ -51,10 +55,19 @@ class TaskCertificationDetailViewModel(
         )
 
     init {
-        reduceInitialState()
-        collectReactionFlow()
         fetchPhotolog()
+        collectReactionFlow()
         collectEventBus()
+    }
+
+    private fun fetchPhotolog() {
+        launchResult(
+            block = { photologRepository.fetchPhotologs(argTargetDate) },
+            onSuccess = { reduce { it.toUiState(argGoalId, argBetweenUs, argTargetDate) } },
+            onError = {
+                showToast(R.string.task_certification_detail_fetch_photolog_fail, ToastType.ERROR)
+            },
+        )
     }
 
     @OptIn(FlowPreview::class)
@@ -63,29 +76,30 @@ class TaskCertificationDetailViewModel(
             reactionFlow
                 .distinctUntilChanged()
                 .debounce(DEBOUNCE_INTERVAL)
-                .collect { reaction ->
+                .collectLatest { reaction ->
                     reactToPhotolog(reaction)
                 }
         }
     }
 
     private fun reactToPhotolog(reaction: GoalReactionType) {
-        val photologId = currentState.currentGoal.partnerPhotolog?.photologId ?: return
+        val photologId = currentState.partnerPhotolog?.photologId ?: return
 
         launchResult(
             block = { photologRepository.reactToPhotolog(photologId, reaction) },
             onSuccess = {},
+            onError = {
+                rollbackReaction()
+                showToast(R.string.task_certification_detail_reaction_fail, ToastType.ERROR)
+            },
         )
     }
 
-    private fun reduceInitialState() =
-        reduce {
-            setupInitialState(
-                goalId,
-                this@TaskCertificationDetailViewModel.selectedDate,
-                betweenUs,
-            )
+    private fun rollbackReaction() {
+        lastReaction?.let { prev ->
+            reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(prev)) }
         }
+    }
 
     private fun collectEventBus() {
         viewModelScope.launch {
@@ -110,30 +124,32 @@ class TaskCertificationDetailViewModel(
         }
     }
 
-    private fun fetchPhotolog() {
-        launchResult(
-            block = { photologRepository.fetchPhotologs(selectedDate) },
-            onSuccess = {
-                reduce { copy(photoLogs = it.toUiModel()) }
-            },
-            onError = {
-                emitSideEffect(
-                    TaskCertificationDetailSideEffect.ShowToast(
-                        R.string.task_certification_detail_fetch_photolog_fail,
-                        ToastType.ERROR,
-                    ),
-                )
-            },
-        )
-    }
-
-    private fun reduceReaction(reaction: GoalReactionType) {
-        reduce { updatePartnerReaction(reaction) }
-        viewModelScope.launch { reactionFlow.emit(reaction) }
+    private suspend fun reduceReaction(reaction: GoalReactionType) {
+        lastReaction = currentState.partnerPhotolog?.reaction
+        reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(reaction)) }
+        reactionFlow.emit(reaction)
     }
 
     private fun reduceShownCard() {
         reduce { toggleBetweenUs() }
+    }
+
+    private fun toggleBetweenUs(): TaskCertificationDetailUiState =
+        currentState.copy(
+            currentShow =
+                when (currentState.currentShow) {
+                    BetweenUs.ME -> BetweenUs.PARTNER
+                    BetweenUs.PARTNER -> BetweenUs.ME
+                },
+        )
+
+    private fun showToast(
+        message: Int,
+        type: ToastType,
+    ) {
+        viewModelScope.launch {
+            emitSideEffect(TaskCertificationDetailSideEffect.ShowToast(message, type))
+        }
     }
 
     companion object {

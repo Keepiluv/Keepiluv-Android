@@ -8,6 +8,15 @@ enum class GoalReactionType {
     FUCK,
     ;
 
+    fun toApi(): String =
+        when (this) {
+            HAPPY -> "ICON_HAPPY"
+            TROUBLE -> "ICON_TROUBLE"
+            LOVE -> "ICON_LOVE"
+            DOUBT -> "ICON_DOUBT"
+            FUCK -> "ICON_FUCK"
+        }
+
     companion object {
         fun fromApi(reaction: String?): GoalReactionType? =
             when (reaction) {

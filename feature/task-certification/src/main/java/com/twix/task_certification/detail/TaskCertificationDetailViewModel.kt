@@ -104,7 +104,7 @@ class TaskCertificationDetailViewModel(
         }
     }
 
-    private fun reduceReaction(reaction: GoalReactionType) {
+    private suspend fun reduceReaction(reaction: GoalReactionType) {
         reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(reaction)) }
         viewModelScope.launch { reactionFlow.emit(reaction) }
     }

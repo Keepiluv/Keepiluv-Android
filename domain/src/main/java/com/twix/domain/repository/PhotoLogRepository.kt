@@ -1,5 +1,6 @@
 package com.twix.domain.repository
 
+import com.twix.domain.model.enums.GoalReactionType
 import com.twix.domain.model.photo.PhotoLogUploadInfo
 import com.twix.domain.model.photo.PhotologParam
 import com.twix.domain.model.photolog.PhotoLogs
@@ -17,4 +18,9 @@ interface PhotoLogRepository {
     ): AppResult<String>
 
     suspend fun fetchPhotoLogs(targetDate: String): AppResult<PhotoLogs>
+
+    suspend fun reactToPhotolog(
+        photologId: Long,
+        reaction: GoalReactionType,
+    ): AppResult<Unit>
 }

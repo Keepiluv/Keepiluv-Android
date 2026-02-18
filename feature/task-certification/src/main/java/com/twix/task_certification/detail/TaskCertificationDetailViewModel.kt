@@ -15,6 +15,12 @@ import com.twix.task_certification.detail.model.toUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.TaskCertificationRefreshBus
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class TaskCertificationDetailViewModel(
@@ -33,8 +39,17 @@ class TaskCertificationDetailViewModel(
         savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_DATE]
             ?: error(TARGET_DATE_NOT_FOUND)
 
+    private var lastReaction: GoalReactionType? = null
+
+    private val reactionFlow =
+        MutableSharedFlow<GoalReactionType>(
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+
     init {
         fetchPhotolog()
+        collectReactionFlow()
         collectEventBus()
     }
 
@@ -43,14 +58,40 @@ class TaskCertificationDetailViewModel(
             block = { photologRepository.fetchPhotoLogs(argTargetDate) },
             onSuccess = { reduce { it.toUiState(argGoalId) } },
             onError = {
-                emitSideEffect(
-                    TaskCertificationDetailSideEffect.ShowToast(
-                        R.string.task_certification_detail_fetch_photolog_fail,
-                        ToastType.ERROR,
-                    ),
-                )
+                showToast(R.string.task_certification_detail_fetch_photolog_fail, ToastType.ERROR)
             },
         )
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun collectReactionFlow() {
+        viewModelScope.launch {
+            reactionFlow
+                .distinctUntilChanged()
+                .debounce(DEBOUNCE_INTERVAL)
+                .collectLatest { reaction ->
+                    reactToPhotolog(reaction)
+                }
+        }
+    }
+
+    private fun reactToPhotolog(reaction: GoalReactionType) {
+        val photologId = currentState.partnerPhotolog?.photologId ?: return
+
+        launchResult(
+            block = { photologRepository.reactToPhotolog(photologId, reaction) },
+            onSuccess = {},
+            onError = {
+                rollbackReaction()
+                showToast(R.string.task_certification_detail_reaction_fail, ToastType.ERROR)
+            },
+        )
+    }
+
+    private fun rollbackReaction() {
+        lastReaction?.let { prev ->
+            reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(prev)) }
+        }
     }
 
     private fun collectEventBus() {
@@ -70,8 +111,10 @@ class TaskCertificationDetailViewModel(
         }
     }
 
-    private fun reduceReaction(reaction: GoalReactionType) {
+    private suspend fun reduceReaction(reaction: GoalReactionType) {
+        lastReaction = currentState.partnerPhotolog?.reaction
         reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(reaction)) }
+        reactionFlow.emit(reaction)
     }
 
     private fun reduceShownCard() {
@@ -87,8 +130,18 @@ class TaskCertificationDetailViewModel(
                 },
         )
 
+    private fun showToast(
+        message: Int,
+        type: ToastType,
+    ) {
+        viewModelScope.launch {
+            emitSideEffect(TaskCertificationDetailSideEffect.ShowToast(message, type))
+        }
+    }
+
     companion object {
         private const val GOAL_ID_NOT_FOUND = "Goal Id Argument Not Found"
         private const val TARGET_DATE_NOT_FOUND = "Target Date Argument Not Found"
+        private const val DEBOUNCE_INTERVAL = 600L
     }
 }

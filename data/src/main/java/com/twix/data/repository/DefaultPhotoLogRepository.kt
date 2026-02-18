@@ -1,10 +1,12 @@
 package com.twix.data.repository
 
+import com.twix.domain.model.enums.GoalReactionType
 import com.twix.domain.model.photo.PhotoLogUploadInfo
 import com.twix.domain.model.photo.PhotologParam
 import com.twix.domain.model.photolog.PhotoLogs
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.network.execute.safeApiCall
+import com.twix.network.model.request.ReactionRequest
 import com.twix.network.model.request.photolog.mapper.toRequest
 import com.twix.network.model.response.photo.mapper.toDomain
 import com.twix.network.model.response.photolog.mapper.toDomain
@@ -51,4 +53,9 @@ class DefaultPhotoLogRepository(
         safeApiCall {
             service.fetchPhotoLogs(targetDate).toDomain()
         }
+
+    override suspend fun reactToPhotolog(
+        photologId: Long,
+        reaction: GoalReactionType,
+    ): AppResult<Unit> = safeApiCall { service.reactToPhotolog(photologId, ReactionRequest(reaction.toApi())) }
 }

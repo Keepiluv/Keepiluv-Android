@@ -1,63 +1,92 @@
 package com.twix.task_certification.detail.model
 
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import com.twix.domain.model.enums.BetweenUs
-import com.twix.domain.model.enums.GoalReactionType
+import com.twix.domain.model.enums.GoalIconType
+import com.twix.domain.model.photolog.PhotoLogs
+import com.twix.domain.model.photolog.PhotologDetail
 import com.twix.ui.base.State
+import com.twix.util.RelativeTimeFormatter
 
 @Immutable
 data class TaskCertificationDetailUiState(
-    val currentGoalId: Long = -1L,
+    val goalId: Long = -1L,
     val currentShow: BetweenUs = BetweenUs.PARTNER,
-    val photoLogs: PhotoLogsUiModel = PhotoLogsUiModel(),
+    val myNickname: String = "",
+    val partnerNickname: String = "",
+    val goalName: String = "",
+    val icon: GoalIconType = GoalIconType.DEFAULT,
+    val myPhotolog: PhotologDetail? = null,
+    val partnerPhotolog: PhotologDetail? = null,
 ) : State {
-    val currentGoal: GoalPhotologUiModel
-        get() = photoLogs[currentGoalId]
-
     val isDisplayedGoalCertificated: Boolean
         get() =
             when (currentShow) {
-                BetweenUs.ME -> currentGoal.isCertificated
-                BetweenUs.PARTNER -> currentGoal.isPartnerCertificated
+                BetweenUs.ME -> myPhotolog != null
+                BetweenUs.PARTNER -> partnerPhotolog != null
             }
 
     val displayedGoalUpdateAt: String
         get() =
             when (currentShow) {
-                BetweenUs.ME -> currentGoal.myUpdatedDate
-                BetweenUs.PARTNER -> currentGoal.partnerUpdatedDate
+                BetweenUs.ME ->
+                    myPhotolog?.uploadedAt?.let {
+                        RelativeTimeFormatter.format(it)
+                    } ?: ""
+
+                BetweenUs.PARTNER ->
+                    partnerPhotolog?.uploadedAt?.let {
+                        RelativeTimeFormatter.format(
+                            it,
+                        )
+                    } ?: ""
             }
 
     val displayedGoalImageUrl: String?
         get() =
             when (currentShow) {
-                BetweenUs.ME -> currentGoal.myPhotolog?.imageUrl
-                BetweenUs.PARTNER -> currentGoal.partnerPhotolog?.imageUrl
+                BetweenUs.ME -> myPhotolog?.imageUrl
+                BetweenUs.PARTNER -> partnerPhotolog?.imageUrl
             }
 
     val displayedGoalComment: String?
         get() =
             when (currentShow) {
-                BetweenUs.ME -> currentGoal.myPhotolog?.comment
-                BetweenUs.PARTNER -> currentGoal.partnerPhotolog?.comment
+                BetweenUs.ME -> myPhotolog?.comment
+                BetweenUs.PARTNER -> partnerPhotolog?.comment
+            }
+
+    val displayedNickname: String
+        get() =
+            when (currentShow) {
+                BetweenUs.ME -> myNickname
+                BetweenUs.PARTNER -> partnerNickname
             }
 
     val canModify: Boolean
         get() =
-            currentShow == BetweenUs.ME && currentGoal.isCertificated
+            currentShow == BetweenUs.ME && isDisplayedGoalCertificated
 
     val canReaction: Boolean
         get() =
-            currentShow == BetweenUs.PARTNER && currentGoal.isPartnerCertificated
+            currentShow == BetweenUs.PARTNER && isDisplayedGoalCertificated
+}
 
-    fun toggleBetweenUs() =
-        copy(
-            currentShow =
-                when (currentShow) {
-                    BetweenUs.ME -> BetweenUs.PARTNER
-                    BetweenUs.PARTNER -> BetweenUs.ME
-                },
-        )
+fun PhotoLogs.toUiState(goalId: Long): TaskCertificationDetailUiState {
+    Log.d("Dasdsa", "$goalId vs ${this.goals.map { it.goalId }} ")
+    val currentGoalPhotolog =
+        goals.firstOrNull {
+            it.goalId == goalId
+        } ?: return TaskCertificationDetailUiState()
 
-    fun updatePartnerReaction(type: GoalReactionType) = copy(photoLogs = photoLogs.updatePartnerReaction(currentGoalId, type))
+    return TaskCertificationDetailUiState(
+        goalId = goalId,
+        myNickname = myNickname,
+        partnerNickname = partnerNickname,
+        goalName = currentGoalPhotolog.goalName,
+        icon = currentGoalPhotolog.icon,
+        myPhotolog = currentGoalPhotolog.myPhotolog,
+        partnerPhotolog = currentGoalPhotolog.partnerPhotolog,
+    )
 }

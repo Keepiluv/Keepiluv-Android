@@ -3,6 +3,7 @@ package com.twix.task_certification.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.components.toast.model.ToastType
+import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalReactionType
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
@@ -70,12 +71,21 @@ class TaskCertificationDetailViewModel(
     }
 
     private fun reduceReaction(reaction: GoalReactionType) {
-        reduce { updatePartnerReaction(reaction) }
+        reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(reaction)) }
     }
 
     private fun reduceShownCard() {
         reduce { toggleBetweenUs() }
     }
+
+    private fun toggleBetweenUs(): TaskCertificationDetailUiState =
+        currentState.copy(
+            currentShow =
+                when (currentState.currentShow) {
+                    BetweenUs.ME -> BetweenUs.PARTNER
+                    BetweenUs.PARTNER -> BetweenUs.ME
+                },
+        )
 
     companion object {
         private const val GOAL_ID_NOT_FOUND = "Goal Id Argument Not Found"

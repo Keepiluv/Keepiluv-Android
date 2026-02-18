@@ -39,6 +39,8 @@ class TaskCertificationDetailViewModel(
         savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_DATE]
             ?: error(TARGET_DATE_NOT_FOUND)
 
+    private var lastReaction: GoalReactionType? = null
+
     private val reactionFlow =
         MutableSharedFlow<GoalReactionType>(
             extraBufferCapacity = 1,
@@ -56,12 +58,7 @@ class TaskCertificationDetailViewModel(
             block = { photologRepository.fetchPhotoLogs(argTargetDate) },
             onSuccess = { reduce { it.toUiState(argGoalId) } },
             onError = {
-                emitSideEffect(
-                    TaskCertificationDetailSideEffect.ShowToast(
-                        R.string.task_certification_detail_fetch_photolog_fail,
-                        ToastType.ERROR,
-                    ),
-                )
+                showToast(R.string.task_certification_detail_fetch_photolog_fail, ToastType.ERROR)
             },
         )
     }
@@ -84,7 +81,17 @@ class TaskCertificationDetailViewModel(
         launchResult(
             block = { photologRepository.reactToPhotolog(photologId, reaction) },
             onSuccess = {},
+            onError = {
+                rollbackReaction()
+                showToast(R.string.task_certification_detail_reaction_fail, ToastType.ERROR)
+            },
         )
+    }
+
+    private fun rollbackReaction() {
+        lastReaction?.let { prev ->
+            reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(prev)) }
+        }
     }
 
     private fun collectEventBus() {
@@ -105,8 +112,9 @@ class TaskCertificationDetailViewModel(
     }
 
     private suspend fun reduceReaction(reaction: GoalReactionType) {
+        lastReaction = currentState.partnerPhotolog?.reaction
         reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(reaction)) }
-        viewModelScope.launch { reactionFlow.emit(reaction) }
+        reactionFlow.emit(reaction)
     }
 
     private fun reduceShownCard() {
@@ -121,6 +129,15 @@ class TaskCertificationDetailViewModel(
                     BetweenUs.PARTNER -> BetweenUs.ME
                 },
         )
+
+    private fun showToast(
+        message: Int,
+        type: ToastType,
+    ) {
+        viewModelScope.launch {
+            emitSideEffect(TaskCertificationDetailSideEffect.ShowToast(message, type))
+        }
+    }
 
     companion object {
         private const val GOAL_ID_NOT_FOUND = "Goal Id Argument Not Found"

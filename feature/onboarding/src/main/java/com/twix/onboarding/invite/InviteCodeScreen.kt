@@ -156,7 +156,7 @@ private fun InviteCodeScreen(
             contentAlignment = Alignment.CenterStart,
         ) {
             Image(
-                imageVector = ImageVector.vectorResource(com.twix.designsystem.R.drawable.ic_arrow1_m_left),
+                imageVector = ImageVector.vectorResource(com.twix.designsystem.R.drawable.ic_arrow_m_left),
                 contentDescription = null,
                 modifier =
                     Modifier

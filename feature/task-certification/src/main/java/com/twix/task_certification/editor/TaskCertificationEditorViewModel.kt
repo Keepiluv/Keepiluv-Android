@@ -2,13 +2,13 @@ package com.twix.task_certification.editor
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
 import com.twix.navigation.args.EditorNavArgs
 import com.twix.navigation.savedstate.decodeNavArgs
 import com.twix.result.AppResult
-import com.twix.task_certification.R
 import com.twix.task_certification.editor.model.TaskCertificationEditorIntent
 import com.twix.task_certification.editor.model.TaskCertificationEditorSideEffect
 import com.twix.task_certification.editor.model.TaskCertificationEditorUiState

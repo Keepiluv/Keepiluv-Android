@@ -19,9 +19,9 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.twix.designsystem.R
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
-import com.twix.task_certification.R
 import com.twix.task_certification.certification.model.CameraPreview
 import com.twix.task_certification.certification.model.CaptureStatus
 import com.twix.task_certification.certification.model.TorchStatus

@@ -2,12 +2,12 @@ package com.twix.task_certification.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalReactionType
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
-import com.twix.task_certification.R
 import com.twix.task_certification.detail.model.TaskCertificationDetailIntent
 import com.twix.task_certification.detail.model.TaskCertificationDetailSideEffect
 import com.twix.task_certification.detail.model.TaskCertificationDetailUiState

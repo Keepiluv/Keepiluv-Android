@@ -32,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.twix.designsystem.R
 import com.twix.designsystem.components.button.AppRoundButton
 import com.twix.designsystem.components.comment.CommentAnchorFrame
 import com.twix.designsystem.components.photolog.PhotologCard
@@ -42,7 +43,6 @@ import com.twix.designsystem.extension.showCameraPermissionToastWithNavigateToSe
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
-import com.twix.task_certification.R
 import com.twix.task_certification.editor.component.TaskCertificationEditorTopBar
 import com.twix.task_certification.editor.model.TaskCertificationEditorIntent
 import com.twix.task_certification.editor.model.TaskCertificationEditorSideEffect
@@ -54,7 +54,6 @@ import com.twix.ui.extension.noRippleClickable
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
-import com.twix.designsystem.R as DesR
 
 @Composable
 fun TaskCertificationEditorRoute(
@@ -102,7 +101,7 @@ fun TaskCertificationEditorRoute(
                     toastManager.show(
                         ToastData(
                             currentContext.getString(
-                                DesR.string.toast_camera_permission_request,
+                                R.string.toast_camera_permission_request,
                             ),
                             ToastType.ERROR,
                         ),

@@ -5,10 +5,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.twix.designsystem.R
 import com.twix.designsystem.components.photolog.BackgroundCard
 import com.twix.designsystem.components.photolog.ForegroundCard
 import com.twix.domain.model.enums.BetweenUs
-import com.twix.task_certification.R
 import com.twix.task_certification.detail.model.TaskCertificationDetailUiState
 import com.twix.task_certification.detail.swipe.SwipeableCard
 

@@ -3,13 +3,13 @@ package com.twix.task_certification.certification
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.photo.PhotologParam
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
 import com.twix.navigation.args.DetailNavArgs
 import com.twix.navigation.savedstate.decodeNavArgs
-import com.twix.task_certification.R
 import com.twix.task_certification.certification.model.CaptureStatus
 import com.twix.task_certification.certification.model.TaskCertificationIntent
 import com.twix.task_certification.certification.model.TaskCertificationSideEffect

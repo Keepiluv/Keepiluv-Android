@@ -27,7 +27,13 @@ object TaskCertificationGraph : NavGraphContributor {
                 arguments =
                     listOf(
                         navArgument(NavRoutes.TaskCertificationDetailRoute.ARG_GOAL_ID) {
-                            defaultValue = -1L
+                            type = NavType.LongType
+                        },
+                        navArgument(NavRoutes.TaskCertificationDetailRoute.ARG_DATE) {
+                            type = NavType.StringType
+                        },
+                        navArgument(NavRoutes.TaskCertificationDetailRoute.ARG_BETWEEN_US) {
+                            type = NavType.StringType
                         },
                         navArgument(NavRoutes.TaskCertificationDetailRoute.ARG_DATE) {
                             type = NavType.StringType
@@ -36,10 +42,15 @@ object TaskCertificationGraph : NavGraphContributor {
             ) {
                 TaskCertificationDetailRoute(
                     navigateToBack = navController::popBackStack,
-                    navigateToUpload = { goalId ->
-                        val destination = NavRoutes.TaskCertificationRoute.createRoute(goalId)
+                    navigateToUpload = {
+                        val destination =
+                            NavRoutes.TaskCertificationRoute.createRoute(
+                                goalId = it,
+                                from = NavRoutes.TaskCertificationRoute.From.DETAIL,
+                            )
                         navController.navigate(destination)
                     },
+                    navigateToEditor = { },
                 )
             }
 
@@ -48,7 +59,10 @@ object TaskCertificationGraph : NavGraphContributor {
                 arguments =
                     listOf(
                         navArgument(NavRoutes.TaskCertificationRoute.ARG_GOAL_ID) {
-                            defaultValue = -1L
+                            type = NavType.LongType
+                        },
+                        navArgument(NavRoutes.TaskCertificationRoute.ARG_FROM) {
+                            type = NavType.StringType
                         },
                     ),
             ) {

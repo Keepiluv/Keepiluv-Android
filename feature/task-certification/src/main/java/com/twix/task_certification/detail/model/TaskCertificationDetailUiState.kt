@@ -72,7 +72,10 @@ data class TaskCertificationDetailUiState(
             currentShow == BetweenUs.PARTNER && isDisplayedGoalCertificated
 }
 
-fun PhotoLogs.toUiState(goalId: Long): TaskCertificationDetailUiState {
+fun PhotoLogs.toUiState(
+    goalId: Long,
+    betweenUs: String,
+): TaskCertificationDetailUiState {
     val currentGoalPhotolog =
         goals.firstOrNull {
             it.goalId == goalId
@@ -80,6 +83,7 @@ fun PhotoLogs.toUiState(goalId: Long): TaskCertificationDetailUiState {
 
     return TaskCertificationDetailUiState(
         goalId = goalId,
+        currentShow = BetweenUs.valueOf(betweenUs),
         myNickname = myNickname,
         partnerNickname = partnerNickname,
         goalName = currentGoalPhotolog.goalName,

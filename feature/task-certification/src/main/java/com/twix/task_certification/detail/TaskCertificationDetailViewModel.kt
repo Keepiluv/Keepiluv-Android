@@ -39,6 +39,10 @@ class TaskCertificationDetailViewModel(
         savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_DATE]
             ?: error(TARGET_DATE_NOT_FOUND)
 
+    private val argBetweenUs: String =
+        savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_BETWEEN_US]
+            ?: error(BETWEEN_US_NOT_FOUND)
+
     private var lastReaction: GoalReactionType? = null
 
     private val reactionFlow =
@@ -56,7 +60,7 @@ class TaskCertificationDetailViewModel(
     private fun fetchPhotolog() {
         launchResult(
             block = { photologRepository.fetchPhotoLogs(argTargetDate) },
-            onSuccess = { reduce { it.toUiState(argGoalId) } },
+            onSuccess = { reduce { it.toUiState(argGoalId, argBetweenUs) } },
             onError = {
                 showToast(R.string.task_certification_detail_fetch_photolog_fail, ToastType.ERROR)
             },
@@ -94,6 +98,12 @@ class TaskCertificationDetailViewModel(
         }
     }
 
+    private suspend fun reduceReaction(reaction: GoalReactionType) {
+        lastReaction = currentState.partnerPhotolog?.reaction
+        reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(reaction)) }
+        reactionFlow.emit(reaction)
+    }
+
     private fun collectEventBus() {
         viewModelScope.launch {
             taskCertificationRefreshBus.events.collect {
@@ -109,12 +119,6 @@ class TaskCertificationDetailViewModel(
             TaskCertificationDetailIntent.Sting -> TODO("찌르기 API 연동")
             TaskCertificationDetailIntent.SwipeCard -> reduceShownCard()
         }
-    }
-
-    private suspend fun reduceReaction(reaction: GoalReactionType) {
-        lastReaction = currentState.partnerPhotolog?.reaction
-        reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(reaction)) }
-        reactionFlow.emit(reaction)
     }
 
     private fun reduceShownCard() {
@@ -142,6 +146,7 @@ class TaskCertificationDetailViewModel(
     companion object {
         private const val GOAL_ID_NOT_FOUND = "Goal Id Argument Not Found"
         private const val TARGET_DATE_NOT_FOUND = "Target Date Argument Not Found"
+        private const val BETWEEN_US_NOT_FOUND = "Between Us Argument Not Found"
         private const val DEBOUNCE_INTERVAL = 600L
     }
 }

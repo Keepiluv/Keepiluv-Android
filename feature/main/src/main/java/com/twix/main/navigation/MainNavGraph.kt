@@ -36,11 +36,22 @@ object MainNavGraph : NavGraphContributor {
                             launchSingleTop = true
                         }
                     },
-                    navigateToCertificationDetail = { goalId, date ->
+                    navigateToCertification = {
+                        val destination =
+                            NavRoutes.TaskCertificationRoute.createRoute(
+                                goalId = it,
+                                from = NavRoutes.TaskCertificationRoute.From.HOME,
+                            )
+                        navController.navigate(destination) {
+                            launchSingleTop = true
+                        }
+                    },
+                    navigateToCertificationDetail = { goalId, date, betweenUs ->
                         navController.navigate(
                             NavRoutes.TaskCertificationDetailRoute.createRoute(
                                 goalId,
                                 date,
+                                betweenUs.name,
                             ),
                         ) {
                             launchSingleTop = true

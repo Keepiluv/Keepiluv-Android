@@ -16,6 +16,7 @@ import com.twix.designsystem.components.bottomsheet.CommonBottomSheet
 import com.twix.designsystem.components.bottomsheet.model.CommonBottomSheetConfig
 import com.twix.designsystem.components.calendar.Calendar
 import com.twix.designsystem.theme.CommonColor
+import com.twix.domain.model.enums.BetweenUs
 import com.twix.home.HomeIntent
 import com.twix.home.HomeRoute
 import com.twix.home.HomeViewModel
@@ -30,7 +31,8 @@ fun MainRoute(
     navigateToGoalEditor: () -> Unit,
     navigateToGoalManage: (LocalDate) -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToCertificationDetail: (Long, LocalDate) -> Unit,
+    navigateToCertification: (Long) -> Unit,
+    navigateToCertificationDetail: (Long, LocalDate, BetweenUs) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val homeViewModel: HomeViewModel = koinViewModel()
@@ -42,6 +44,7 @@ fun MainRoute(
         navigateToGoalEditor = navigateToGoalEditor,
         navigateToGoalManage = navigateToGoalManage,
         navigateToCertificationDetail = navigateToCertificationDetail,
+        navigateToCertification = navigateToCertification,
         navigateToSettings = navigateToSettings,
     )
 }
@@ -54,7 +57,8 @@ private fun MainScreen(
     navigateToGoalEditor: () -> Unit,
     navigateToGoalManage: (LocalDate) -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToCertificationDetail: (Long, LocalDate) -> Unit,
+    navigateToCertification: (Long) -> Unit,
+    navigateToCertificationDetail: (Long, LocalDate, BetweenUs) -> Unit,
 ) {
     val calendarState by homeViewModel.calendarState.collectAsStateWithLifecycle()
     var showCalendarBottomSheet by remember { mutableStateOf(false) }
@@ -92,6 +96,7 @@ private fun MainScreen(
                             navigateToGoalManage = navigateToGoalManage,
                             navigateToCertificationDetail = navigateToCertificationDetail,
                             navigateToSettings = navigateToSettings,
+                            navigateToCertification = navigateToCertification,
                         )
 
                     MainTab.STATS -> Box(modifier = Modifier.fillMaxSize())

@@ -30,8 +30,8 @@ import com.twix.domain.login.LoginType
 import com.twix.domain.model.OnboardingStatus
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.login.component.LoginButton
-import com.twix.login.model.LoginIntent
-import com.twix.login.model.LoginSideEffect
+import com.twix.login.contract.LoginIntent
+import com.twix.login.contract.LoginSideEffect
 import com.twix.ui.base.ObserveAsEvents
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel

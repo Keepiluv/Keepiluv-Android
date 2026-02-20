@@ -19,11 +19,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.twix.designsystem.R
-import com.twix.designsystem.components.button.model.LoginTypeUiModel
 import com.twix.designsystem.components.text.AppText
-import com.twix.designsystem.theme.CommonColor
-import com.twix.designsystem.theme.GrayColor
+import com.twix.designsystem.extension.toUiModel
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.login.LoginType
 import com.twix.domain.model.enums.AppTextStyle
@@ -31,10 +28,12 @@ import com.twix.ui.extension.noRippleClickable
 
 @Composable
 fun LoginButton(
-    uiModel: LoginTypeUiModel,
+    type: LoginType,
     onClickLogin: (LoginType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val uiModel = type.toUiModel()
+
     Row(
         modifier =
             modifier
@@ -48,14 +47,14 @@ fun LoginButton(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
-            imageVector = uiModel.logo,
+            imageVector = ImageVector.vectorResource(uiModel.logo),
             contentDescription = null,
         )
 
         Spacer(Modifier.width(12.dp))
 
         AppText(
-            text = uiModel.title,
+            text = stringResource(uiModel.title),
             style = AppTextStyle.T3,
             color = uiModel.textColor,
         )
@@ -67,15 +66,7 @@ fun LoginButton(
 private fun LoginButtonPreview() {
     TwixTheme {
         LoginButton(
-            uiModel =
-                LoginTypeUiModel(
-                    type = LoginType.GOOGLE,
-                    logo = ImageVector.vectorResource(R.drawable.ic_google),
-                    title = stringResource(R.string.google_login_button_title),
-                    background = CommonColor.White,
-                    border = GrayColor.C200,
-                    textColor = GrayColor.C500,
-                ),
+            type = LoginType.GOOGLE,
             onClickLogin = {},
         )
     }

@@ -111,15 +111,15 @@ private fun LoginScreen(onClickLogin: (LoginType) -> Unit) {
                 contentDescription = null,
             )
 
-            // LoginType.entries.forEach { type ->
-            LoginButton(
-                type = LoginType.GOOGLE,
-                onClickLogin = onClickLogin,
-                modifier =
-                    Modifier
-                        .padding(horizontal = 20.dp),
-            )
-            // }
+            LoginType.entries.forEach { type ->
+                LoginButton(
+                    type = type,
+                    onClickLogin = onClickLogin,
+                    modifier =
+                        Modifier
+                            .padding(horizontal = 20.dp),
+                )
+            }
 
             Spacer(Modifier.height(27.dp))
         }

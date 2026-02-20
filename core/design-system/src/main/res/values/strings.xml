@@ -69,7 +69,6 @@
     <string name="settings_privacy_policy">개인정보 처리방침</string>
     <string name="settings_my_app_version">나의 버전</string>
 
-
     <!-- 토스트 메시지 -->
     <string name="toast_end_date_before_start_date">종료 날짜가 시작 날짜보다 이전입니다.</string>
     <string name="toast_goal_fetch_failed">목표 조회에 실패했습니다.</string>
@@ -93,4 +92,9 @@
     <string name="dialog_withdraw_account_title">정말 탈퇴하시겠어요?</string>
     <string name="dialog_withdraw_account_content">커플 연결이 끊어집니다.\n데이터는 전부 삭제되며 복구가 불가능합니다.</string>
 
+    <!-- 로그인 화면 -->
+    <string name="google_login_button_title">Google로 시작하기</string>
+    <string name="login_fail_message">로그인에 실패했습니다. 다시 시도해주세요</string>
+    <string name="fetch_onboarding_status_fail_message">온보딩 정보를 불러오는 데 실패했습니다. 다시 시도해주세요</string>
+    <string name="login_title_message">함께니까 멈추지 않아요.\n지금 바로 키피럽 시작하기!</string>
 </resources>

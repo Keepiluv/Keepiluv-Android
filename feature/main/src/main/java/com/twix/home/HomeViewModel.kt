@@ -101,11 +101,14 @@ class HomeViewModel(
             when (intent.goalCheckState) {
                 GoalCheckState.ONLY_ME,
                 GoalCheckState.BOTH,
-                ->
-                    HomeSideEffect.ShowToast(
-                        R.string.toast_already_certificated,
-                        ToastType.SUCCESS,
+                -> {
+                    emitSideEffect(
+                        HomeSideEffect.ShowToast(
+                            R.string.toast_already_certificated,
+                            ToastType.SUCCESS,
+                        ),
                     )
+                }
 
                 GoalCheckState.ONLY_PARTNER,
                 GoalCheckState.NONE,

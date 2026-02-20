@@ -43,7 +43,6 @@ import com.twix.designsystem.components.comment.CommentBox
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
-import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.designsystem.theme.DimmedColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
@@ -97,18 +96,8 @@ fun TaskCertificationRoute(
         camera.toggleTorch(uiState.torch)
     }
 
-    val imageCaptureFailMessage = stringResource(R.string.task_certification_image_capture_fail)
     ObserveAsEvents(viewModel.sideEffect) { event ->
         when (event) {
-            TaskCertificationSideEffect.ShowImageCaptureFailToast -> {
-                toastManager.tryShow(
-                    ToastData(
-                        message = imageCaptureFailMessage,
-                        type = ToastType.ERROR,
-                    ),
-                )
-            }
-
             is TaskCertificationSideEffect.ShowToast -> {
                 toastManager.tryShow(
                     ToastData(

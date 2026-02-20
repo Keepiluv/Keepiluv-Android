@@ -4,8 +4,6 @@ import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.ui.base.SideEffect
 
 sealed interface TaskCertificationSideEffect : SideEffect {
-    data object ShowImageCaptureFailToast : TaskCertificationSideEffect
-
     data class ShowToast(
         val message: Int,
         val type: ToastType,

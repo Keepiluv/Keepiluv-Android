@@ -1,6 +1,5 @@
 package com.twix.task_certification.certification.model
 
-import android.net.Uri
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.ui.base.SideEffect
 
@@ -10,10 +9,6 @@ sealed interface TaskCertificationSideEffect : SideEffect {
     data class ShowToast(
         val message: Int,
         val type: ToastType,
-    ) : TaskCertificationSideEffect
-
-    data class GetImageFromUri(
-        val uri: Uri,
     ) : TaskCertificationSideEffect
 
     data object NavigateToDetail : TaskCertificationSideEffect

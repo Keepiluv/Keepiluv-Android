@@ -13,6 +13,7 @@ import com.twix.task_certification.certification.model.TaskCertificationIntent
 import com.twix.task_certification.certification.model.TaskCertificationSideEffect
 import com.twix.task_certification.certification.model.TaskCertificationUiState
 import com.twix.ui.base.BaseViewModel
+import com.twix.ui.image.ImageGenerator
 import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.TaskCertificationRefreshBus
 import kotlinx.coroutines.delay
@@ -20,6 +21,7 @@ import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class TaskCertificationViewModel(
+    private val imageGenerator: ImageGenerator,
     private val photologRepository: PhotoLogRepository,
     private val taskCertificationRefreshBus: TaskCertificationRefreshBus,
     private val goalRefreshBus: GoalRefreshBus,
@@ -44,7 +46,7 @@ class TaskCertificationViewModel(
             is TaskCertificationIntent.RetakePicture -> setupRetake()
             is TaskCertificationIntent.UpdateComment -> reduceComment(intent.value)
             is TaskCertificationIntent.CommentFocusChanged -> reduceCommentFocus(intent.isFocused)
-            is TaskCertificationIntent.TryUpload -> checkUpload()
+            is TaskCertificationIntent.TryUpload -> handleUploadIntent()
             is TaskCertificationIntent.Upload -> upload(intent.image)
         }
     }
@@ -88,21 +90,30 @@ class TaskCertificationViewModel(
         reduce { updateCommentFocus(isFocused) }
     }
 
-    private fun checkUpload() {
-        viewModelScope.launch {
-            val capture = currentState.capture
-            if (capture !is CaptureStatus.Captured) return@launch
+    private fun handleUploadIntent() {
+        val capture = currentState.capture as? CaptureStatus.Captured ?: return
+        if (!currentState.commentUiModel.canUpload) {
+            showValidationError()
+            return
+        }
 
+        viewModelScope.launch {
+            val imageBytes = imageGenerator.uriToByteArray(capture.uri)
+            if (imageBytes != null) {
+                upload(imageBytes)
+            } else {
+                showToast(R.string.task_certification_image_translate_fail, ToastType.ERROR)
+            }
+        }
+    }
+
+    private fun showValidationError() {
+        viewModelScope.launch {
             if (!currentState.commentUiModel.canUpload) {
                 reduce { showCommentError() }
                 delay(ERROR_DISPLAY_DURATION_MS)
                 reduce { hideCommentError() }
-                return@launch
             }
-
-            emitSideEffect(
-                TaskCertificationSideEffect.GetImageFromUri(capture.uri),
-            )
         }
     }
 
@@ -155,6 +166,15 @@ class TaskCertificationViewModel(
                 )
             },
         )
+    }
+
+    private fun showToast(
+        message: Int,
+        type: ToastType,
+    ) {
+        viewModelScope.launch {
+            emitSideEffect(TaskCertificationSideEffect.ShowToast(message, type))
+        }
     }
 
     companion object {

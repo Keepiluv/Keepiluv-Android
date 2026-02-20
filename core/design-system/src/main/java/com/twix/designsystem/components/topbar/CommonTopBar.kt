@@ -13,20 +13,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.theme.GrayColor
+import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 
 @Composable
 fun CommonTopBar(
     title: String,
     left: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
     right: (@Composable () -> Unit)? = null,
 ) {
     Column(
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .padding(vertical = 10.dp),
     ) {
@@ -58,13 +61,24 @@ fun CommonTopBar(
             Box(
                 modifier =
                     Modifier
-                        .padding(18.dp)
-                        .size(24.dp),
+                        .size(60.dp),
             ) {
                 right?.invoke()
             }
         }
 
         HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CommonTopBarPreview() {
+    TwixTheme {
+        CommonTopBar(
+            title = "Title",
+            left = { Box(modifier = Modifier.size(60.dp)) },
+            right = { Box(modifier = Modifier.size(60.dp)) },
+        )
     }
 }

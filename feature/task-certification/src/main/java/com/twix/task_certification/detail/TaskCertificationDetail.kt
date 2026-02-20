@@ -140,13 +140,10 @@ fun TaskCertificationDetailScreen(
     Scaffold(
         topBar = {
             TaskCertificationDetailTopBar(
-                goalTitle = uiState.goalName,
+                title = uiState.goalName,
+                canModify = uiState.canModify,
                 onBack = onBack,
-                actionTitle = if (uiState.canModify) stringResource(DesR.string.word_modify) else null,
-                onClickModify = if (uiState.canModify) onClickModify else null,
-                modifier =
-                    Modifier
-                        .background(color = CommonColor.White),
+                onClickModify = onClickModify,
             )
         },
     ) { innerPadding ->

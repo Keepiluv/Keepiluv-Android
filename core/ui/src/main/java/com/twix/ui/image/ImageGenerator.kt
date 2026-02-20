@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.exifinterface.media.ExifInterface
+import com.twix.ui.image.exception.ImageProcessException
 import java.io.ByteArrayOutputStream
 
 class ImageGenerator(
@@ -30,7 +31,7 @@ class ImageGenerator(
     fun uriToByteArray(imageUri: Uri): ByteArray? =
         try {
             val orientation: Int = rotator.orientation(imageUri)
-            val bitmap: Bitmap = bitmap(contentResolver, imageUri)
+            val bitmap: Bitmap = uriToBitmap(imageUri)
             val rotatedBitmap =
                 when (orientation) {
                     ExifInterface.ORIENTATION_ROTATE_90 -> rotator.rotate(bitmap, 90f)
@@ -38,8 +39,12 @@ class ImageGenerator(
                     ExifInterface.ORIENTATION_ROTATE_270 -> rotator.rotate(bitmap, 270f)
                     else -> bitmap
                 }
+
+            /**
+             * 회전된 새로운 비트맵이 생성되었다면 원본은 즉시 해제
+             * */
             if (rotatedBitmap !== bitmap) bitmap.recycle()
-            byteArray(rotatedBitmap)
+            bitmapToByteArray(rotatedBitmap)
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -50,13 +55,10 @@ class ImageGenerator(
      *
      * 새로운 InputStream을 열어 [BitmapFactory.decodeStream] 으로 변환한다.
      */
-    private fun bitmap(
-        contentResolver: ContentResolver,
-        imageUri: Uri,
-    ): Bitmap =
+    private fun uriToBitmap(imageUri: Uri): Bitmap =
         contentResolver.openInputStream(imageUri)?.use { inputStream ->
             BitmapFactory.decodeStream(inputStream)
-        } ?: throw IllegalArgumentException(IMAGE_DECODE_ERROR_MESSAGE.format(imageUri))
+        } ?: throw ImageProcessException.DecodeFailedException(imageUri)
 
     /**
      * [Bitmap] 을 JPEG 형식(품질 90)으로 압축하여 [ByteArray] 로 변환한다.
@@ -67,14 +69,29 @@ class ImageGenerator(
      * @param bitmap 압축 대상 Bitmap
      * @return JPEG 바이트 배열
      */
-    private fun byteArray(bitmap: Bitmap): ByteArray =
-        ByteArrayOutputStream().use { outputStream ->
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+    private fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+        val outputStream = ByteArrayOutputStream()
+        try {
+            val success = bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
+
+            if (!success) {
+                // TODO("Firebase Crashlytics 로깅")
+                throw ImageProcessException.CompressionFailedException(
+                    IMAGE_COMPRESSION_ERROR_MESSAGE.format(
+                        bitmap.config,
+                        bitmap.width,
+                        bitmap.height,
+                    ),
+                )
+            }
+            return outputStream.toByteArray()
+        } finally {
             bitmap.recycle()
-            outputStream.toByteArray()
+            outputStream.close()
         }
+    }
 
     companion object {
-        private const val IMAGE_DECODE_ERROR_MESSAGE = "Failed to open or decode image: %s"
+        private const val IMAGE_COMPRESSION_ERROR_MESSAGE = "Config: %s, Size: %dx%d"
     }
 }

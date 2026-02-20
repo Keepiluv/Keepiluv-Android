@@ -14,14 +14,18 @@ import com.twix.task_certification.certification.model.TaskCertificationIntent
 import com.twix.task_certification.certification.model.TaskCertificationSideEffect
 import com.twix.task_certification.certification.model.TaskCertificationUiState
 import com.twix.ui.base.BaseViewModel
+import com.twix.ui.image.ImageGenerator
 import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.TaskCertificationRefreshBus
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import java.time.LocalDate
 
 class TaskCertificationViewModel(
+    private val imageGenerator: ImageGenerator,
     private val photologRepository: PhotoLogRepository,
     private val detailRefreshBus: TaskCertificationRefreshBus,
     private val goalRefreshBus: GoalRefreshBus,
@@ -54,15 +58,16 @@ class TaskCertificationViewModel(
             is TaskCertificationIntent.RetakePicture -> setupRetake()
             is TaskCertificationIntent.UpdateComment -> reduceComment(intent.value)
             is TaskCertificationIntent.CommentFocusChanged -> reduceCommentFocus(intent.isFocused)
-            is TaskCertificationIntent.TryUpload -> checkUpload()
+            is TaskCertificationIntent.TryUpload -> handleUploadIntent()
             is TaskCertificationIntent.Upload -> upload(intent.image)
         }
     }
 
     private fun takePicture(uri: Uri?) {
-        uri?.let { reducePicture(it) } ?: viewModelScope.launch {
-            showToast(R.string.task_certification_image_capture_fail, ToastType.ERROR)
-        }
+        uri?.let { reducePicture(it) } ?: showToast(
+            R.string.task_certification_image_capture_fail,
+            ToastType.ERROR,
+        )
     }
 
     private fun pickPicture(uri: Uri?) {
@@ -96,21 +101,33 @@ class TaskCertificationViewModel(
         reduce { updateCommentFocus(isFocused) }
     }
 
-    private fun checkUpload() {
-        viewModelScope.launch {
-            val capture = currentState.capture
-            if (capture !is CaptureStatus.Captured) return@launch
+    private fun handleUploadIntent() {
+        val capture = currentState.capture as? CaptureStatus.Captured ?: return
+        if (!currentState.comment.canUpload) {
+            showValidationError()
+            return
+        }
 
+        viewModelScope.launch {
+            val imageBytes =
+                withContext(Dispatchers.IO) {
+                    imageGenerator.uriToByteArray(capture.uri)
+                }
+            if (imageBytes != null) {
+                upload(imageBytes)
+            } else {
+                showToast(R.string.task_certification_image_translate_fail, ToastType.ERROR)
+            }
+        }
+    }
+
+    private fun showValidationError() {
+        viewModelScope.launch {
             if (!currentState.comment.canUpload) {
                 reduce { showCommentError() }
                 delay(ERROR_DISPLAY_DURATION_MS)
                 reduce { hideCommentError() }
-                return@launch
             }
-
-            emitSideEffect(
-                TaskCertificationSideEffect.GetImageFromUri(capture.uri),
-            )
         }
     }
 
@@ -182,6 +199,7 @@ class TaskCertificationViewModel(
                 tryEmitSideEffect(TaskCertificationSideEffect.NavigateToDetail)
             },
             onError = {
+                showToast(R.string.task_certification_upload_fail, ToastType.ERROR)
                 showToast(R.string.task_certification_modify_fail, ToastType.ERROR)
             },
         )

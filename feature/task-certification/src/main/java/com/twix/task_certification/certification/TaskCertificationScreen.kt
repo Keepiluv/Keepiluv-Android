@@ -32,7 +32,6 @@ import com.twix.designsystem.components.comment.CommentAnchorFrame
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
-import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
@@ -48,16 +47,12 @@ import com.twix.task_certification.certification.model.TaskCertificationSideEffe
 import com.twix.task_certification.certification.model.TaskCertificationUiState
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.noRippleClickable
-import com.twix.ui.image.ImageGenerator
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 
 @Composable
 fun TaskCertificationRoute(
-    imageGenerator: ImageGenerator = koinInject(),
     toastManager: ToastManager = koinInject(),
     camera: Camera = koinInject(),
     viewModel: TaskCertificationViewModel = koinViewModel(),
@@ -76,11 +71,11 @@ fun TaskCertificationRoute(
             viewModel.dispatch(TaskCertificationIntent.PickPicture(uri))
         }
 
-    DisposableEffect(lifecycleOwner, uiState.lens) {
-        coroutineScope.launch {
-            camera.bind(lifecycleOwner, uiState.lens)
-        }
+    LaunchedEffect(uiState.lens) {
+        camera.bind(lifecycleOwner, uiState.lens)
+    }
 
+    DisposableEffect(Unit) {
         onDispose {
             camera.unbind()
         }
@@ -90,7 +85,6 @@ fun TaskCertificationRoute(
         camera.toggleTorch(uiState.torch)
     }
 
-    val imageCaptureFailMessage = stringResource(R.string.task_certification_image_capture_fail)
     ObserveAsEvents(viewModel.sideEffect) { event ->
         when (event) {
             is TaskCertificationSideEffect.ShowToast -> {
@@ -101,25 +95,6 @@ fun TaskCertificationRoute(
                     ),
                 )
             }
-
-            is TaskCertificationSideEffect.GetImageFromUri -> {
-                val bytes =
-                    withContext(Dispatchers.IO) {
-                        imageGenerator.uriToByteArray(event.uri)
-                    }
-
-                if (bytes != null) {
-                    viewModel.dispatch(TaskCertificationIntent.Upload(bytes))
-                } else {
-                    toastManager.tryShow(
-                        ToastData(
-                            message = currentContext.getString(R.string.task_certification_image_translate_fail),
-                            type = ToastType.ERROR,
-                        ),
-                    )
-                }
-            }
-
             TaskCertificationSideEffect.NavigateToBack -> navigateToBack()
             TaskCertificationSideEffect.NavigateToDetail -> navigateToDetail()
         }

@@ -1,4 +1,4 @@
-package com.twix.task_certification.detail.component
+package com.twix.task_certification.editor.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,11 +24,10 @@ import com.twix.ui.extension.noRippleClickable
 import com.twix.designsystem.R as DesR
 
 @Composable
-internal fun TaskCertificationDetailTopBar(
+internal fun TaskCertificationEditorTopBar(
     title: String,
-    canModify: Boolean,
     onBack: () -> Unit,
-    onClickModify: () -> Unit,
+    onClickSave: () -> Unit,
 ) {
     CommonTopBar(
         title = title,
@@ -44,21 +43,19 @@ internal fun TaskCertificationDetailTopBar(
             )
         },
         right = {
-            if (canModify) {
-                Box(
-                    modifier =
-                        Modifier
-                            .fillMaxSize()
-                            .background(GrayColor.C100)
-                            .noRippleClickable { onClickModify() },
-                    contentAlignment = Alignment.Center,
-                ) {
-                    AppText(
-                        text = stringResource(DesR.string.word_modify),
-                        style = AppTextStyle.T2,
-                        color = GrayColor.C500,
-                    )
-                }
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(GrayColor.C100)
+                        .noRippleClickable { onClickSave() },
+                contentAlignment = Alignment.Center,
+            ) {
+                AppText(
+                    text = stringResource(DesR.string.word_save),
+                    style = AppTextStyle.T2,
+                    color = GrayColor.C500,
+                )
             }
         },
         modifier = Modifier.background(color = CommonColor.White),
@@ -67,21 +64,19 @@ internal fun TaskCertificationDetailTopBar(
 
 @Preview
 @Composable
-fun TaskCertificationDetailTopBarPreview() {
+fun TaskCertificationEditorTopBarPreview() {
     TwixTheme {
         Column {
-            TaskCertificationDetailTopBar(
+            TaskCertificationEditorTopBar(
                 title = "목표 인증",
-                canModify = true,
                 onBack = {},
-                onClickModify = {},
+                onClickSave = {},
             )
 
-            TaskCertificationDetailTopBar(
+            TaskCertificationEditorTopBar(
                 title = "목표 인증",
-                canModify = false,
                 onBack = {},
-                onClickModify = {},
+                onClickSave = {},
             )
         }
     }

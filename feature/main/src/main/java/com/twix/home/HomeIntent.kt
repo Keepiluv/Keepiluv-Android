@@ -1,5 +1,6 @@
 package com.twix.home
 
+import com.twix.domain.model.enums.GoalCheckState
 import com.twix.ui.base.Intent
 import java.time.LocalDate
 
@@ -16,5 +17,10 @@ sealed interface HomeIntent : Intent {
 
     data class UpdateVisibleDate(
         val date: LocalDate,
+    ) : HomeIntent
+
+    data class Verification(
+        val goalId: Long,
+        val goalCheckState: GoalCheckState,
     ) : HomeIntent
 }

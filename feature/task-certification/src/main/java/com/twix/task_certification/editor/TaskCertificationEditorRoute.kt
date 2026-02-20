@@ -43,7 +43,7 @@ import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.task_certification.R
-import com.twix.task_certification.detail.component.TaskCertificationDetailTopBar
+import com.twix.task_certification.editor.component.TaskCertificationEditorTopBar
 import com.twix.task_certification.editor.model.TaskCertificationEditorIntent
 import com.twix.task_certification.editor.model.TaskCertificationEditorSideEffect
 import com.twix.task_certification.editor.model.TaskCertificationEditorUiState
@@ -147,11 +147,10 @@ fun TaskCertificationEditorScreen(
                 .noRippleClickable { focusManager.clearFocus() },
     ) {
         Column {
-            TaskCertificationDetailTopBar(
-                actionTitle = stringResource(DesR.string.word_save),
-                goalTitle = uiState.goalName,
+            TaskCertificationEditorTopBar(
+                title = uiState.goalName,
                 onBack = onBack,
-                onClickModify = onClickSave,
+                onClickSave = onClickSave,
             )
 
             Spacer(Modifier.height(103.dp))

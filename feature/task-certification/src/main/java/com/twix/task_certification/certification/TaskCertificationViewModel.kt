@@ -8,6 +8,7 @@ import com.twix.domain.model.photo.PhotologParam
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
 import com.twix.navigation.args.DetailNavArgs
+import com.twix.navigation.savedstate.decodeNavArgs
 import com.twix.task_certification.R
 import com.twix.task_certification.certification.model.CaptureStatus
 import com.twix.task_certification.certification.model.TaskCertificationIntent
@@ -21,7 +22,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import java.time.LocalDate
 
 class TaskCertificationViewModel(
@@ -33,19 +33,12 @@ class TaskCertificationViewModel(
 ) : BaseViewModel<TaskCertificationUiState, TaskCertificationIntent, TaskCertificationSideEffect>(
         TaskCertificationUiState(),
     ) {
-    private val serializer: DetailNavArgs =
-        requireNotNull(
-            savedStateHandle
-                .get<String>(NavRoutes.TaskCertificationRoute.ARG_DATA)
-                ?.let { encoded ->
-                    val json = Uri.decode(encoded)
-                    Json.decodeFromString<DetailNavArgs>(json)
-                },
-        ) { SERIALIZER_NOT_FOUND }
+    private val navArgs: DetailNavArgs =
+        savedStateHandle.decodeNavArgs<DetailNavArgs>(NavRoutes.TaskCertificationRoute.ARG_DATA)
 
     init {
-        if (serializer.from == NavRoutes.TaskCertificationRoute.From.EDITOR) {
-            reduceComment(serializer.comment)
+        if (navArgs.from == NavRoutes.TaskCertificationRoute.From.EDITOR) {
+            reduceComment(navArgs.comment)
         }
     }
 
@@ -135,13 +128,13 @@ class TaskCertificationViewModel(
         launchResult(
             block = {
                 photologRepository.uploadPhotologImage(
-                    goalId = serializer.goalId,
+                    goalId = navArgs.goalId,
                     bytes = image,
                     contentType = "image/jpeg",
                 )
             },
             onSuccess = { fileName ->
-                when (serializer.from) {
+                when (navArgs.from) {
                     NavRoutes.TaskCertificationRoute.From.DETAIL,
                     NavRoutes.TaskCertificationRoute.From.HOME,
                     -> uploadPhotolog(fileName)
@@ -160,10 +153,10 @@ class TaskCertificationViewModel(
             block = {
                 photologRepository.uploadPhotolog(
                     PhotologParam(
-                        goalId = serializer.goalId,
+                        goalId = navArgs.goalId,
                         fileName = fileName,
                         comment = currentState.comment.value,
-                        verificationDate = LocalDate.parse(serializer.selectedDate),
+                        verificationDate = LocalDate.parse(navArgs.selectedDate),
                     ),
                 )
             },
@@ -175,7 +168,7 @@ class TaskCertificationViewModel(
     }
 
     private fun handleUploadPhotologSuccess() {
-        when (serializer.from) {
+        when (navArgs.from) {
             NavRoutes.TaskCertificationRoute.From.HOME ->
                 goalRefreshBus.notifyGoalListChanged()
             NavRoutes.TaskCertificationRoute.From.DETAIL ->
@@ -189,7 +182,7 @@ class TaskCertificationViewModel(
         launchResult(
             block = {
                 photologRepository.modifyPhotolog(
-                    photologId = serializer.photologId,
+                    photologId = navArgs.photologId,
                     fileName = fileName,
                     comment = currentState.comment.value,
                 )
@@ -216,6 +209,5 @@ class TaskCertificationViewModel(
 
     companion object {
         private const val ERROR_DISPLAY_DURATION_MS = 1500L
-        private const val SERIALIZER_NOT_FOUND = "Serializer Not Found"
     }
 }

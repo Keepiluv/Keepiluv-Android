@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.twix.android.compose)
     alias(libs.plugins.twix.koin)
     alias(libs.plugins.serialization)
+    alias(libs.plugins.twix.kermit)
 }
 
 android {

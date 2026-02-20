@@ -1,12 +1,12 @@
 package com.twix.task_certification.editor
 
-import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
 import com.twix.navigation.args.EditorNavArgs
+import com.twix.navigation.savedstate.decodeNavArgs
 import com.twix.result.AppResult
 import com.twix.task_certification.R
 import com.twix.task_certification.editor.model.TaskCertificationEditorIntent
@@ -16,7 +16,6 @@ import com.twix.task_certification.editor.model.toUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.TaskCertificationRefreshBus
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 
 class TaskCertificationEditorViewModel(
     private val photologRepository: PhotoLogRepository,
@@ -25,18 +24,11 @@ class TaskCertificationEditorViewModel(
 ) : BaseViewModel<TaskCertificationEditorUiState, TaskCertificationEditorIntent, TaskCertificationEditorSideEffect>(
         TaskCertificationEditorUiState(),
     ) {
-    private val args: EditorNavArgs =
-        requireNotNull(
-            savedStateHandle
-                .get<String>(NavRoutes.TaskCertificationEditorRoute.ARG_DATA)
-                ?.let { encoded ->
-                    val json = Uri.decode(encoded)
-                    Json.decodeFromString<EditorNavArgs>(json)
-                },
-        ) { SERIALIZER_NOT_FOUND }
+    private val navArgs: EditorNavArgs =
+        savedStateHandle.decodeNavArgs(NavRoutes.TaskCertificationEditorRoute.ARG_DATA)
 
     init {
-        args.toUiState()
+        navArgs.toUiState()
     }
 
     override suspend fun handleIntent(intent: TaskCertificationEditorIntent) {

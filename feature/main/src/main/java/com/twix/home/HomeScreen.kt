@@ -22,7 +22,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
@@ -56,6 +55,7 @@ import com.twix.domain.model.goal.checkState
 import com.twix.home.component.GoalVerifications
 import com.twix.home.component.HomeTopBar
 import com.twix.home.model.HomeUiState
+import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.findActivity
 import com.twix.ui.extension.noRippleClickable
 import kotlinx.coroutines.launch
@@ -78,14 +78,13 @@ fun HomeRoute(
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
     val coroutineScope = rememberCoroutineScope()
-    var pendingGoalId by remember { mutableStateOf<Long?>(null) }
 
     val permissionLauncher =
         rememberLauncherForActivityResult(
             ActivityResultContracts.RequestPermission(),
         ) { granted ->
             if (granted) {
-                pendingGoalId?.let { navigateToCertification(it) }
+                navigateToCertification(uiState.selectedGoalId)
                 return@rememberLauncherForActivityResult
             }
 
@@ -112,6 +111,24 @@ fun HomeRoute(
             }
         }
 
+    ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
+        when (sideEffect) {
+            HomeSideEffect.ShowPermissionLauncher -> {
+                permissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+
+            is HomeSideEffect.ShowToast ->
+                toastManager.tryShow(
+                    ToastData(
+                        currentContext.getString(sideEffect.resId),
+                        sideEffect.type,
+                    ),
+                )
+
+            HomeSideEffect.ShowMonthPickerBottomSheet -> Unit
+        }
+    }
+
     HomeScreen(
         uiState = uiState,
         onSelectDate = { viewModel.dispatch(HomeIntent.SelectDate(it)) },
@@ -123,24 +140,7 @@ fun HomeRoute(
         onAddNewGoal = navigateToGoalEditor,
         onEditClick = { navigateToGoalManage(uiState.selectedDate) },
         onVerificationClick = { goalId, goalCheckState ->
-            when (goalCheckState) {
-                GoalCheckState.ONLY_ME,
-                GoalCheckState.BOTH,
-                ->
-                    toastManager.tryShow(
-                        ToastData(
-                            currentContext.getString(R.string.toast_already_certificated),
-                            ToastType.SUCCESS,
-                        ),
-                    )
-
-                GoalCheckState.ONLY_PARTNER,
-                GoalCheckState.NONE,
-                -> {
-                    pendingGoalId = goalId
-                    permissionLauncher.launch(Manifest.permission.CAMERA)
-                }
-            }
+            viewModel.dispatch(HomeIntent.Verification(goalId, goalCheckState))
         },
         onClickCard = navigateToCertificationDetail,
         onSettingClick = navigateToSettings,

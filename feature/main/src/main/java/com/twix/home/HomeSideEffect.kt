@@ -11,4 +11,6 @@ sealed interface HomeSideEffect : SideEffect {
         @param:StringRes val resId: Int,
         val type: ToastType,
     ) : HomeSideEffect
+
+    data object ShowPermissionLauncher : HomeSideEffect
 }

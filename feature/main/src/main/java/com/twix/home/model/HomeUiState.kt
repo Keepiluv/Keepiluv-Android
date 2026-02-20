@@ -13,6 +13,7 @@ data class HomeUiState(
     val selectedDate: LocalDate = LocalDate.now(),
     val referenceDate: LocalDate = LocalDate.now(), // 7일 달력을 생성하기 위한 레퍼런스 날짜
     val goalList: GoalList = GoalList(),
+    val selectedGoalId: Long = -1,
 ) : State {
     val monthYear: String
         get() = "${visibleDate.month.value}월 ${visibleDate.year}"

@@ -1,4 +1,4 @@
-package com.twix.task_certification.detail.component
+package com.twix.task_certification.detail.component.reaction
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,9 +13,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.GoalReactionType
-import com.twix.task_certification.detail.reaction.ReactionBar
-import com.twix.task_certification.detail.reaction.ReactionEffect
-import com.twix.task_certification.detail.reaction.ReactionUiModel
 
 @Composable
 internal fun ReactionContent(

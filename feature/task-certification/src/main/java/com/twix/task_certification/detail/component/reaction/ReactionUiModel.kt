@@ -1,4 +1,4 @@
-package com.twix.task_certification.detail.reaction
+package com.twix.task_certification.detail.component.reaction
 
 import com.twix.designsystem.R
 import com.twix.domain.model.enums.GoalReactionType

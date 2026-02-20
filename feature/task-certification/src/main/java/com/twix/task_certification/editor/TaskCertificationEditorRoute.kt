@@ -43,6 +43,7 @@ import com.twix.designsystem.extension.showCameraPermissionToastWithNavigateToSe
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
+import com.twix.task_certification.editor.component.RetakeButton
 import com.twix.task_certification.editor.component.TaskCertificationEditorTopBar
 import com.twix.task_certification.editor.contract.TaskCertificationEditorIntent
 import com.twix.task_certification.editor.contract.TaskCertificationEditorSideEffect
@@ -178,17 +179,7 @@ fun TaskCertificationEditorScreen(
 
             Spacer(Modifier.height(101.dp))
 
-            AppRoundButton(
-                text = stringResource(R.string.task_certification_editor_retake),
-                textColor = GrayColor.C500,
-                backgroundColor = CommonColor.White,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .height(68.dp)
-                        .padding(horizontal = 30.dp)
-                        .noRippleClickable { onClickRetake() },
-            )
+            RetakeButton(onClickRetake = onClickRetake)
         }
 
         CommentAnchorFrame(

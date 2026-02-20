@@ -1,4 +1,4 @@
-package com.twix.task_certification.detail.reaction
+package com.twix.task_certification.detail.component.reaction
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D

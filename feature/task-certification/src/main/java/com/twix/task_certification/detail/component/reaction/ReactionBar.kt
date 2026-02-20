@@ -1,4 +1,4 @@
-package com.twix.task_certification.detail.reaction
+package com.twix.task_certification.detail.component.reaction
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

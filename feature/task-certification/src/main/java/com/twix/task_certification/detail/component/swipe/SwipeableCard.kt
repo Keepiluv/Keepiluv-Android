@@ -1,4 +1,4 @@
-package com.twix.task_certification.detail.swipe
+package com.twix.task_certification.detail.component.swipe
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring

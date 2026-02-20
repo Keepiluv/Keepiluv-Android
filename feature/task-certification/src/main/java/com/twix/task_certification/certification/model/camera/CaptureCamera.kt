@@ -1,4 +1,4 @@
-package com.twix.task_certification.certification.camera
+package com.twix.task_certification.certification.model.camera
 
 import android.content.ContentValues
 import android.content.Context
@@ -15,7 +15,6 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.lifecycle.awaitInstance
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import com.twix.task_certification.certification.model.CameraPreview
 import com.twix.task_certification.certification.model.TorchStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

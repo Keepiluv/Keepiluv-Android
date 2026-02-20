@@ -28,7 +28,7 @@ import com.twix.designsystem.extension.showCameraPermissionToastWithNavigateToSe
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.GoalReactionType
-import com.twix.task_certification.detail.component.ReactionContent
+import com.twix.task_certification.detail.component.reaction.ReactionContent
 import com.twix.task_certification.detail.component.TaskCertificationCardContent
 import com.twix.task_certification.detail.component.TaskCertificationDetailTopBar
 import com.twix.task_certification.detail.contract.TaskCertificationDetailIntent

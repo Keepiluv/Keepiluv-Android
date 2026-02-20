@@ -1,4 +1,4 @@
-package com.twix.task_certification.detail.reaction
+package com.twix.task_certification.detail.component.reaction
 
 /**
  * ReactionEffect 애니메이션 설정 값 묶음.

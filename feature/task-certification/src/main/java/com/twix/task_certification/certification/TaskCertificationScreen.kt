@@ -36,7 +36,6 @@ import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
-import com.twix.task_certification.certification.model.camera.Camera
 import com.twix.task_certification.certification.component.CameraControlBar
 import com.twix.task_certification.certification.component.CameraPreviewBox
 import com.twix.task_certification.certification.component.CommentErrorText
@@ -44,6 +43,7 @@ import com.twix.task_certification.certification.component.TaskCertificationTopB
 import com.twix.task_certification.certification.contract.TaskCertificationIntent
 import com.twix.task_certification.certification.contract.TaskCertificationSideEffect
 import com.twix.task_certification.certification.contract.TaskCertificationUiState
+import com.twix.task_certification.certification.model.camera.Camera
 import com.twix.task_certification.certification.model.camera.CameraPreview
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.noRippleClickable

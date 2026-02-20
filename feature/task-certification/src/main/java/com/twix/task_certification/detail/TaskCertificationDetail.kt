@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.components.toast.model.ToastType
@@ -28,9 +29,9 @@ import com.twix.designsystem.extension.showCameraPermissionToastWithNavigateToSe
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.GoalReactionType
-import com.twix.task_certification.detail.component.reaction.ReactionContent
 import com.twix.task_certification.detail.component.TaskCertificationCardContent
 import com.twix.task_certification.detail.component.TaskCertificationDetailTopBar
+import com.twix.task_certification.detail.component.reaction.ReactionContent
 import com.twix.task_certification.detail.contract.TaskCertificationDetailIntent
 import com.twix.task_certification.detail.contract.TaskCertificationDetailSideEffect
 import com.twix.task_certification.detail.contract.TaskCertificationDetailUiState
@@ -42,7 +43,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import java.time.LocalDate
-import com.twix.designsystem.R as DesR
 
 @Composable
 fun TaskCertificationDetailRoute(
@@ -89,7 +89,7 @@ fun TaskCertificationDetailRoute(
                     toastManager.show(
                         ToastData(
                             currentContext.getString(
-                                DesR.string.toast_camera_permission_request,
+                                R.string.toast_camera_permission_request,
                             ),
                             ToastType.ERROR,
                         ),

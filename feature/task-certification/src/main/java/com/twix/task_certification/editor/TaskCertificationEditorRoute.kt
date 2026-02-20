@@ -8,9 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -24,7 +22,6 @@ import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -33,7 +30,6 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.twix.designsystem.R
-import com.twix.designsystem.components.button.AppRoundButton
 import com.twix.designsystem.components.comment.CommentAnchorFrame
 import com.twix.designsystem.components.photolog.PhotologCard
 import com.twix.designsystem.components.toast.ToastManager
@@ -41,7 +37,6 @@ import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.designsystem.extension.showCameraPermissionToastWithNavigateToSettingAction
 import com.twix.designsystem.theme.CommonColor
-import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.task_certification.editor.component.RetakeButton
 import com.twix.task_certification.editor.component.TaskCertificationEditorTopBar

@@ -4,9 +4,9 @@ import android.net.Uri
 import androidx.camera.core.CameraSelector
 import androidx.compose.runtime.Immutable
 import com.twix.designsystem.components.comment.model.CommentUiModel
-import com.twix.task_certification.certification.model.camera.CameraPreview
 import com.twix.task_certification.certification.model.CaptureStatus
 import com.twix.task_certification.certification.model.TorchStatus
+import com.twix.task_certification.certification.model.camera.CameraPreview
 import com.twix.ui.base.State
 
 @Immutable

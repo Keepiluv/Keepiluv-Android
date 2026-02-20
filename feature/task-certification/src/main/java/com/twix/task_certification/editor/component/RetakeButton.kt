@@ -18,7 +18,7 @@ import com.twix.ui.extension.noRippleClickable
 @Composable
 internal fun RetakeButton(
     onClickRetake: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AppRoundButton(
         text = stringResource(R.string.task_certification_editor_retake),

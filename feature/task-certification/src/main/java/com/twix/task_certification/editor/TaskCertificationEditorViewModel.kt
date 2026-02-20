@@ -83,8 +83,4 @@ class TaskCertificationEditorViewModel(
             currentState.imageName,
             currentState.comment.value,
         )
-
-    companion object {
-        private const val SERIALIZER_NOT_FOUND = "Serializer Not Found"
-    }
 }

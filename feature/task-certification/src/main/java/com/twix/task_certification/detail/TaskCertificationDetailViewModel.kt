@@ -8,10 +8,10 @@ import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalReactionType
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
-import com.twix.task_certification.detail.model.TaskCertificationDetailIntent
-import com.twix.task_certification.detail.model.TaskCertificationDetailSideEffect
-import com.twix.task_certification.detail.model.TaskCertificationDetailUiState
-import com.twix.task_certification.detail.model.toUiState
+import com.twix.task_certification.detail.contract.TaskCertificationDetailIntent
+import com.twix.task_certification.detail.contract.TaskCertificationDetailSideEffect
+import com.twix.task_certification.detail.contract.TaskCertificationDetailUiState
+import com.twix.task_certification.detail.contract.toUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.TaskCertificationRefreshBus

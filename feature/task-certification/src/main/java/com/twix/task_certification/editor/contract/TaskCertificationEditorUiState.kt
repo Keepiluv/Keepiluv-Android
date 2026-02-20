@@ -1,4 +1,4 @@
-package com.twix.task_certification.editor.model
+package com.twix.task_certification.editor.contract
 
 import androidx.compose.runtime.Immutable
 import com.twix.designsystem.components.comment.model.CommentUiModel

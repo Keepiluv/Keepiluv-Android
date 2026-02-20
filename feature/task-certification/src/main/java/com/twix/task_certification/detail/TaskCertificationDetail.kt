@@ -31,9 +31,9 @@ import com.twix.domain.model.enums.GoalReactionType
 import com.twix.task_certification.detail.component.ReactionContent
 import com.twix.task_certification.detail.component.TaskCertificationCardContent
 import com.twix.task_certification.detail.component.TaskCertificationDetailTopBar
-import com.twix.task_certification.detail.model.TaskCertificationDetailIntent
-import com.twix.task_certification.detail.model.TaskCertificationDetailSideEffect
-import com.twix.task_certification.detail.model.TaskCertificationDetailUiState
+import com.twix.task_certification.detail.contract.TaskCertificationDetailIntent
+import com.twix.task_certification.detail.contract.TaskCertificationDetailSideEffect
+import com.twix.task_certification.detail.contract.TaskCertificationDetailUiState
 import com.twix.task_certification.detail.preview.TaskCertificationDetailPreviewProvider
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.findActivity

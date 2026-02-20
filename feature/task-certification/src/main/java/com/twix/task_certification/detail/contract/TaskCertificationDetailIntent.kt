@@ -1,4 +1,4 @@
-package com.twix.task_certification.detail.model
+package com.twix.task_certification.detail.contract
 
 import com.twix.domain.model.enums.GoalReactionType
 import com.twix.ui.base.Intent

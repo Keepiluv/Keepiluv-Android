@@ -1,4 +1,4 @@
-package com.twix.task_certification.certification.model
+package com.twix.task_certification.certification.contract
 
 import android.net.Uri
 import com.twix.ui.base.Intent

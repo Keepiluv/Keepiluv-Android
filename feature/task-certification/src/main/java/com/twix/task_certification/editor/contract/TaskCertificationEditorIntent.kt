@@ -1,4 +1,4 @@
-package com.twix.task_certification.editor.model
+package com.twix.task_certification.editor.contract
 
 import com.twix.ui.base.Intent
 

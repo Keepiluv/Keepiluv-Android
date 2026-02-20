@@ -9,7 +9,7 @@ import com.twix.designsystem.R
 import com.twix.designsystem.components.photolog.BackgroundCard
 import com.twix.designsystem.components.photolog.ForegroundCard
 import com.twix.domain.model.enums.BetweenUs
-import com.twix.task_certification.detail.model.TaskCertificationDetailUiState
+import com.twix.task_certification.detail.contract.TaskCertificationDetailUiState
 import com.twix.task_certification.detail.swipe.SwipeableCard
 
 @Composable

@@ -1,4 +1,4 @@
-package com.twix.task_certification.certification.model
+package com.twix.task_certification.certification.contract
 
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.ui.base.SideEffect

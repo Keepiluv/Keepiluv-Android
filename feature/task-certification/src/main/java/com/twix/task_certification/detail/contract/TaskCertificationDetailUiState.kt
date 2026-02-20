@@ -1,4 +1,4 @@
-package com.twix.task_certification.detail.model
+package com.twix.task_certification.detail.contract
 
 import androidx.compose.runtime.Immutable
 import com.twix.domain.model.enums.BetweenUs

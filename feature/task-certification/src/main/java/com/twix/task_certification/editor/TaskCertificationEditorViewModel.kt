@@ -9,10 +9,10 @@ import com.twix.navigation.NavRoutes
 import com.twix.navigation.args.EditorNavArgs
 import com.twix.navigation.savedstate.decodeNavArgs
 import com.twix.result.AppResult
-import com.twix.task_certification.editor.model.TaskCertificationEditorIntent
-import com.twix.task_certification.editor.model.TaskCertificationEditorSideEffect
-import com.twix.task_certification.editor.model.TaskCertificationEditorUiState
-import com.twix.task_certification.editor.model.toUiState
+import com.twix.task_certification.editor.contract.TaskCertificationEditorIntent
+import com.twix.task_certification.editor.contract.TaskCertificationEditorSideEffect
+import com.twix.task_certification.editor.contract.TaskCertificationEditorUiState
+import com.twix.task_certification.editor.contract.toUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.TaskCertificationRefreshBus
 import kotlinx.coroutines.launch

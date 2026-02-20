@@ -41,10 +41,10 @@ import com.twix.task_certification.certification.component.CameraControlBar
 import com.twix.task_certification.certification.component.CameraPreviewBox
 import com.twix.task_certification.certification.component.CommentErrorText
 import com.twix.task_certification.certification.component.TaskCertificationTopBar
+import com.twix.task_certification.certification.contract.TaskCertificationIntent
+import com.twix.task_certification.certification.contract.TaskCertificationSideEffect
+import com.twix.task_certification.certification.contract.TaskCertificationUiState
 import com.twix.task_certification.certification.model.CameraPreview
-import com.twix.task_certification.certification.model.TaskCertificationIntent
-import com.twix.task_certification.certification.model.TaskCertificationSideEffect
-import com.twix.task_certification.certification.model.TaskCertificationUiState
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.noRippleClickable
 import kotlinx.coroutines.launch

@@ -44,9 +44,9 @@ import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.task_certification.editor.component.TaskCertificationEditorTopBar
-import com.twix.task_certification.editor.model.TaskCertificationEditorIntent
-import com.twix.task_certification.editor.model.TaskCertificationEditorSideEffect
-import com.twix.task_certification.editor.model.TaskCertificationEditorUiState
+import com.twix.task_certification.editor.contract.TaskCertificationEditorIntent
+import com.twix.task_certification.editor.contract.TaskCertificationEditorSideEffect
+import com.twix.task_certification.editor.contract.TaskCertificationEditorUiState
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.findActivity
 import com.twix.ui.extension.hasCameraPermission

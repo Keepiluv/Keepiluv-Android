@@ -10,10 +10,10 @@ import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
 import com.twix.navigation.args.DetailNavArgs
 import com.twix.navigation.savedstate.decodeNavArgs
+import com.twix.task_certification.certification.contract.TaskCertificationIntent
+import com.twix.task_certification.certification.contract.TaskCertificationSideEffect
+import com.twix.task_certification.certification.contract.TaskCertificationUiState
 import com.twix.task_certification.certification.model.CaptureStatus
-import com.twix.task_certification.certification.model.TaskCertificationIntent
-import com.twix.task_certification.certification.model.TaskCertificationSideEffect
-import com.twix.task_certification.certification.model.TaskCertificationUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.ui.image.ImageGenerator
 import com.twix.util.bus.GoalRefreshBus

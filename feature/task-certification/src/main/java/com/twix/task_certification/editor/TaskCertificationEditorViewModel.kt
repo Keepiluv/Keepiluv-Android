@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
-import com.twix.navigation.serializer.EditorSerializer
+import com.twix.navigation.args.EditorNavArgs
 import com.twix.result.AppResult
 import com.twix.task_certification.R
 import com.twix.task_certification.editor.model.TaskCertificationEditorIntent
@@ -30,7 +30,7 @@ class TaskCertificationEditorViewModel(
                 .get<String>(NavRoutes.TaskCertificationEditorRoute.ARG_DATA)
                 ?.let { encoded ->
                     val json = Uri.decode(encoded)
-                    Json.decodeFromString<EditorSerializer>(json)
+                    Json.decodeFromString<EditorNavArgs>(json)
                 },
         ) { SERIALIZER_NOT_FOUND }
 

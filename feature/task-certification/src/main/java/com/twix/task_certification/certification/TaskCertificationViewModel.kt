@@ -7,7 +7,7 @@ import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.photo.PhotologParam
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
-import com.twix.navigation.serializer.DetailSerializer
+import com.twix.navigation.args.DetailNavArgs
 import com.twix.task_certification.R
 import com.twix.task_certification.certification.model.CaptureStatus
 import com.twix.task_certification.certification.model.TaskCertificationIntent
@@ -33,13 +33,13 @@ class TaskCertificationViewModel(
 ) : BaseViewModel<TaskCertificationUiState, TaskCertificationIntent, TaskCertificationSideEffect>(
         TaskCertificationUiState(),
     ) {
-    private val serializer: DetailSerializer =
+    private val serializer: DetailNavArgs =
         requireNotNull(
             savedStateHandle
                 .get<String>(NavRoutes.TaskCertificationRoute.ARG_DATA)
                 ?.let { encoded ->
                     val json = Uri.decode(encoded)
-                    Json.decodeFromString<DetailSerializer>(json)
+                    Json.decodeFromString<DetailNavArgs>(json)
                 },
         ) { SERIALIZER_NOT_FOUND }
 

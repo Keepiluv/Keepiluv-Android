@@ -1,10 +1,11 @@
-package com.twix.navigation.serializer
+package com.twix.navigation.args
 
 import com.twix.navigation.NavRoutes
 import kotlinx.serialization.Serializable
 
+// TODO("인증샷 단일 조회 API 연동시 제거")
 @Serializable
-data class EditorSerializer(
+data class EditorNavArgs(
     val goalId: Long,
     val goalName: String,
     val nickname: String,
@@ -14,7 +15,7 @@ data class EditorSerializer(
 )
 
 @Serializable
-data class DetailSerializer(
+data class DetailNavArgs(
     val goalId: Long,
     val from: NavRoutes.TaskCertificationRoute.From,
     val photologId: Long = -1,

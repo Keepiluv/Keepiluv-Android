@@ -7,8 +7,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.twix.navigation.NavRoutes
+import com.twix.navigation.args.DetailNavArgs
 import com.twix.navigation.base.NavGraphContributor
-import com.twix.navigation.serializer.DetailSerializer
 import com.twix.task_certification.certification.TaskCertificationRoute
 import com.twix.task_certification.detail.TaskCertificationDetailRoute
 import com.twix.task_certification.editor.TaskCertificationEditorRoute
@@ -44,7 +44,7 @@ object TaskCertificationGraph : NavGraphContributor {
                     navigateToCertification = { goalId, date ->
                         val destination =
                             NavRoutes.TaskCertificationRoute.createRoute(
-                                DetailSerializer(
+                                DetailNavArgs(
                                     goalId = goalId,
                                     from = NavRoutes.TaskCertificationRoute.From.DETAIL,
                                     selectedDate = date.toString(),
@@ -77,7 +77,7 @@ object TaskCertificationGraph : NavGraphContributor {
                     navigateToCertification = { goalId, photologId, comment ->
                         val destination =
                             NavRoutes.TaskCertificationRoute.createRoute(
-                                DetailSerializer(
+                                DetailNavArgs(
                                     goalId = goalId,
                                     from = NavRoutes.TaskCertificationRoute.From.EDITOR,
                                     photologId = photologId,

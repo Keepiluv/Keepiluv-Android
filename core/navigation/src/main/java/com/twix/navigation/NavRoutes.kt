@@ -1,8 +1,8 @@
 package com.twix.navigation
 
 import android.net.Uri
-import com.twix.navigation.serializer.DetailSerializer
-import com.twix.navigation.serializer.EditorSerializer
+import com.twix.navigation.args.DetailNavArgs
+import com.twix.navigation.args.EditorNavArgs
 import kotlinx.serialization.json.Json
 import java.time.LocalDate
 
@@ -57,7 +57,7 @@ sealed class NavRoutes(
             EDITOR,
         }
 
-        fun createRoute(data: DetailSerializer): String {
+        fun createRoute(data: DetailNavArgs): String {
             val json = Json.encodeToString(data)
             val encoded = Uri.encode(json)
             return "task_certification/$encoded"
@@ -68,7 +68,7 @@ sealed class NavRoutes(
         NavRoutes("task_certification_editor/{data}") {
         const val ARG_DATA = "data"
 
-        fun createRoute(data: EditorSerializer): String {
+        fun createRoute(data: EditorNavArgs): String {
             val json = Json.encodeToString(data)
             val encoded = Uri.encode(json)
             return "task_certification_editor/$encoded"

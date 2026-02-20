@@ -6,8 +6,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.twix.main.MainRoute
 import com.twix.navigation.NavRoutes
+import com.twix.navigation.args.DetailNavArgs
 import com.twix.navigation.base.NavGraphContributor
-import com.twix.navigation.serializer.DetailSerializer
 
 object MainNavGraph : NavGraphContributor {
     override val graphRoute: NavRoutes
@@ -40,7 +40,7 @@ object MainNavGraph : NavGraphContributor {
                     navigateToCertification = { goalId, date ->
                         val destination =
                             NavRoutes.TaskCertificationRoute.createRoute(
-                                DetailSerializer(
+                                DetailNavArgs(
                                     goalId = goalId,
                                     from = NavRoutes.TaskCertificationRoute.From.HOME,
                                     selectedDate = date.toString(),

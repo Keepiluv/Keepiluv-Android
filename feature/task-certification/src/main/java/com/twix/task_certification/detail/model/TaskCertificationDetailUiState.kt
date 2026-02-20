@@ -5,7 +5,7 @@ import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalIconType
 import com.twix.domain.model.photolog.PhotoLogs
 import com.twix.domain.model.photolog.PhotologDetail
-import com.twix.navigation.serializer.EditorSerializer
+import com.twix.navigation.args.EditorNavArgs
 import com.twix.ui.base.State
 import com.twix.util.RelativeTimeFormatter
 import java.time.LocalDate
@@ -75,7 +75,7 @@ data class TaskCertificationDetailUiState(
             currentShow == BetweenUs.PARTNER && isDisplayedGoalCertificated
 
     fun toSerializer() =
-        EditorSerializer(
+        EditorNavArgs(
             goalId = goalId,
             nickname = myNickname,
             goalName = goalName,

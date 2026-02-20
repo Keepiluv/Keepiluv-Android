@@ -25,10 +25,10 @@ class TaskCertificationEditorViewModel(
         TaskCertificationEditorUiState(),
     ) {
     private val navArgs: EditorNavArgs =
-        savedStateHandle.decodeNavArgs(NavRoutes.TaskCertificationEditorRoute.ARG_DATA)
+        savedStateHandle.decodeNavArgs<EditorNavArgs>(NavRoutes.TaskCertificationEditorRoute.ARG_DATA)
 
     init {
-        navArgs.toUiState()
+        reduce { navArgs.toUiState() }
     }
 
     override suspend fun handleIntent(intent: TaskCertificationEditorIntent) {

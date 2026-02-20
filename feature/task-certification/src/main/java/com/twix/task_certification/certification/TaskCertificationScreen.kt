@@ -82,11 +82,11 @@ fun TaskCertificationRoute(
             viewModel.dispatch(TaskCertificationIntent.PickPicture(uri))
         }
 
-    DisposableEffect(lifecycleOwner, uiState.lens) {
-        coroutineScope.launch {
-            camera.bind(lifecycleOwner, uiState.lens)
-        }
+    LaunchedEffect(uiState.lens) {
+        camera.bind(lifecycleOwner, uiState.lens)
+    }
 
+    DisposableEffect(Unit) {
         onDispose {
             camera.unbind()
         }

@@ -18,25 +18,21 @@ data class TaskCertificationEditorUiState(
     val isCommentNotChanged: Boolean
         get() = comment.value == originComment
 
-    fun updateCommentFocus(isFocus: Boolean) = copy(comment = comment.updateFocus(isFocus))
-
-    fun updateComment(value: String) = copy(comment = comment.updateComment(value))
-
     val imageName: String
         get() = imageUrl.split(IMAGE_NAME_SEPARATOR).last()
-
-    fun updateInitialState(serializer: EditorNavArgs) =
-        copy(
-            goalId = serializer.goalId,
-            nickname = serializer.nickname,
-            goalName = serializer.goalName,
-            photologId = serializer.photologId,
-            imageUrl = serializer.imageUrl,
-            comment = CommentUiModel(serializer.comment.orEmpty()),
-            originComment = serializer.comment.orEmpty(),
-        )
 
     companion object {
         private const val IMAGE_NAME_SEPARATOR = "/"
     }
 }
+
+internal fun EditorNavArgs.toUiState() =
+    TaskCertificationEditorUiState(
+        goalId = goalId,
+        nickname = nickname,
+        goalName = goalName,
+        photologId = photologId,
+        imageUrl = imageUrl,
+        comment = CommentUiModel(comment.orEmpty()),
+        originComment = comment.orEmpty(),
+    )

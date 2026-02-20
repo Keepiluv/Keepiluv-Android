@@ -12,6 +12,7 @@ import com.twix.task_certification.R
 import com.twix.task_certification.editor.model.TaskCertificationEditorIntent
 import com.twix.task_certification.editor.model.TaskCertificationEditorSideEffect
 import com.twix.task_certification.editor.model.TaskCertificationEditorUiState
+import com.twix.task_certification.editor.model.toUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.TaskCertificationRefreshBus
 import kotlinx.coroutines.launch
@@ -24,7 +25,7 @@ class TaskCertificationEditorViewModel(
 ) : BaseViewModel<TaskCertificationEditorUiState, TaskCertificationEditorIntent, TaskCertificationEditorSideEffect>(
         TaskCertificationEditorUiState(),
     ) {
-    private val serializer =
+    private val args: EditorNavArgs =
         requireNotNull(
             savedStateHandle
                 .get<String>(NavRoutes.TaskCertificationEditorRoute.ARG_DATA)
@@ -35,11 +36,7 @@ class TaskCertificationEditorViewModel(
         ) { SERIALIZER_NOT_FOUND }
 
     init {
-        reduceInitialState()
-    }
-
-    private fun reduceInitialState() {
-        reduce { updateInitialState(serializer) }
+        args.toUiState()
     }
 
     override suspend fun handleIntent(intent: TaskCertificationEditorIntent) {
@@ -50,12 +47,12 @@ class TaskCertificationEditorViewModel(
         }
     }
 
-    private fun reduceCommentFocus(isFocused: Boolean) {
-        reduce { updateCommentFocus(isFocused) }
+    private fun reduceCommentFocus(value: Boolean) {
+        reduce { copy(comment = comment.copy(isFocused = value)) }
     }
 
-    private fun reduceComment(comment: String) {
-        reduce { updateComment(comment) }
+    private fun reduceComment(value: String) {
+        reduce { copy(comment = comment.copy(value = value)) }
     }
 
     private fun modifyComment() {

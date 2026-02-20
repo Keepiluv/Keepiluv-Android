@@ -30,7 +30,7 @@ class ImageGenerator(
     fun uriToByteArray(imageUri: Uri): ByteArray? =
         try {
             val orientation: Int = rotator.orientation(imageUri)
-            val bitmap: Bitmap = bitmap(contentResolver, imageUri)
+            val bitmap: Bitmap = uriToBitmap(contentResolver, imageUri)
             val rotatedBitmap =
                 when (orientation) {
                     ExifInterface.ORIENTATION_ROTATE_90 -> rotator.rotate(bitmap, 90f)
@@ -39,7 +39,7 @@ class ImageGenerator(
                     else -> bitmap
                 }
             if (rotatedBitmap !== bitmap) bitmap.recycle()
-            byteArray(rotatedBitmap)
+            bitmapToByteArray(rotatedBitmap)
         } catch (e: Exception) {
             e.printStackTrace()
             null
@@ -50,7 +50,7 @@ class ImageGenerator(
      *
      * 새로운 InputStream을 열어 [BitmapFactory.decodeStream] 으로 변환한다.
      */
-    private fun bitmap(
+    private fun uriToBitmap(
         contentResolver: ContentResolver,
         imageUri: Uri,
     ): Bitmap =
@@ -67,7 +67,7 @@ class ImageGenerator(
      * @param bitmap 압축 대상 Bitmap
      * @return JPEG 바이트 배열
      */
-    private fun byteArray(bitmap: Bitmap): ByteArray =
+    private fun bitmapToByteArray(bitmap: Bitmap): ByteArray =
         ByteArrayOutputStream().use { outputStream ->
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
             bitmap.recycle()

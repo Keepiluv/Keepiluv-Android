@@ -16,8 +16,10 @@ import com.twix.ui.base.BaseViewModel
 import com.twix.ui.image.ImageGenerator
 import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.TaskCertificationRefreshBus
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 class TaskCertificationViewModel(
@@ -97,7 +99,10 @@ class TaskCertificationViewModel(
         }
 
         viewModelScope.launch {
-            val imageBytes = imageGenerator.uriToByteArray(capture.uri)
+            val imageBytes =
+                withContext(Dispatchers.IO) {
+                    imageGenerator.uriToByteArray(capture.uri)
+                }
             if (imageBytes != null) {
                 upload(imageBytes)
             } else {

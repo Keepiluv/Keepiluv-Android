@@ -14,6 +14,11 @@ interface AuthService {
         @Body request: LoginRequest,
     ): LoginResponse
 
+    @POST("api/v1/auth/kakao/token")
+    suspend fun kakaoLogin(
+        @Body request: LoginRequest,
+    ): LoginResponse
+
     @POST("api/v1/auth/refresh")
     suspend fun refresh(
         @Body request: RefreshRequest,

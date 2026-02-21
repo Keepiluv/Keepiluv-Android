@@ -73,7 +73,7 @@ junit = "4.13.2"
 browser = "1.9.0"
 
 # Kakao
-kakao = "2.20.1"
+kakao = "2.23.2"
 
 [libraries]
 # AndroidX

@@ -21,7 +21,7 @@ fun LoginType.toUiModel(): LoginTypeUiModel =
             LoginTypeUiModel(
                 type = this,
                 logo = R.drawable.ic_kakao,
-                title = R.string.google_login_button_title,
+                title = R.string.kakao_login_button_title,
                 background = LoginColor.Kakao,
                 border = LoginColor.Kakao,
                 textColor = GrayColor.C500,

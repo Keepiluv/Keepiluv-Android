@@ -37,9 +37,9 @@ import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
-import com.twix.domain.login.LoginType
 import com.twix.domain.model.OnboardingStatus
 import com.twix.domain.model.enums.AppTextStyle
+import com.twix.domain.model.enums.LoginType
 import com.twix.login.contract.LoginIntent
 import com.twix.login.contract.LoginSideEffect
 import com.twix.ui.base.ObserveAsEvents

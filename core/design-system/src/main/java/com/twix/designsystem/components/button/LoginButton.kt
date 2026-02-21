@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.extension.toUiModel
 import com.twix.designsystem.theme.TwixTheme
-import com.twix.domain.login.LoginType
 import com.twix.domain.model.enums.AppTextStyle
+import com.twix.domain.model.enums.LoginType
 import com.twix.ui.extension.noRippleClickable
 
 const val LOGIN_BUTTON_HEIGHT = 54

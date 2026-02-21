@@ -16,11 +16,10 @@ class DefaultAuthRepository(
         idToken: String,
         type: LoginType,
     ) {
-        val request = LoginRequest(idToken)
         val response =
             when (type) {
-                LoginType.GOOGLE -> service.googleLogin(request)
-                LoginType.KAKAO -> service.kakaoLogin(request)
+                LoginType.GOOGLE -> service.googleLogin(LoginRequest(idToken))
+                LoginType.KAKAO -> return
             }
 
         tokenProvider.saveToken(response.accessToken, response.refreshToken)

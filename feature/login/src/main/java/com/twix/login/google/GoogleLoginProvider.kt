@@ -15,7 +15,7 @@ import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.twix.domain.login.LoginProvider
 import com.twix.domain.login.LoginResult
-import com.twix.domain.login.LoginType
+import com.twix.domain.model.enums.LoginType
 import com.twix.login.BuildConfig
 
 /**
@@ -33,6 +33,8 @@ import com.twix.login.BuildConfig
 class GoogleLoginProvider(
     private val context: Context,
 ) : LoginProvider {
+    override val type: LoginType = LoginType.GOOGLE
+
     /** Android Credential API 진입점 */
     private val credentialManager = CredentialManager.create(context)
 
@@ -66,7 +68,7 @@ class GoogleLoginProvider(
     override suspend fun login(): LoginResult =
         when (val result = getGoogleCredentialResult()) {
             is GoogleCredentialResult.Success ->
-                LoginResult.Success(result.idToken, LoginType.GOOGLE)
+                LoginResult.Success(result.idToken, type)
 
             GoogleCredentialResult.Cancel ->
                 LoginResult.Cancel

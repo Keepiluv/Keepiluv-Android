@@ -26,6 +26,8 @@ import com.twix.domain.login.LoginType
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.ui.extension.noRippleClickable
 
+const val LOGIN_BUTTON_HEIGHT = 54
+
 @Composable
 fun LoginButton(
     type: LoginType,
@@ -38,7 +40,7 @@ fun LoginButton(
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(54.dp)
+                .height(LOGIN_BUTTON_HEIGHT.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(uiModel.background)
                 .border(1.dp, uiModel.border, RoundedCornerShape(12.dp))

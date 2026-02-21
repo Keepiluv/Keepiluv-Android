@@ -4,7 +4,7 @@ import com.twix.designsystem.R
 import com.twix.designsystem.components.button.model.LoginTypeUiModel
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
-import com.twix.domain.login.LoginType
+import com.twix.domain.model.enums.LoginType
 
 fun LoginType.toUiModel(): LoginTypeUiModel =
     when (this) {

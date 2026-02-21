@@ -1,7 +1,7 @@
 package com.twix.login.di
 
 import com.twix.domain.login.LoginProvider
-import com.twix.domain.login.LoginType
+import com.twix.domain.model.enums.LoginType
 import com.twix.login.LoginProviderFactory
 import com.twix.login.LoginViewModel
 import com.twix.login.google.GoogleLoginProvider

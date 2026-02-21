@@ -1,4 +1,4 @@
-package com.twix.domain.login
+package com.twix.domain.model.enums
 
 enum class LoginType {
     GOOGLE,

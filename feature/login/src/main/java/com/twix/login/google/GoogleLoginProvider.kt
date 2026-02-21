@@ -15,7 +15,7 @@ import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.twix.domain.login.LoginProvider
 import com.twix.domain.login.LoginResult
-import com.twix.domain.login.LoginType
+import com.twix.domain.model.enums.LoginType
 import com.twix.login.BuildConfig
 
 /**

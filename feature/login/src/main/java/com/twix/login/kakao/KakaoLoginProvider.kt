@@ -60,7 +60,13 @@ class KakaoLoginProvider(
             }
         }
 
-    private fun success(token: OAuthToken): LoginResult = LoginResult.Success(token.idToken.toString(), LoginType.KAKAO)
+    private fun success(token: OAuthToken): LoginResult {
+        val idToken =
+            requireNotNull(token.idToken) {
+                return LoginResult.Failure(IllegalStateException(ID_TOKEN_NULL_ERROR_MESSAGE))
+            }
+        return LoginResult.Success(idToken, LoginType.KAKAO)
+    }
 
     private fun resumeWithAccountLogin(continuation: Continuation<LoginResult>) {
         UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
@@ -69,5 +75,10 @@ class KakaoLoginProvider(
                 error != null -> continuation.resume(LoginResult.Failure(error))
             }
         }
+    }
+
+    companion object {
+        private const val ID_TOKEN_NULL_ERROR_MESSAGE =
+            "idToken is null. Ensure OpenID Connect is enabled in Kakao developer console."
     }
 }

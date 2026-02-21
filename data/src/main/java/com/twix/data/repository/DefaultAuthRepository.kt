@@ -1,6 +1,6 @@
 package com.twix.data.repository
 
-import com.twix.domain.login.LoginType
+import com.twix.domain.model.enums.LoginType
 import com.twix.domain.repository.AuthRepository
 import com.twix.network.execute.safeApiCall
 import com.twix.network.model.request.LoginRequest
@@ -16,10 +16,11 @@ class DefaultAuthRepository(
         idToken: String,
         type: LoginType,
     ) {
+        val request = LoginRequest(idToken)
         val response =
             when (type) {
-                LoginType.GOOGLE -> service.googleLogin(LoginRequest(idToken))
-                LoginType.KAKAO -> return
+                LoginType.GOOGLE -> service.googleLogin(request)
+                LoginType.KAKAO -> service.kakaoLogin(request)
             }
 
         tokenProvider.saveToken(response.accessToken, response.refreshToken)

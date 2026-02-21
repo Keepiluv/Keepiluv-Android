@@ -1,6 +1,6 @@
 package com.twix.domain.repository
 
-import com.twix.domain.login.LoginType
+import com.twix.domain.model.enums.LoginType
 import com.twix.result.AppResult
 
 interface AuthRepository {

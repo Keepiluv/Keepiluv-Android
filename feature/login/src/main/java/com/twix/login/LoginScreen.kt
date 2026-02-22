@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -23,13 +22,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.R
-import com.twix.designsystem.components.button.LOGIN_BUTTON_HEIGHT
 import com.twix.designsystem.components.button.LoginButton
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
@@ -84,66 +83,67 @@ fun LoginRoute(
 @Composable
 private fun LoginScreen(onClickLogin: (LoginType) -> Unit) {
     var imageBottomPx by remember { mutableFloatStateOf(0f) }
+    val density = LocalDensity.current
+    val offsetPx = with(density) { 34.dp.toPx() }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-    ) { innerPadding ->
-        Column(
-            modifier =
-                Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .background(CommonColor.White),
-        ) {
-            Spacer(Modifier.height(35.dp))
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(CommonColor.White),
+    ) {
+        Spacer(Modifier.height(35.dp))
 
+        Image(
+            imageVector = ImageVector.vectorResource(R.drawable.ic_app_logo),
+            contentDescription = null,
+            modifier = Modifier.padding(start = 24.dp),
+        )
+
+        Spacer(Modifier.height(24.dp))
+
+        AppText(
+            text = stringResource(R.string.login_title_message),
+            style = AppTextStyle.H3,
+            color = GrayColor.C500,
+            modifier = Modifier.padding(start = 24.dp),
+        )
+
+        Spacer(Modifier.height(27.dp))
+
+        Box(modifier = Modifier.fillMaxSize()) {
             Image(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_app_logo),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_keepi_singing),
                 contentDescription = null,
-                modifier = Modifier.padding(start = 24.dp),
+                modifier =
+                    Modifier
+                        .onGloballyPositioned { coordinates ->
+                            imageBottomPx = coordinates.boundsInParent().bottom
+                        },
             )
 
-            Spacer(Modifier.height(24.dp))
-
-            AppText(
-                text = stringResource(R.string.login_title_message),
-                style = AppTextStyle.H3,
-                color = GrayColor.C500,
-                modifier = Modifier.padding(start = 24.dp),
-            )
-
-            Spacer(Modifier.height(27.dp))
-
-            Box(modifier = Modifier.fillMaxSize()) {
-                Image(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_keepi_singing),
-                    contentDescription = null,
+            if (imageBottomPx != 0f) {
+                Column(
                     modifier =
                         Modifier
-                            .onGloballyPositioned { coordinates ->
-                                imageBottomPx = coordinates.boundsInParent().bottom
+                            .padding(horizontal = 20.dp)
+                            .offset {
+                                IntOffset(
+                                    x = 0,
+                                    /**
+                                     * singing 이미지 하단 기준으로 로그인 버튼을 배치하고
+                                     * 이미지와 버튼이 겹치는 만큼(34dp) 상단으로 이동
+                                     * */
+                                    y = (imageBottomPx - offsetPx).toInt(),
+                                )
                             },
-                )
-
-                if (imageBottomPx != 0f) {
-                    Column(
-                        modifier =
-                            Modifier
-                                .padding(horizontal = 20.dp)
-                                .offset {
-                                    IntOffset(
-                                        x = 0,
-                                        y = (imageBottomPx - LOGIN_BUTTON_HEIGHT.toFloat() - 34f).toInt(),
-                                    )
-                                },
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        LoginType.entries.forEach { type ->
-                            LoginButton(
-                                type = type,
-                                onClickLogin = onClickLogin,
-                            )
-                        }
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    LoginType.entries.forEach { type ->
+                        LoginButton(
+                            type = type,
+                            onClickLogin = onClickLogin,
+                        )
                     }
                 }
             }

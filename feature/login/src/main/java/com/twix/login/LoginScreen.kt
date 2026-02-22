@@ -22,13 +22,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.R
-import com.twix.designsystem.components.button.LOGIN_BUTTON_HEIGHT
 import com.twix.designsystem.components.button.LoginButton
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
@@ -83,6 +83,8 @@ fun LoginRoute(
 @Composable
 private fun LoginScreen(onClickLogin: (LoginType) -> Unit) {
     var imageBottomPx by remember { mutableFloatStateOf(0f) }
+    val density = LocalDensity.current
+    val offsetPx = with(density) { 34.dp.toPx() }
 
     Column(
         modifier =
@@ -128,7 +130,11 @@ private fun LoginScreen(onClickLogin: (LoginType) -> Unit) {
                             .offset {
                                 IntOffset(
                                     x = 0,
-                                    y = (imageBottomPx - LOGIN_BUTTON_HEIGHT.toFloat() - 34f).toInt(),
+                                    /**
+                                     * singing 이미지 하단 기준으로 로그인 버튼을 배치하고
+                                     * 이미지와 버튼이 겹치는 만큼(34dp) 상단으로 이동
+                                     * */
+                                    y = (imageBottomPx - offsetPx).toInt(),
                                 )
                             },
                     verticalArrangement = Arrangement.spacedBy(12.dp),

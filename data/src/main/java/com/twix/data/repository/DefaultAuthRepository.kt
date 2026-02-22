@@ -1,6 +1,6 @@
 package com.twix.data.repository
 
-import com.twix.domain.login.LoginType
+import com.twix.domain.model.enums.LoginType
 import com.twix.domain.repository.AuthRepository
 import com.twix.network.execute.safeApiCall
 import com.twix.network.model.request.LoginRequest

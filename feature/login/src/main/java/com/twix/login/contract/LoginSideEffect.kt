@@ -1,4 +1,4 @@
-package com.twix.login.model
+package com.twix.login.contract
 
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.OnboardingStatus

@@ -1,4 +1,4 @@
-package com.twix.login.model
+package com.twix.login.contract
 
 import com.twix.ui.base.State
 

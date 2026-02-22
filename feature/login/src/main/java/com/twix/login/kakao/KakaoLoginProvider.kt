@@ -8,8 +8,8 @@ import com.kakao.sdk.user.UserApiClient
 import com.twix.domain.login.LoginProvider
 import com.twix.domain.login.LoginResult
 import com.twix.domain.model.enums.LoginType
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
 class KakaoLoginProvider(
@@ -76,8 +76,10 @@ class KakaoLoginProvider(
         return LoginResult.Success(idToken, LoginType.KAKAO)
     }
 
-    private fun resumeWithAccountLogin(continuation: Continuation<LoginResult>) {
+    private fun resumeWithAccountLogin(continuation: CancellableContinuation<LoginResult>) {
         UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
+            if (!continuation.isActive) return@loginWithKakaoAccount
+
             when {
                 token != null -> continuation.resume(success(token))
                 error != null -> continuation.resume(LoginResult.Failure(error))

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -85,65 +84,60 @@ fun LoginRoute(
 private fun LoginScreen(onClickLogin: (LoginType) -> Unit) {
     var imageBottomPx by remember { mutableFloatStateOf(0f) }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-    ) { innerPadding ->
-        Column(
-            modifier =
-                Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize()
-                    .background(CommonColor.White),
-        ) {
-            Spacer(Modifier.height(35.dp))
+    Column(
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(CommonColor.White),
+    ) {
+        Spacer(Modifier.height(35.dp))
 
+        Image(
+            imageVector = ImageVector.vectorResource(R.drawable.ic_app_logo),
+            contentDescription = null,
+            modifier = Modifier.padding(start = 24.dp),
+        )
+
+        Spacer(Modifier.height(24.dp))
+
+        AppText(
+            text = stringResource(R.string.login_title_message),
+            style = AppTextStyle.H3,
+            color = GrayColor.C500,
+            modifier = Modifier.padding(start = 24.dp),
+        )
+
+        Spacer(Modifier.height(27.dp))
+
+        Box(modifier = Modifier.fillMaxSize()) {
             Image(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_app_logo),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_keepi_singing),
                 contentDescription = null,
-                modifier = Modifier.padding(start = 24.dp),
+                modifier =
+                    Modifier
+                        .onGloballyPositioned { coordinates ->
+                            imageBottomPx = coordinates.boundsInParent().bottom
+                        },
             )
 
-            Spacer(Modifier.height(24.dp))
-
-            AppText(
-                text = stringResource(R.string.login_title_message),
-                style = AppTextStyle.H3,
-                color = GrayColor.C500,
-                modifier = Modifier.padding(start = 24.dp),
-            )
-
-            Spacer(Modifier.height(27.dp))
-
-            Box(modifier = Modifier.fillMaxSize()) {
-                Image(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_keepi_singing),
-                    contentDescription = null,
+            if (imageBottomPx != 0f) {
+                Column(
                     modifier =
                         Modifier
-                            .onGloballyPositioned { coordinates ->
-                                imageBottomPx = coordinates.boundsInParent().bottom
+                            .padding(horizontal = 20.dp)
+                            .offset {
+                                IntOffset(
+                                    x = 0,
+                                    y = (imageBottomPx - LOGIN_BUTTON_HEIGHT.toFloat() - 34f).toInt(),
+                                )
                             },
-                )
-
-                if (imageBottomPx != 0f) {
-                    Column(
-                        modifier =
-                            Modifier
-                                .padding(horizontal = 20.dp)
-                                .offset {
-                                    IntOffset(
-                                        x = 0,
-                                        y = (imageBottomPx - LOGIN_BUTTON_HEIGHT.toFloat() - 34f).toInt(),
-                                    )
-                                },
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                    ) {
-                        LoginType.entries.forEach { type ->
-                            LoginButton(
-                                type = type,
-                                onClickLogin = onClickLogin,
-                            )
-                        }
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    LoginType.entries.forEach { type ->
+                        LoginButton(
+                            type = type,
+                            onClickLogin = onClickLogin,
+                        )
                     }
                 }
             }

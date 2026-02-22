@@ -56,6 +56,14 @@ class KakaoLoginProvider(
                 when {
                     token != null -> continuation.resume(success(token))
                     error != null -> continuation.resume(LoginResult.Failure(error))
+                    else ->
+                        continuation.resume(
+                            LoginResult.Failure(
+                                IllegalStateException(
+                                    UNEXPECTED_STATE_ERROR_MESSAGE,
+                                ),
+                            ),
+                        )
                 }
             }
         }
@@ -80,5 +88,7 @@ class KakaoLoginProvider(
     companion object {
         private const val ID_TOKEN_NULL_ERROR_MESSAGE =
             "idToken is null. Ensure OpenID Connect is enabled in Kakao developer console."
+        private const val UNEXPECTED_STATE_ERROR_MESSAGE =
+            "Unexpected: both token and error are null"
     }
 }

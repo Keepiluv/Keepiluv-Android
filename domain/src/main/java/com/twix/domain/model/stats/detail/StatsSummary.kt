@@ -12,4 +12,18 @@ data class StatsSummary(
     val repeatCycle: RepeatCycle,
     val startDate: LocalDate,
     val endDate: LocalDate?,
-)
+) {
+    companion object {
+        val EMPTY =
+            StatsSummary(
+                myNickname = "",
+                partnerNickname = "",
+                totalCount = 0,
+                myCompletedCount = 0,
+                partnerCompletedCount = 0,
+                repeatCycle = RepeatCycle.DAILY,
+                startDate = LocalDate.now(),
+                endDate = null,
+            )
+    }
+}

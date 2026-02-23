@@ -11,4 +11,17 @@ data class StatsDetail(
     val monthDate: LocalDate,
     val completedDate: List<CompletedDate>,
     val statsSummary: StatsSummary,
-)
+) {
+    companion object {
+        val EMPTY =
+            StatsDetail(
+                goalId = -1,
+                goalName = "",
+                goalIcon = GoalIconType.DEFAULT,
+                status = "",
+                monthDate = LocalDate.now(),
+                completedDate = emptyList(),
+                statsSummary = StatsSummary.EMPTY,
+            )
+    }
+}

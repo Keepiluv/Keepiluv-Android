@@ -1,5 +1,6 @@
 package com.yapp.twix.main
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,15 +20,20 @@ import com.twix.designsystem.components.toast.ToastHost
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.navigation.AppNavHost
+import com.twix.navigation_contract.NotificationLaunchEventSource
 import org.koin.android.ext.android.inject
+import org.koin.compose.koinInject
 import kotlin.getValue
 
 class MainActivity : ComponentActivity() {
+    private val notificationLaunchEventSource: NotificationLaunchEventSource by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        handleNotificationIntent(intent)
         enableEdgeToEdge()
         setContent {
-            val toastManager by inject<ToastManager>()
+            val toastManager: ToastManager = koinInject()
             WindowCompat.setDecorFitsSystemWindows(window, false)
             WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
 
@@ -40,7 +46,7 @@ class MainActivity : ComponentActivity() {
                                 WindowInsets.systemBars.only(WindowInsetsSides.Vertical),
                             ),
                 ) {
-                    AppNavHost()
+                    AppNavHost(notificationLaunchEventSource = notificationLaunchEventSource)
 
                     ToastHost(
                         toastManager = toastManager,
@@ -51,5 +57,15 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleNotificationIntent(intent)
+    }
+
+    private fun handleNotificationIntent(intent: Intent?) {
+        notificationLaunchEventSource.dispatchFromIntent(intent)
     }
 }

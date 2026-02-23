@@ -7,3 +7,9 @@ plugins {
 android {
     namespace = "com.twix.navigation"
 }
+
+dependencies {
+    implementation(projects.core.navigationContract)
+    implementation(projects.core.ui)
+    implementation(projects.domain)
+}

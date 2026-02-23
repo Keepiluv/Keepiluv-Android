@@ -31,7 +31,7 @@ fun StatsCard(
 ) {
     GoalCardFrame(
         goalName = statsGoal.goalName,
-        goalIcon = GoalIconType.EXERCISE,
+        goalIcon = statsGoal.goalIconType,
         right = { right() },
         content = { StatsCardContent(statsGoal, showStamp) },
         modifier = modifier,

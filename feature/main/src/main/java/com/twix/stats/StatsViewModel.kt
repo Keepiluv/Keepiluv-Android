@@ -59,12 +59,10 @@ class StatsViewModel(
         )
     }
 
-    private fun showToast(
+    private suspend fun showToast(
         message: Int,
         type: ToastType,
     ) {
-        viewModelScope.launch {
-            emitSideEffect(StatsSideEffect.ShowToast(message, type))
-        }
+        emitSideEffect(StatsSideEffect.ShowToast(message, type))
     }
 }

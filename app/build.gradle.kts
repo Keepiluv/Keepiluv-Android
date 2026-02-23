@@ -1,3 +1,6 @@
+import java.util.Properties
+import kotlin.apply
+
 plugins {
     alias(libs.plugins.twix.android.application)
     alias(libs.plugins.twix.koin)
@@ -6,13 +9,33 @@ plugins {
     alias(libs.plugins.twix.kermit)
 }
 
+val localPropertiesFile = project.rootProject.file("local.properties")
+val properties =
+    Properties().apply {
+        if (localPropertiesFile.exists()) {
+            load(localPropertiesFile.inputStream())
+        }
+    }
+
 android {
     namespace = "com.yapp.twix"
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "com.yapp.twix"
         versionCode = 1
         versionName = "1.0"
+
+        val kakaoKey = properties["kakao_dev_native_app_key"].toString()
+        manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = kakaoKey.trim('"')
+        buildConfigField(
+            "String",
+            "KAKAO_NATIVE_APP_KEY",
+            "\"$kakaoKey\"",
+        )
     }
 
     buildTypes {
@@ -49,4 +72,6 @@ dependencies {
     implementation(platform(libs.google.firebase.bom))
     implementation(libs.google.firebase.crashlytics)
     implementation(libs.google.firebase.messaging)
+
+    implementation(libs.kakao.user)
 }

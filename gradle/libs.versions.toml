@@ -72,6 +72,9 @@ junit = "4.13.2"
 # Browser
 browser = "1.9.0"
 
+# Kakao
+kakao = "2.23.2"
+
 [libraries]
 # AndroidX
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
@@ -159,6 +162,9 @@ guava = { module = "com.google.guava:guava", version.ref = "guava" }
 
 # Browser
 browser = { module = "androidx.browser:browser", version.ref = "browser" }
+
+# Kakao
+kakao-user = { group = "com.kakao.sdk", name = "v2-user", version.ref = "kakao" }
 
 [bundles]
 androidx = [

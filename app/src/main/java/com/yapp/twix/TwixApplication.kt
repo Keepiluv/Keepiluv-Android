@@ -1,6 +1,7 @@
 package com.yapp.twix
 
 import android.app.Application
+import com.kakao.sdk.common.KakaoSdk
 import co.touchlab.kermit.Logger
 import com.twix.notification.token.NotificationTokenRegistrar
 import com.yapp.twix.di.initKoin
@@ -15,6 +16,7 @@ class TwixApplication : Application() {
         initKoin(
             context = this,
         )
+        KakaoSdk.init(this, BuildConfig.KAKAO_NATIVE_APP_KEY)
 
         try {
             getKoin().get<NotificationTokenRegistrar>().registerCurrentToken()

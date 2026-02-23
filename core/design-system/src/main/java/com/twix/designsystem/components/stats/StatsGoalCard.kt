@@ -21,6 +21,7 @@ import com.twix.domain.model.stats.StatsGoal
 fun StatsGoalCard(
     statsGoal: StatsGoal,
     showStamp: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     StatsCard(
         statsGoal = statsGoal,
@@ -38,7 +39,7 @@ fun StatsGoalCard(
             )
         },
         modifier =
-            Modifier
+            modifier
                 .padding(horizontal = 20.dp)
                 .padding(bottom = 16.dp),
     )

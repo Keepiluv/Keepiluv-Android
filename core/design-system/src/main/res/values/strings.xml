@@ -71,6 +71,10 @@
 
     <!-- 통계 화면 -->
     <string name="stats_top_bar_title">스탬프 통계</string>
+    <string name="stats_stamp_total_count">이번달 목표 %d번</string>
+    <string name="stats_stamp_not_has_in_progress_goal">아직 목표가 없어요!</string>
+    <string name="stats_stamp_not_has_complete_goal">아직 끝낸 목표가 없어요!</string>
+    <string name="stats_stamp_total_end_count">총 목료 %d번</string>
     <string name="stats_stamp_end_count">%d번 완료</string>
     <string name="stats_stamp_in_progress_tap_title">진행중</string>
     <string name="stats_stamp_end_tap_title">종료</string>

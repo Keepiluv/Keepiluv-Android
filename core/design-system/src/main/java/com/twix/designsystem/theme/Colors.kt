@@ -24,3 +24,8 @@ object SystemColor {
     val Success = Color(0xFF1ED45A)
     val Warning = Color(0xFFFF6363)
 }
+
+object LoginColor {
+    val Google = Color(0xFFFFFFFF)
+    val Kakao = Color(0xFFFEE500)
+}

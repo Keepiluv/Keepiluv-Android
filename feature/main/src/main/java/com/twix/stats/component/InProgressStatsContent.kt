@@ -30,8 +30,8 @@ fun InProgressStatsContent(
     currentDate: LocalDate,
     stats: Stats,
     modifier: Modifier = Modifier,
-    onClickPreviousMonth: () -> Unit = {},
-    onClickNextMonth: () -> Unit = {},
+    onClickPreviousMonth: () -> Unit,
+    onClickNextMonth: () -> Unit,
 ) {
     LazyColumn(
         modifier =

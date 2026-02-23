@@ -30,7 +30,7 @@ fun StampGrid(
     ) {
         stampIndices.forEach { rowIndices ->
             Row(
-                modifier = modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 rowIndices.forEach { index ->

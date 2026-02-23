@@ -3,7 +3,7 @@ package com.twix.stats.contract
 import com.twix.ui.base.Intent
 
 sealed interface StatsIntent : Intent {
-    data object OnClickPreviousMonth : StatsIntent
+    data object PreviousMonth : StatsIntent
 
-    data object OnClickNextMonth : StatsIntent
+    data object NextMonth : StatsIntent
 }

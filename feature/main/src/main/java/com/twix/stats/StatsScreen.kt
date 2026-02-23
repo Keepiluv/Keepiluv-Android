@@ -17,7 +17,9 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -26,16 +28,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
+import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.components.topbar.TitleTopBar
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
-import com.twix.stats.component.StatsContent
+import com.twix.stats.component.EndStatsContent
+import com.twix.stats.component.InProgressStatsContent
 import com.twix.stats.contract.StatsIntent
+import com.twix.stats.contract.StatsSideEffect
 import com.twix.stats.contract.StatsUiState
 import com.twix.stats.model.StatsTabDestination
 import com.twix.stats.preview.StatsUiStatePreviewProvider
+import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.noRippleClickable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -48,11 +54,26 @@ fun StatsRoute(
     toastManager: ToastManager = koinInject(),
     viewModel: StatsViewModel = koinViewModel(),
 ) {
+    val context = LocalContext.current
+    val currentContext by rememberUpdatedState(context)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
+        when (sideEffect) {
+            is StatsSideEffect.ShowToast ->
+                toastManager.tryShow(
+                    ToastData(
+                        message = currentContext.getString(sideEffect.message),
+                        type = sideEffect.type,
+                    ),
+                )
+        }
+    }
+
     StatsScreen(
         uiState = uiState,
-        onClickInProgressPreviousMonth = { viewModel.dispatch(StatsIntent.OnClickPreviousMonth) },
-        onClickInProgressNextMonth = { viewModel.dispatch(StatsIntent.OnClickNextMonth) },
+        onClickInProgressPreviousMonth = { viewModel.dispatch(StatsIntent.PreviousMonth) },
+        onClickInProgressNextMonth = { viewModel.dispatch(StatsIntent.NextMonth) },
     )
 }
 
@@ -142,20 +163,16 @@ private fun StatsTabPager(
         state = pagerState,
         modifier = Modifier.fillMaxSize(),
     ) { page ->
-        when (val destination = StatsTabDestination.entries[page]) {
+        when (StatsTabDestination.entries[page]) {
             StatsTabDestination.IN_PROGRESS ->
-                StatsContent(
+                InProgressStatsContent(
                     stats = uiState.inProgressStats,
-                    currentTab = destination,
                     onClickPreviousMonth = { onClickPreviousMonth() },
                     onClickNextMonth = { onClickNextMonth() },
                 )
 
             StatsTabDestination.END ->
-                StatsContent(
-                    stats = uiState.endStats,
-                    currentTab = destination,
-                )
+                EndStatsContent(statsGoals = uiState.endStats)
         }
     }
 }

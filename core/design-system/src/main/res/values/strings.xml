@@ -74,7 +74,7 @@
     <string name="stats_stamp_total_count">이번달 목표 %d번</string>
     <string name="stats_stamp_not_has_in_progress_goal">아직 목표가 없어요!</string>
     <string name="stats_stamp_not_has_complete_goal">아직 끝낸 목표가 없어요!</string>
-    <string name="stats_stamp_total_end_count">총 목료 %d번</string>
+    <string name="stats_stamp_total_end_count">총 목표 %d번</string>
     <string name="stats_stamp_end_count">%d번 완료</string>
     <string name="stats_stamp_in_progress_tap_title">진행중</string>
     <string name="stats_stamp_end_tap_title">종료</string>
@@ -91,6 +91,7 @@
     <string name="toast_logout_failed">로그아웃에 실패했습니다.</string>
     <string name="toast_account_deleted">계정이 삭제되었습니다.</string>
     <string name="toast_account_delete_failed">계정 삭제에 실패했습니다.</string>
+    <string name="toast_fetch_stats_failed">통계 조회에 실패했습니다.</string>
 
     <!-- 다이얼로그 -->
     <string name="dialog_end_goal_title">%s\n목표를 이루셨나요?</string>

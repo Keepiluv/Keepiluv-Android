@@ -28,8 +28,8 @@ internal fun TaskCertificationCardContent(
                     BetweenUs.ME -> stringResource(R.string.task_certification_take_picture)
                     BetweenUs.PARTNER -> stringResource(R.string.task_certification_detail_partner_sting)
                 },
-            rotation = if (uiState.currentShow == BetweenUs.ME) -8f else 0f,
-            onClick = if (uiState.currentShow == BetweenUs.ME) onClickUpload else onClickSting,
+            rotation = if (uiState.isDisplayedMyPhotolog) -8f else 0f,
+            onClick = if (uiState.isDisplayedMyPhotolog) onClickUpload else onClickSting,
         )
 
         SwipeableCard(
@@ -42,7 +42,7 @@ internal fun TaskCertificationCardContent(
                 imageUrl = uiState.displayedGoalImageUrl,
                 comment = uiState.displayedGoalComment,
                 currentShow = uiState.currentShow,
-                rotation = if (uiState.currentShow == BetweenUs.ME) 0f else -8f,
+                rotation = if (uiState.isDisplayedMyPhotolog) 0f else -8f,
             )
         }
     }

@@ -66,6 +66,10 @@ data class TaskCertificationDetailUiState(
                 BetweenUs.PARTNER -> partnerNickname
             }
 
+    val isDisplayedMyPhotolog: Boolean
+        get() =
+            currentShow == BetweenUs.ME
+
     val canModify: Boolean
         get() =
             currentShow == BetweenUs.ME && isDisplayedGoalCertificated

@@ -47,9 +47,11 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
+import java.time.LocalDate
 
 @Composable
 fun StatsRoute(
+    navigateToDetail: (Long, LocalDate?) -> Unit,
     toastManager: ToastManager = koinInject(),
     viewModel: StatsViewModel = koinViewModel(),
 ) {
@@ -73,6 +75,15 @@ fun StatsRoute(
         uiState = uiState,
         onClickInProgressPreviousMonth = { viewModel.dispatch(StatsIntent.PreviousMonth) },
         onClickInProgressNextMonth = { viewModel.dispatch(StatsIntent.NextMonth) },
+        onClickStatsCard = { goalId, destination ->
+            val currentDate =
+                when (destination) {
+                    StatsTabDestination.IN_PROGRESS -> uiState.inProgressStats.selectedDate
+                    StatsTabDestination.END -> null
+                }
+
+            navigateToDetail(goalId, currentDate)
+        },
     )
 }
 
@@ -81,6 +92,7 @@ fun StatsScreen(
     uiState: StatsUiState,
     onClickInProgressPreviousMonth: () -> Unit,
     onClickInProgressNextMonth: () -> Unit,
+    onClickStatsCard: (Long, StatsTabDestination) -> Unit,
 ) {
     val pagerState =
         rememberPagerState(initialPage = StatsTabDestination.IN_PROGRESS.ordinal) {
@@ -97,6 +109,7 @@ fun StatsScreen(
             pagerState = pagerState,
             onClickPreviousMonth = onClickInProgressPreviousMonth,
             onClickNextMonth = onClickInProgressNextMonth,
+            onClickStatsCard = onClickStatsCard,
         )
     }
 }
@@ -150,22 +163,29 @@ private fun StatsTabPager(
     pagerState: PagerState,
     onClickPreviousMonth: () -> Unit,
     onClickNextMonth: () -> Unit,
+    onClickStatsCard: (Long, StatsTabDestination) -> Unit,
 ) {
     HorizontalPager(
         state = pagerState,
         modifier = Modifier.fillMaxSize(),
     ) { page ->
-        when (StatsTabDestination.entries[page]) {
+        when (val tab = StatsTabDestination.entries[page]) {
             StatsTabDestination.IN_PROGRESS ->
                 InProgressStatsContent(
                     currentDate = uiState.currentDate,
                     stats = uiState.inProgressStats,
                     onClickPreviousMonth = { onClickPreviousMonth() },
                     onClickNextMonth = { onClickNextMonth() },
+                    onClickStatsCard = {
+                        onClickStatsCard(it, tab)
+                    },
                 )
 
             StatsTabDestination.END ->
-                EndStatsContent(statsGoals = uiState.endStats)
+                EndStatsContent(
+                    statsGoals = uiState.endStats,
+                    onClickStatsCard = { onClickStatsCard(it, tab) },
+                )
         }
     }
 }
@@ -190,6 +210,7 @@ fun StatsRoutePreview(
             uiState = uiState,
             onClickInProgressPreviousMonth = {},
             onClickInProgressNextMonth = {},
+            onClickStatsCard = { _, _ -> },
         )
     }
 }

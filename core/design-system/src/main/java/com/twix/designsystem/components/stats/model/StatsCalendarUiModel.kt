@@ -35,31 +35,3 @@ data class StatsCalendarUiModel(
         }
     }
 }
-
-val dummyStatsCalendarUiModel =
-    StatsCalendarUiModel.create(
-        currentDate = LocalDate.of(2025, 2, 1),
-        completedDate =
-            listOf(
-                CompletedDate(LocalDate.of(2025, 2, 1), "https://picsum.photos/seed/1/200", "https://picsum.photos/seed/2/200"),
-                CompletedDate(LocalDate.of(2025, 2, 3), "https://picsum.photos/seed/3/200", null),
-                CompletedDate(LocalDate.of(2025, 2, 5), null, "https://picsum.photos/seed/4/200"),
-                CompletedDate(LocalDate.of(2025, 2, 7), "https://picsum.photos/seed/5/200", "https://picsum.photos/seed/6/200"),
-                CompletedDate(LocalDate.of(2025, 2, 8), "https://picsum.photos/seed/7/200", "https://picsum.photos/seed/8/200"),
-                CompletedDate(LocalDate.of(2025, 2, 10), null, "https://picsum.photos/seed/9/200"),
-                CompletedDate(LocalDate.of(2025, 2, 11), "https://picsum.photos/seed/10/200", null),
-                CompletedDate(LocalDate.of(2025, 2, 13), "https://picsum.photos/seed/11/200", "https://picsum.photos/seed/12/200"),
-                CompletedDate(LocalDate.of(2025, 2, 14), "https://picsum.photos/seed/13/200", "https://picsum.photos/seed/14/200"),
-                CompletedDate(LocalDate.of(2025, 2, 15), null, null),
-                CompletedDate(LocalDate.of(2025, 2, 17), "https://picsum.photos/seed/15/200", "https://picsum.photos/seed/16/200"),
-                CompletedDate(LocalDate.of(2025, 2, 18), "https://picsum.photos/seed/17/200", null),
-                CompletedDate(LocalDate.of(2025, 2, 19), null, "https://picsum.photos/seed/18/200"),
-                CompletedDate(LocalDate.of(2025, 2, 20), "https://picsum.photos/seed/19/200", "https://picsum.photos/seed/20/200"),
-                CompletedDate(LocalDate.of(2025, 2, 21), "https://picsum.photos/seed/21/200", "https://picsum.photos/seed/22/200"),
-                CompletedDate(LocalDate.of(2025, 2, 22), null, "https://picsum.photos/seed/23/200"),
-                CompletedDate(LocalDate.of(2025, 2, 24), "https://picsum.photos/seed/24/200", null),
-                CompletedDate(LocalDate.of(2025, 2, 25), "https://picsum.photos/seed/25/200", "https://picsum.photos/seed/26/200"),
-                CompletedDate(LocalDate.of(2025, 2, 27), null, null),
-                CompletedDate(LocalDate.of(2025, 2, 28), "https://picsum.photos/seed/27/200", "https://picsum.photos/seed/28/200"),
-            ),
-    )

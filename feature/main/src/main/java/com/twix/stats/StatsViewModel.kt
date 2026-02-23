@@ -1,6 +1,5 @@
 package com.twix.stats
 
-import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.repository.StatsRepository
@@ -9,7 +8,6 @@ import com.twix.stats.contract.StatsSideEffect
 import com.twix.stats.contract.StatsUiState
 import com.twix.ui.base.BaseViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class StatsViewModel(

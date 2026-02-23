@@ -42,7 +42,6 @@ import com.twix.stats.contract.StatsUiState
 import com.twix.stats.model.StatsTabDestination
 import com.twix.stats.preview.StatsUiStatePreviewProvider
 import com.twix.ui.base.ObserveAsEvents
-import com.twix.ui.extension.noRippleClickable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.launch
@@ -139,14 +138,7 @@ private fun StatsTabRow(pagerState: PagerState) {
                         pagerState.animateScrollToPage(index)
                     }
                 },
-                modifier =
-                    Modifier
-                        .height(36.dp)
-                        .noRippleClickable {
-                            coroutineScope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
+                modifier = Modifier.height(36.dp),
             )
         }
     }

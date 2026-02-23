@@ -8,12 +8,15 @@ import com.twix.stats.contract.StatsIntent
 import com.twix.stats.contract.StatsSideEffect
 import com.twix.stats.contract.StatsUiState
 import com.twix.ui.base.BaseViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class StatsViewModel(
     private val statsRepository: StatsRepository,
 ) : BaseViewModel<StatsUiState, StatsIntent, StatsSideEffect>(StatsUiState()) {
+    private var inProgressStatsJob: Job? = null
+
     init {
         fetchInProgressStats(LocalDate.now())
         fetchEndStats()
@@ -27,11 +30,13 @@ class StatsViewModel(
     }
 
     private fun fetchInProgressStats(date: LocalDate) {
-        launchResult(
-            block = { statsRepository.fetchInProgressStats(date) },
-            onSuccess = { reduce { copy(inProgressStats = it) } },
-            onError = { showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR) },
-        )
+        inProgressStatsJob?.cancel()
+        inProgressStatsJob =
+            launchResult(
+                block = { statsRepository.fetchInProgressStats(date) },
+                onSuccess = { reduce { copy(inProgressStats = it) } },
+                onError = { showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR) },
+            )
     }
 
     private fun fetchPreviousMonthStats() {

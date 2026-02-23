@@ -117,16 +117,6 @@ private fun StatsCalendarPreview() {
                                 "https://picsum.photos/101",
                                 null,
                             ),
-                            CompletedDate(
-                                LocalDate.of(2026, 2, 15),
-                                "https://picsum.photos/102",
-                                "https://picsum.photos/102",
-                            ),
-                            CompletedDate(
-                                LocalDate.of(2026, 2, 28),
-                                null,
-                                "https://picsum.photos/103",
-                            ),
                         ),
                 ),
             onSelectedDate = { },

@@ -17,7 +17,7 @@ class NotificationTokenRegistrar(
     private val deviceIdProvider: IdProvider,
     private val appScope: CoroutineScope,
 ) {
-    private val logger = Logger.withTag("NotificationTokenRegister")
+    private val logger = Logger.withTag("NotificationTokenRegistrar")
 
     /**
      * 앱 시작 시 호출

@@ -92,6 +92,8 @@
     <string name="toast_account_deleted">계정이 삭제되었습니다.</string>
     <string name="toast_account_delete_failed">계정 삭제에 실패했습니다.</string>
     <string name="toast_fetch_stats_failed">통계 조회에 실패했습니다.</string>
+    <string name="toast_already_certificated">이미 인증되었어요.</string>
+    <string name="toast_camera_permission_request">인증샷 촬영을 위해서 카메라 권한이 필요해요.</string>
 
     <!-- 다이얼로그 -->
     <string name="dialog_end_goal_title">%s\n목표를 이루셨나요?</string>
@@ -101,4 +103,10 @@
     <string name="dialog_withdraw_account_title">정말 탈퇴하시겠어요?</string>
     <string name="dialog_withdraw_account_content">커플 연결이 끊어집니다.\n데이터는 전부 삭제되며 복구가 불가능합니다.</string>
 
+    <!-- 로그인 화면 -->
+    <string name="google_login_button_title">Google로 시작하기</string>
+    <string name="kakao_login_button_title">카카오로 시작하기</string>
+    <string name="login_fail_message">로그인에 실패했습니다. 다시 시도해주세요</string>
+    <string name="fetch_onboarding_status_fail_message">온보딩 정보를 불러오는 데 실패했습니다. 다시 시도해주세요</string>
+    <string name="login_title_message">함께니까 멈추지 않아요.\n지금 바로 키피럽 시작하기!</string>
 </resources>

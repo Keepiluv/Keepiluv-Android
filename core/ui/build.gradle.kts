@@ -12,4 +12,5 @@ android {
 dependencies {
     implementation(projects.domain)
     implementation(projects.core.result)
+    implementation(libs.androidx.exifinterface)
 }

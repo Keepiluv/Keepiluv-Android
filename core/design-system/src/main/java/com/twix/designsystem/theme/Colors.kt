@@ -35,3 +35,8 @@ object ChromaticColor {
     val Orange400 = Color(0xFFFFA271)
     val Purple400 = Color(0xFFDCC3FF)
 }
+
+object LoginColor {
+    val Google = Color(0xFFFFFFFF)
+    val Kakao = Color(0xFFFEE500)
+}

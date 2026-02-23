@@ -1,4 +1,4 @@
-package com.twix.login.model
+package com.twix.login.contract
 
 import com.twix.domain.login.LoginResult
 import com.twix.ui.base.Intent

@@ -16,7 +16,7 @@ import com.twix.ui.extension.noRippleClickable
 fun GoalCheckIndicator(
     state: GoalCheckState,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit,
+    onClick: (GoalCheckState) -> Unit,
 ) {
     val meChecked = state == GoalCheckState.ONLY_ME || state == GoalCheckState.BOTH
     val partnerChecked = state == GoalCheckState.ONLY_PARTNER || state == GoalCheckState.BOTH
@@ -25,14 +25,14 @@ fun GoalCheckIndicator(
         CheckDot(
             checked = partnerChecked,
             isPartner = true,
-            onClick = onClick,
+            onClick = { onClick(state) },
         )
 
         CheckDot(
             checked = meChecked,
             isPartner = false,
             modifier = Modifier.offset(x = (-17).dp),
-            onClick = onClick,
+            onClick = { onClick(state) },
         )
     }
 }

@@ -1,4 +1,4 @@
-package com.twix.login.component
+package com.twix.designsystem.components.button
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,15 +20,11 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.components.text.AppText
-import com.twix.designsystem.theme.CommonColor
-import com.twix.designsystem.theme.GrayColor
+import com.twix.designsystem.extension.toUiModel
 import com.twix.designsystem.theme.TwixTheme
-import com.twix.domain.login.LoginType
 import com.twix.domain.model.enums.AppTextStyle
-import com.twix.login.R
-import com.twix.login.model.LoginTypeUiModel
+import com.twix.domain.model.enums.LoginType
 import com.twix.ui.extension.noRippleClickable
-import com.twix.designsystem.R as DesR
 
 @Composable
 fun LoginButton(
@@ -36,7 +32,8 @@ fun LoginButton(
     onClickLogin: (LoginType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val uiModel = type.uiModel()
+    val uiModel = type.toUiModel()
+
     Row(
         modifier =
             modifier
@@ -45,50 +42,28 @@ fun LoginButton(
                 .clip(RoundedCornerShape(12.dp))
                 .background(uiModel.background)
                 .border(1.dp, uiModel.border, RoundedCornerShape(12.dp))
-                .noRippleClickable { onClickLogin(type) },
+                .noRippleClickable { onClickLogin(uiModel.type) },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
-            imageVector = uiModel.logo,
+            imageVector = ImageVector.vectorResource(uiModel.logo),
             contentDescription = null,
         )
 
         Spacer(Modifier.width(12.dp))
 
         AppText(
-            text = uiModel.title,
+            text = stringResource(uiModel.title),
             style = AppTextStyle.T3,
             color = uiModel.textColor,
         )
     }
 }
 
+@Preview
 @Composable
-private fun LoginType.uiModel(): LoginTypeUiModel =
-    when (this) {
-        LoginType.GOOGLE ->
-            LoginTypeUiModel(
-                logo = ImageVector.vectorResource(DesR.drawable.ic_google),
-                title = stringResource(R.string.google_login_button_title),
-                background = CommonColor.White,
-                border = GrayColor.C200,
-                textColor = GrayColor.C500,
-            )
-        // TODO : KAKAO용으로 수정
-        LoginType.KAKAO ->
-            LoginTypeUiModel(
-                logo = ImageVector.vectorResource(DesR.drawable.ic_google),
-                title = stringResource(R.string.google_login_button_title),
-                background = CommonColor.White,
-                border = GrayColor.C200,
-                textColor = GrayColor.C500,
-            )
-    }
-
-@Preview(showBackground = true)
-@Composable
-fun LoginButtonPreview() {
+private fun LoginButtonPreview() {
     TwixTheme {
         LoginButton(
             type = LoginType.GOOGLE,

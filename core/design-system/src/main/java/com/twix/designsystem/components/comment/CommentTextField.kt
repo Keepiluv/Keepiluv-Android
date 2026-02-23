@@ -73,6 +73,10 @@ fun CommentTextField(
         }
     }
 
+    LaunchedEffect(uiModel.isFocused) {
+        if (uiModel.isFocused) focusRequester.requestFocus()
+    }
+
     Box(
         modifier =
             modifier

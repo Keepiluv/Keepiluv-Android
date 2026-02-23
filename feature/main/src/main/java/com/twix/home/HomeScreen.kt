@@ -1,5 +1,8 @@
 package com.twix.home
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,12 +23,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.calendar.WeeklyCalendar
@@ -33,28 +41,93 @@ import com.twix.designsystem.components.goal.EmptyGoalGuide
 import com.twix.designsystem.components.goal.GoalCardFrame
 import com.twix.designsystem.components.goal.GoalCheckIndicator
 import com.twix.designsystem.components.text.AppText
+import com.twix.designsystem.components.toast.ToastManager
+import com.twix.designsystem.components.toast.model.ToastData
+import com.twix.designsystem.components.toast.model.ToastType
+import com.twix.designsystem.extension.showCameraPermissionToastWithNavigateToSettingAction
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.domain.model.enums.AppTextStyle
+import com.twix.domain.model.enums.BetweenUs
+import com.twix.domain.model.enums.GoalCheckState
 import com.twix.domain.model.goal.Goal
 import com.twix.domain.model.goal.checkState
 import com.twix.home.component.GoalVerifications
 import com.twix.home.component.HomeTopBar
 import com.twix.home.model.HomeUiState
+import com.twix.ui.base.ObserveAsEvents
+import com.twix.ui.extension.findActivity
 import com.twix.ui.extension.noRippleClickable
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import java.time.LocalDate
 
 @Composable
 fun HomeRoute(
     viewModel: HomeViewModel = koinViewModel(),
+    toastManager: ToastManager = koinInject(),
     onShowCalendarBottomSheet: () -> Unit,
     navigateToGoalEditor: () -> Unit,
     navigateToGoalManage: (LocalDate) -> Unit,
-    navigateToCertificationDetail: (Long) -> Unit,
     navigateToSettings: () -> Unit,
+    navigateToCertification: (Long) -> Unit,
+    navigateToCertificationDetail: (Long, LocalDate, BetweenUs) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val currentContext by rememberUpdatedState(context)
+    val coroutineScope = rememberCoroutineScope()
+
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { granted ->
+            if (granted) {
+                navigateToCertification(uiState.selectedGoalId)
+                return@rememberLauncherForActivityResult
+            }
+
+            val activity = currentContext.findActivity() ?: return@rememberLauncherForActivityResult
+
+            val shouldShowRationale =
+                ActivityCompat.shouldShowRequestPermissionRationale(
+                    activity,
+                    Manifest.permission.CAMERA,
+                )
+            coroutineScope.launch {
+                if (!shouldShowRationale) {
+                    toastManager.showCameraPermissionToastWithNavigateToSettingAction(currentContext)
+                } else {
+                    toastManager.show(
+                        ToastData(
+                            currentContext.getString(
+                                R.string.toast_camera_permission_request,
+                            ),
+                            ToastType.ERROR,
+                        ),
+                    )
+                }
+            }
+        }
+
+    ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
+        when (sideEffect) {
+            HomeSideEffect.ShowPermissionLauncher -> {
+                permissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+
+            is HomeSideEffect.ShowToast ->
+                toastManager.tryShow(
+                    ToastData(
+                        currentContext.getString(sideEffect.resId),
+                        sideEffect.type,
+                    ),
+                )
+
+            HomeSideEffect.ShowMonthPickerBottomSheet -> Unit
+        }
+    }
 
     HomeScreen(
         uiState = uiState,
@@ -66,7 +139,10 @@ fun HomeRoute(
         onShowCalendarBottomSheet = onShowCalendarBottomSheet,
         onAddNewGoal = navigateToGoalEditor,
         onEditClick = { navigateToGoalManage(uiState.selectedDate) },
-        onVerificationClick = navigateToCertificationDetail,
+        onVerificationClick = { goalId, goalCheckState ->
+            viewModel.dispatch(HomeIntent.Verification(goalId, goalCheckState))
+        },
+        onClickCard = navigateToCertificationDetail,
         onSettingClick = navigateToSettings,
     )
 }
@@ -82,7 +158,8 @@ fun HomeScreen(
     onShowCalendarBottomSheet: () -> Unit,
     onAddNewGoal: () -> Unit,
     onEditClick: () -> Unit,
-    onVerificationClick: (Long) -> Unit,
+    onVerificationClick: (Long, GoalCheckState) -> Unit,
+    onClickCard: (Long, LocalDate, BetweenUs) -> Unit,
     onSettingClick: () -> Unit,
 ) {
     Box(
@@ -129,6 +206,7 @@ fun HomeScreen(
                     selectedDate = uiState.selectedDate,
                     onVerificationClick = onVerificationClick,
                     onEditClick = onEditClick,
+                    onClickGoalCard = onClickCard,
                 )
             }
         }
@@ -148,7 +226,8 @@ fun GoalList(
     modifier: Modifier = Modifier,
     goals: List<Goal>,
     selectedDate: LocalDate,
-    onVerificationClick: (Long) -> Unit,
+    onVerificationClick: (Long, GoalCheckState) -> Unit,
+    onClickGoalCard: (Long, LocalDate, BetweenUs) -> Unit,
     onEditClick: () -> Unit,
 ) {
     val today = remember { LocalDate.now() }
@@ -203,7 +282,7 @@ fun GoalList(
                 right = {
                     GoalCheckIndicator(
                         state = goal.checkState(),
-                        onClick = { onVerificationClick(goal.goalId) },
+                        onClick = { onVerificationClick(goal.goalId, it) },
                     )
                 },
                 content = {
@@ -211,6 +290,20 @@ fun GoalList(
                         GoalVerifications(
                             myVerification = goal.myVerification,
                             partnerVerification = goal.partnerVerification,
+                            onMyClick = {
+                                onClickGoalCard(
+                                    goal.goalId,
+                                    selectedDate,
+                                    BetweenUs.ME,
+                                )
+                            },
+                            onPartnerClick = {
+                                onClickGoalCard(
+                                    goal.goalId,
+                                    selectedDate,
+                                    BetweenUs.PARTNER,
+                                )
+                            },
                         )
                     }
                 },

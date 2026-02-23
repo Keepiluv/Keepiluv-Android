@@ -1,27 +1,39 @@
 package com.twix.network.model.response.photolog.mapper
 
+import com.twix.domain.model.enums.GoalIconType
+import com.twix.domain.model.enums.GoalReactionType
+import com.twix.domain.model.photolog.GoalPhotolog
 import com.twix.domain.model.photolog.PhotoLogs
 import com.twix.domain.model.photolog.PhotologDetail
-import com.twix.network.model.response.photolog.PhotoLogResponse
+import com.twix.network.model.response.photolog.GoalPhotologResponse
+import com.twix.network.model.response.photolog.PhotoLogsResponse
 import com.twix.network.model.response.photolog.PhotologDetailResponse
 
-fun PhotologDetailResponse.toDomain(): PhotologDetail =
-    PhotologDetail(
-        comment = comment,
-        goalId = goalId,
-        imageUrl = imageUrl,
-        isMine = isMine,
-        photologId = photologId,
-        uploadedAt = uploadedAt,
-        uploaderName = uploaderName,
-        verificationDate = verificationDate,
-    )
-
-fun PhotoLogResponse.toDomain(): PhotoLogs =
+fun PhotoLogsResponse.toDomain(): PhotoLogs =
     PhotoLogs(
-        goalId = goalId,
-        goalTitle = goalTitle,
+        targetDate = targetDate,
         myNickname = myNickname,
         partnerNickname = partnerNickname,
-        photologDetails = photologs?.map { it.toDomain() } ?: emptyList(),
+        goals = photologs.map { it.toDomain() },
+    )
+
+private fun GoalPhotologResponse.toDomain(): GoalPhotolog =
+    GoalPhotolog(
+        goalId = goalId,
+        goalName = goalName,
+        icon = GoalIconType.fromApi(goalIcon),
+        myPhotolog = myPhotolog?.toDomain(),
+        partnerPhotolog = partnerPhotolog?.toDomain(),
+    )
+
+private fun PhotologDetailResponse.toDomain(): PhotologDetail =
+    PhotologDetail(
+        photologId = photologId,
+        goalId = goalId,
+        imageUrl = imageUrl,
+        comment = comment,
+        verificationDate = verificationDate,
+        uploaderName = uploaderName,
+        uploadedAt = uploadedAt,
+        reaction = GoalReactionType.fromApi(reaction),
     )

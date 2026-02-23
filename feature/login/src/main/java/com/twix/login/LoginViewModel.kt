@@ -1,14 +1,15 @@
 package com.twix.login
 
 import androidx.lifecycle.viewModelScope
+import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.login.LoginResult
 import com.twix.domain.model.OnboardingStatus
 import com.twix.domain.repository.AuthRepository
 import com.twix.domain.repository.OnBoardingRepository
-import com.twix.login.model.LoginIntent
-import com.twix.login.model.LoginSideEffect
-import com.twix.login.model.LoginUiState
+import com.twix.login.contract.LoginIntent
+import com.twix.login.contract.LoginSideEffect
+import com.twix.login.contract.LoginUiState
 import com.twix.ui.base.BaseViewModel
 import kotlinx.coroutines.launch
 

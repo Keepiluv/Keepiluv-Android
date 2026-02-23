@@ -30,9 +30,15 @@ fun StatsGoalCard(
             AppText(
                 text =
                     if (showStamp) {
-                        stringResource(R.string.stats_stamp_total_count, statsGoal.monthlyTargetCount)
+                        stringResource(
+                            R.string.stats_stamp_total_count,
+                            statsGoal.monthlyTargetCount,
+                        )
                     } else {
-                        stringResource(R.string.stats_stamp_total_end_count, statsGoal.monthlyTargetCount)
+                        stringResource(
+                            R.string.stats_stamp_total_end_count,
+                            statsGoal.monthlyTargetCount,
+                        )
                     },
                 style = AppTextStyle.B1,
                 color = GrayColor.C500,
@@ -45,9 +51,9 @@ fun StatsGoalCard(
     )
 }
 
-@Preview(name = "StatsGoalCard")
+@Preview
 @Composable
-fun StatsGoalCardPreview() {
+private fun StatsGoalCardPreview() {
     TwixTheme {
         StatsGoalCard(
             statsGoal =

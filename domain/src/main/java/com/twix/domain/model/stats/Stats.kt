@@ -6,10 +6,6 @@ data class Stats(
     val selectedDate: LocalDate,
     val statsGoals: List<StatsGoal>,
 ) {
-    fun nextMonth(): Stats = copy(selectedDate = selectedDate.plusMonths(1))
-
-    fun previousMonth(): Stats = copy(selectedDate = selectedDate.minusMonths(1))
-
     companion object {
         val EMPTY = Stats(selectedDate = LocalDate.now(), statsGoals = emptyList())
     }

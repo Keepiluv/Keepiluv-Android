@@ -1,8 +1,8 @@
 package com.yapp.twix
 
 import android.app.Application
-import com.kakao.sdk.common.KakaoSdk
 import co.touchlab.kermit.Logger
+import com.kakao.sdk.common.KakaoSdk
 import com.twix.notification.token.NotificationTokenRegistrar
 import com.yapp.twix.di.initKoin
 import org.koin.java.KoinJavaComponent.getKoin

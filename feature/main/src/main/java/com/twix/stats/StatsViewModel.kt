@@ -35,12 +35,14 @@ class StatsViewModel(
     }
 
     private fun fetchPreviousMonthStats() {
-        val previousMonth = currentState.inProgressStats.selectedDate.minusMonths(1)
+        val previousMonth = currentState.currentDate.minusMonths(1)
+        reduce { copy(currentDate = previousMonth) }
         fetchInProgressStats(previousMonth)
     }
 
     private fun fetchNextMonthStats() {
-        val nextMonth = currentState.inProgressStats.selectedDate.plusMonths(1)
+        val nextMonth = currentState.currentDate.plusMonths(1)
+        reduce { copy(currentDate = nextMonth) }
         fetchInProgressStats(nextMonth)
     }
 

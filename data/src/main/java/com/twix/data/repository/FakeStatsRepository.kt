@@ -32,7 +32,7 @@ class FakeStatsRepository : StatsRepository {
 
     private fun initializeFakeData() {
         val now = LocalDate.now()
-        (-2..1).forEach { monthOffset ->
+        (-2..3).forEach { monthOffset ->
             val date = now.plusMonths(monthOffset.toLong()).withDayOfMonth(1)
             fakeInProgressStore[date] = createFakeStats(date, isEmpty = monthOffset == -1)
         }

@@ -23,9 +23,11 @@ import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.stats.Stats
 import com.twix.stats.contract.StatsUiState
 import com.twix.stats.preview.StatsUiStatePreviewProvider
+import java.time.LocalDate
 
 @Composable
 fun InProgressStatsContent(
+    currentDate: LocalDate,
     stats: Stats,
     modifier: Modifier = Modifier,
     onClickPreviousMonth: () -> Unit = {},
@@ -40,7 +42,7 @@ fun InProgressStatsContent(
     ) {
         item {
             CalendarNavigator(
-                currentDate = stats.selectedDate,
+                currentDate = currentDate,
                 onPreviousMonth = onClickPreviousMonth,
                 onNextMonth = onClickNextMonth,
                 modifier = Modifier.padding(top = 16.dp),
@@ -72,6 +74,7 @@ fun InProgressStatsContentPreview(
 ) {
     TwixTheme {
         InProgressStatsContent(
+            currentDate = uiState.currentDate,
             stats = uiState.inProgressStats,
             onClickPreviousMonth = {},
             onClickNextMonth = {},

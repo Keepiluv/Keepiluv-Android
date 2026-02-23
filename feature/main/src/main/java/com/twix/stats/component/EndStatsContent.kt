@@ -15,10 +15,12 @@ import com.twix.designsystem.components.stats.EmptyStatsGuide
 import com.twix.designsystem.components.stats.StatsGoalCard
 import com.twix.designsystem.theme.GrayColor
 import com.twix.domain.model.stats.StatsGoal
+import com.twix.ui.extension.noRippleClickable
 
 @Composable
 fun EndStatsContent(
     statsGoals: List<StatsGoal>,
+    onClickStatsCard: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(
@@ -42,7 +44,11 @@ fun EndStatsContent(
                 items = statsGoals,
                 key = { it.goalId },
             ) {
-                StatsGoalCard(it, false)
+                StatsGoalCard(
+                    statsGoal = it,
+                    showStamp = false,
+                    modifier = Modifier.noRippleClickable(onClick = { onClickStatsCard(it.goalId) }),
+                )
             }
         }
     }

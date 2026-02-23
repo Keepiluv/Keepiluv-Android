@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.twix.koin)
     alias(libs.plugins.google.firebase.crashlytics)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.twix.kermit)
 }
 
 android {
@@ -41,8 +42,11 @@ dependencies {
     implementation(projects.feature.goalEditor)
     implementation(projects.feature.goalManage)
     implementation(projects.feature.settings)
+    implementation(projects.core.notification)
+    implementation(projects.core.navigationContract)
 
     // Firebase
     implementation(platform(libs.google.firebase.bom))
     implementation(libs.google.firebase.crashlytics)
+    implementation(libs.google.firebase.messaging)
 }

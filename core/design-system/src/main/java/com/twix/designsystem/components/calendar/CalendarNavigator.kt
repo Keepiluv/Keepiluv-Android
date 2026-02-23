@@ -39,9 +39,9 @@ fun CalendarNavigator(
             contentDescription = "previous month",
             modifier =
                 Modifier
-                    .padding(6.dp)
                     .size(24.dp)
-                    .noRippleClickable(onClick = onPreviousMonth),
+                    .noRippleClickable(onClick = onPreviousMonth)
+                    .padding(6.dp),
         )
 
         AppText(
@@ -56,9 +56,9 @@ fun CalendarNavigator(
             contentDescription = "next month",
             modifier =
                 Modifier
-                    .padding(6.dp)
                     .size(24.dp)
-                    .noRippleClickable(onClick = onNextMonth),
+                    .noRippleClickable(onClick = onNextMonth)
+                    .padding(6.dp),
         )
     }
 }

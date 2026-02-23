@@ -192,7 +192,6 @@ class TaskCertificationViewModel(
                 tryEmitSideEffect(TaskCertificationSideEffect.NavigateToDetail)
             },
             onError = {
-                showToast(R.string.task_certification_upload_fail, ToastType.ERROR)
                 showToast(R.string.task_certification_modify_fail, ToastType.ERROR)
             },
         )

@@ -8,7 +8,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
-val notificationModule =
+val notificationFeatureModule =
     module {
         single<NavGraphContributor>(named(NavRoutes.NotificationGraph.route)) { NotificationNavGraph }
         viewModelOf(::NotificationViewModel)

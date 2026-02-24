@@ -5,7 +5,7 @@ import com.twix.goal_manage.di.goalManageModule
 import com.twix.home.di.homeModule
 import com.twix.login.di.loginModule
 import com.twix.main.di.mainModule
-import com.twix.notification.di.notificationModule
+import com.twix.notification.di.notificationFeatureModule
 import com.twix.onboarding.di.onBoardingModule
 import com.twix.settings.di.settingsModule
 import com.twix.stats.di.statsModule
@@ -23,5 +23,5 @@ val featureModules: List<Module> =
         settingsModule,
         onBoardingModule,
         statsModule,
-        notificationModule,
+        notificationFeatureModule,
     )

@@ -4,13 +4,18 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
 class StatsRefreshBus {
+    enum class Publisher {
+        InProgress,
+        End,
+    }
+
     private val _events =
-        MutableSharedFlow<Unit>(
+        MutableSharedFlow<Publisher>(
             replay = 0,
             extraBufferCapacity = 1,
         )
 
-    val events: SharedFlow<Unit> = _events
+    val events: SharedFlow<Publisher> = _events
 
-    fun notifyChanged() = _events.tryEmit(Unit)
+    fun notifyChanged(publisher: Publisher) = _events.tryEmit(publisher)
 }

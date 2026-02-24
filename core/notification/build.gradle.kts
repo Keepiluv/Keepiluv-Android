@@ -2,7 +2,6 @@ plugins {
     alias(libs.plugins.twix.android.library)
     alias(libs.plugins.twix.koin)
     alias(libs.plugins.twix.kermit)
-    alias(libs.plugins.google.services)
 }
 
 android {

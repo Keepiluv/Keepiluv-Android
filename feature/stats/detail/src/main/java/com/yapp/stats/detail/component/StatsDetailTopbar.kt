@@ -3,7 +3,6 @@ package com.yapp.stats.detail.component
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -83,10 +83,14 @@ private fun PopupMenu(
     onEnd: () -> Unit,
     onDelete: () -> Unit,
 ) {
-    Column(
+    val density = LocalDensity.current
+    val popupOffset =
+        with(density) {
+            IntOffset(x = -40.dp.roundToPx(), y = 55.dp.roundToPx())
+        }
+    Box(
         modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        contentAlignment = Alignment.Center,
     ) {
         Image(
             painter = painterResource(R.drawable.ic_meatball),
@@ -100,7 +104,7 @@ private fun PopupMenu(
 
         CommonPopup(
             visible = popupMenuVisibility,
-            anchorOffset = IntOffset(x = -100, y = 140),
+            anchorOffset = popupOffset,
             onDismiss = onDismiss,
         ) {
             Column(

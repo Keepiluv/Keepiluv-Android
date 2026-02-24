@@ -5,7 +5,3 @@ plugins {
 android {
     namespace = "com.twix.navigation_contract"
 }
-
-dependencies {
-    implementation(project(":core:ui"))
-}

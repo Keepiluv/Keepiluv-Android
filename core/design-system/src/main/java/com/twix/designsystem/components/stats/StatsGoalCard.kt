@@ -66,13 +66,13 @@ private fun StatsGoalCardPreview() {
                     myStats =
                         ParticipantStats(
                             nickname = "Me",
-                            endCount = 5,
+                            completedConut = 5,
                             stampColors = listOf(StampColor.BLUE400, StampColor.PINK400),
                         ),
                     partnerStats =
                         ParticipantStats(
                             nickname = "Partner",
-                            endCount = 3,
+                            completedConut = 3,
                             stampColors = listOf(StampColor.GREEN400, StampColor.YELLOW400),
                         ),
                 ),

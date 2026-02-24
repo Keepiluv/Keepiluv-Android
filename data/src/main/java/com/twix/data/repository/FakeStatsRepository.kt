@@ -117,13 +117,13 @@ class FakeStatsRepository : StatsRepository {
             myStats =
                 ParticipantStats(
                     nickname = "찬호",
-                    endCount = if (isEmpty) 0 else Random.nextInt(3, myCount + 1),
+                    completedConut = if (isEmpty) 0 else Random.nextInt(3, myCount + 1),
                     stampColors = List(myCount) { StampColor.entries.random() },
                 ),
             partnerStats =
                 ParticipantStats(
                     nickname = "페토",
-                    endCount = if (isEmpty) 0 else Random.nextInt(3, partnerCount + 1),
+                    completedConut = if (isEmpty) 0 else Random.nextInt(3, partnerCount + 1),
                     stampColors = List(partnerCount) { StampColor.entries.random() },
                 ),
         )

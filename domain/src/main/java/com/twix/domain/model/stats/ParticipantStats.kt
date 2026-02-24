@@ -4,6 +4,6 @@ import com.twix.domain.model.enums.StampColor
 
 data class ParticipantStats(
     val nickname: String,
-    val endCount: Int,
+    val completedConut: Int,
     val stampColors: List<StampColor>,
 )

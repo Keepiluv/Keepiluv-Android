@@ -13,6 +13,7 @@ import com.twix.util.bus.StatsRefreshBus
 import com.yapp.stats.detail.contract.StatsDetailIntent
 import com.yapp.stats.detail.contract.StatsDetailSideEffect
 import com.yapp.stats.detail.contract.StatsDetailUiState
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -29,6 +30,8 @@ class StatsDetailViewModel(
 
     private val argDate: String? = savedSateHandle.get<String>(NavRoutes.StatsDetailRoute.ARG_DATE)
 
+    private var fetchStatsDetailJob: Job? = null
+
     init {
         reduceNavArguments()
         fetchStatsDetail(argDate?.let { LocalDate.parse(it) })
@@ -44,23 +47,25 @@ class StatsDetailViewModel(
     }
 
     private fun fetchStatsDetail(date: LocalDate?) {
-        launchResult(
-            block = { statsRepository.fetchStatsDetail(currentState.goalId, date) },
-            onSuccess = {
-                reduce {
-                    copy(
-                        detail = it,
-                        selectedDate = it.monthDate,
-                        calendarUiModel =
-                            StatsCalendarUiModel.create(
-                                currentDate = it.monthDate,
-                                completedDate = it.completedDate,
-                            ),
-                    )
-                }
-            },
-            onError = { showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR) },
-        )
+        fetchStatsDetailJob?.cancel()
+        fetchStatsDetailJob =
+            launchResult(
+                block = { statsRepository.fetchStatsDetail(currentState.goalId, date) },
+                onSuccess = {
+                    reduce {
+                        copy(
+                            detail = it,
+                            selectedDate = it.monthDate,
+                            calendarUiModel =
+                                StatsCalendarUiModel.create(
+                                    currentDate = it.monthDate,
+                                    completedDate = it.completedDate,
+                                ),
+                        )
+                    }
+                },
+                onError = { showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR) },
+            )
     }
 
     override suspend fun handleIntent(intent: StatsDetailIntent) {
@@ -93,7 +98,7 @@ class StatsDetailViewModel(
         launchResult(
             block = { goalRepository.completeGoal(argGoalId) },
             onSuccess = {
-                statsRefreshBus.notifyChanged()
+                statsRefreshBus.notifyChanged(StatsRefreshBus.Publisher.InProgress)
                 tryEmitSideEffect(StatsDetailSideEffect.NavigateToBack)
             },
             onError = { showToast(R.string.toast_complete_goal_failed, ToastType.ERROR) },
@@ -104,7 +109,12 @@ class StatsDetailViewModel(
         launchResult(
             block = { goalRepository.completeGoal(argGoalId) },
             onSuccess = {
-                statsRefreshBus.notifyChanged()
+                val publisher =
+                    when (currentState.isInProgressStatsDetail) {
+                        true -> StatsRefreshBus.Publisher.InProgress
+                        else -> StatsRefreshBus.Publisher.End
+                    }
+                statsRefreshBus.notifyChanged(publisher)
                 tryEmitSideEffect(StatsDetailSideEffect.NavigateToBack)
             },
             onError = { showToast(R.string.toast_delete_goal_failed, ToastType.ERROR) },

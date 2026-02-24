@@ -39,6 +39,7 @@ import com.twix.domain.model.enums.AppTextStyle
 import com.twix.task_certification.certification.component.CameraControlBar
 import com.twix.task_certification.certification.component.CameraPreviewBox
 import com.twix.task_certification.certification.component.CommentErrorText
+import com.twix.task_certification.certification.component.LoadingContent
 import com.twix.task_certification.certification.component.TaskCertificationTopBar
 import com.twix.task_certification.certification.contract.TaskCertificationIntent
 import com.twix.task_certification.certification.contract.TaskCertificationSideEffect
@@ -95,48 +96,53 @@ fun TaskCertificationRoute(
                     ),
                 )
             }
+
             TaskCertificationSideEffect.NavigateToBack -> navigateToBack()
             TaskCertificationSideEffect.NavigateToDetail -> navigateToDetail()
         }
     }
 
-    TaskCertificationScreen(
-        uiState = uiState,
-        cameraPreview = cameraPreview,
-        onClickClose = navigateToBack,
-        onCaptureClick = {
-            coroutineScope.launch {
-                camera
-                    .takePicture()
-                    .onSuccess {
-                        viewModel.dispatch(TaskCertificationIntent.TakePicture(it))
-                    }.onFailure {
-                        viewModel.dispatch(TaskCertificationIntent.TakePicture(null))
-                    }
-            }
-        },
-        onToggleCameraClick = {
-            viewModel.dispatch(TaskCertificationIntent.ToggleLens)
-        },
-        onClickFlash = {
-            viewModel.dispatch(TaskCertificationIntent.ToggleTorch)
-        },
-        onClickGallery = {
-            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-        },
-        onClickRefresh = {
-            viewModel.dispatch(TaskCertificationIntent.RetakePicture)
-        },
-        onCommentChanged = {
-            viewModel.dispatch(TaskCertificationIntent.UpdateComment(it))
-        },
-        onFocusChanged = {
-            viewModel.dispatch(TaskCertificationIntent.CommentFocusChanged(it))
-        },
-        onClickUpload = {
-            viewModel.dispatch(TaskCertificationIntent.TryUpload)
-        },
-    )
+    if (uiState.isLoading) {
+        LoadingContent()
+    } else {
+        TaskCertificationScreen(
+            uiState = uiState,
+            cameraPreview = cameraPreview,
+            onClickClose = navigateToBack,
+            onCaptureClick = {
+                coroutineScope.launch {
+                    camera
+                        .takePicture()
+                        .onSuccess {
+                            viewModel.dispatch(TaskCertificationIntent.TakePicture(it))
+                        }.onFailure {
+                            viewModel.dispatch(TaskCertificationIntent.TakePicture(null))
+                        }
+                }
+            },
+            onToggleCameraClick = {
+                viewModel.dispatch(TaskCertificationIntent.ToggleLens)
+            },
+            onClickFlash = {
+                viewModel.dispatch(TaskCertificationIntent.ToggleTorch)
+            },
+            onClickGallery = {
+                pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            },
+            onClickRefresh = {
+                viewModel.dispatch(TaskCertificationIntent.RetakePicture)
+            },
+            onCommentChanged = {
+                viewModel.dispatch(TaskCertificationIntent.UpdateComment(it))
+            },
+            onFocusChanged = {
+                viewModel.dispatch(TaskCertificationIntent.CommentFocusChanged(it))
+            },
+            onClickUpload = {
+                viewModel.dispatch(TaskCertificationIntent.TryUpload)
+            },
+        )
+    }
 }
 
 @Composable

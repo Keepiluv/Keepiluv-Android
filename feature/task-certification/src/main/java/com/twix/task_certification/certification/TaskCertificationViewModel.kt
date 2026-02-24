@@ -125,6 +125,7 @@ class TaskCertificationViewModel(
     }
 
     private fun upload(image: ByteArray) {
+        reduce { copy(isLoading = true) }
         launchResult(
             block = {
                 photologRepository.uploadPhotologImage(
@@ -134,6 +135,7 @@ class TaskCertificationViewModel(
                 )
             },
             onSuccess = { fileName ->
+                reduce { copy(isLoading = false) }
                 when (navArgs.from) {
                     NavRoutes.TaskCertificationRoute.From.DETAIL,
                     NavRoutes.TaskCertificationRoute.From.HOME,
@@ -143,6 +145,7 @@ class TaskCertificationViewModel(
                 }
             },
             onError = {
+                reduce { copy(isLoading = false) }
                 showToast(R.string.task_certification_upload_fail, ToastType.ERROR)
             },
         )

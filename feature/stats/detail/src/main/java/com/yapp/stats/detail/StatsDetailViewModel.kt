@@ -107,7 +107,7 @@ class StatsDetailViewModel(
 
     private fun deleteGoal() {
         launchResult(
-            block = { goalRepository.completeGoal(argGoalId) },
+            block = { goalRepository.deleteGoal(argGoalId) },
             onSuccess = {
                 val publisher =
                     when (currentState.isInProgressStatsDetail) {

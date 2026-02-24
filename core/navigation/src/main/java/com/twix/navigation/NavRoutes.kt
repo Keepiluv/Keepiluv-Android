@@ -122,4 +122,11 @@ sealed class NavRoutes(
     object SettingsAccountRoute : NavRoutes("settings/account")
 
     object SettingsAboutRoute : NavRoutes("settings/about")
+
+    /**
+     * NotificationGraph
+     * */
+    object NotificationGraph : NavRoutes("notification_graph")
+
+    object NotificationRoute : NavRoutes("notification")
 }

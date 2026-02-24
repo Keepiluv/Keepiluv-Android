@@ -1,5 +1,6 @@
 package com.twix.designsystem.components.stats
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,7 +22,10 @@ fun StampCell(
     modifier: Modifier = Modifier,
     content: (@Composable () -> Unit)? = null,
 ) {
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center
+    ) {
         Row {
             AppText(
                 text = stats.nickname,

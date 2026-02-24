@@ -357,7 +357,7 @@ private fun GoalSummaryItem(
                         ?: stringResource(R.string.word_not_set)
 
                 GoalSummaryInfo(
-                    label = stringResource(R.string.word_repeat_type),
+                    label = stringResource(R.string.header_repeat_type),
                     value = item.repeatCycle.label(),
                 )
                 GoalSummaryInfo(

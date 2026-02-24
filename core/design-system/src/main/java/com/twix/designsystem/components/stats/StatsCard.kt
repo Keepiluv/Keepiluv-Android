@@ -105,13 +105,13 @@ fun StatsCardPreview() {
                     myStats =
                         ParticipantStats(
                             nickname = "페토",
-                            endCount = 10,
+                            completedCount = 10,
                             stampColors = listOf(StampColor.PINK400),
                         ),
                     partnerStats =
                         ParticipantStats(
                             nickname = "찬호",
-                            endCount = 5,
+                            completedCount = 5,
                             stampColors = listOf(StampColor.PINK400),
                         ),
                 ),

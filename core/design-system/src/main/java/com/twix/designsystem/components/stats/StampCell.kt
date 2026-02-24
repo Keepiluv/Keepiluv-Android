@@ -1,8 +1,10 @@
 package com.twix.designsystem.components.stats
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -21,8 +23,11 @@ fun StampCell(
     modifier: Modifier = Modifier,
     content: (@Composable () -> Unit)? = null,
 ) {
-    Column(modifier = modifier) {
-        Row {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Row(modifier = Modifier.fillMaxWidth()) {
             AppText(
                 text = stats.nickname,
                 style = AppTextStyle.B4,
@@ -32,7 +37,7 @@ fun StampCell(
             Spacer(modifier = Modifier.weight(1f))
 
             AppText(
-                text = stringResource(R.string.stats_stamp_end_count).format(stats.endCount),
+                text = stringResource(R.string.stats_stamp_end_count).format(stats.completedCount),
                 style = AppTextStyle.B4,
                 color = GrayColor.C500,
             )
@@ -50,7 +55,7 @@ private fun StampCellPreview() {
             stats =
                 ParticipantStats(
                     nickname = "페토",
-                    endCount = 6,
+                    completedCount = 6,
                     stampColors = listOf(StampColor.PINK400),
                 ),
         )

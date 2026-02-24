@@ -82,8 +82,8 @@
     <string name="stats_stamp_not_has_complete_goal">아직 끝낸 목표가 없어요!</string>
     <string name="stats_stamp_total_end_count">총 목표 %d번</string>
     <string name="stats_stamp_end_count">%d번 완료</string>
-    <string name="stats_stamp_in_progress_tap_title">진행중</string>
-    <string name="stats_stamp_end_tap_title">종료</string>
+    <string name="stats_stamp_in_progress_tab_title">진행중</string>
+    <string name="stats_stamp_end_tab_title">종료</string>
 
     <!-- 통계 상세 화면 -->
     <string name="stats_complete_count">%1$s %2$d/%3$d</string>

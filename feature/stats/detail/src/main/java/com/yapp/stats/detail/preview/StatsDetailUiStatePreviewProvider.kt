@@ -1,4 +1,4 @@
-package com.yapp.detail.preview
+package com.yapp.stats.detail.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.twix.designsystem.components.stats.model.StatsCalendarUiModel
@@ -7,7 +7,7 @@ import com.twix.domain.model.enums.RepeatCycle
 import com.twix.domain.model.stats.detail.CompletedDate
 import com.twix.domain.model.stats.detail.StatsDetail
 import com.twix.domain.model.stats.detail.StatsSummary
-import com.yapp.detail.contract.StatsDetailUiState
+import com.yapp.stats.detail.contract.StatsDetailUiState
 import java.time.LocalDate
 
 class StatsDetailUiStatePreviewProvider : PreviewParameterProvider<StatsDetailUiState> {

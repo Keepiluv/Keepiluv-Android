@@ -1,4 +1,4 @@
-package com.yapp.detail.di
+package com.yapp.stats.detail.di
 
 import com.twix.navigation.NavRoutes
 import com.twix.navigation.base.NavGraphContributor

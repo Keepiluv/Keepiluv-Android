@@ -1,4 +1,4 @@
-package com.yapp.detail.contract
+package com.yapp.stats.detail.contract
 
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.ui.base.SideEffect

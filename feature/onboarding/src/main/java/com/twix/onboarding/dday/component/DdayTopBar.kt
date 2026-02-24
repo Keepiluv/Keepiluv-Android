@@ -29,7 +29,7 @@ fun DdayTopBar(
         contentAlignment = Alignment.CenterStart,
     ) {
         Image(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_arrow1_m_left),
+            imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_m_left),
             contentDescription = null,
             modifier =
                 Modifier

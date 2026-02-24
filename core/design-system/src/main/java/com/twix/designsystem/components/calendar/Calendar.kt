@@ -1,6 +1,5 @@
 package com.twix.designsystem.components.calendar
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -77,48 +75,6 @@ fun Calendar(
                     .fillMaxWidth(),
             text = stringResource(R.string.word_completion),
             onClick = { onComplete(selectedDate) },
-        )
-    }
-}
-
-@Composable
-private fun CalendarNavigator(
-    currentDate: LocalDate,
-    onNextMonth: () -> Unit,
-    onPreviousMonth: () -> Unit,
-) {
-    Row(
-        modifier =
-            Modifier
-                .padding(vertical = 4.5.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Image(
-            painter = painterResource(R.drawable.ic_arrow_m_left),
-            contentDescription = "previous month",
-            modifier =
-                Modifier
-                    .padding(6.dp)
-                    .size(24.dp)
-                    .noRippleClickable(onClick = onPreviousMonth),
-        )
-
-        AppText(
-            text = "%d.%02d".format(currentDate.year, currentDate.monthValue),
-            style = AppTextStyle.T1,
-            color = GrayColor.C500,
-            modifier = Modifier.width(84.dp),
-        )
-
-        Image(
-            painter = painterResource(R.drawable.ic_arrow_m_right),
-            contentDescription = "next month",
-            modifier =
-                Modifier
-                    .padding(6.dp)
-                    .size(24.dp)
-                    .noRippleClickable(onClick = onNextMonth),
         )
     }
 }

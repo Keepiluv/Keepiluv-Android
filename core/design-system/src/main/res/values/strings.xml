@@ -74,6 +74,16 @@
     <string name="settings_privacy_policy">개인정보 처리방침</string>
     <string name="settings_my_app_version">나의 버전</string>
 
+    <!-- 통계 화면 -->
+    <string name="stats_top_bar_title">스탬프 통계</string>
+    <string name="stats_stamp_total_count">이번달 목표 %d번</string>
+    <string name="stats_stamp_not_has_in_progress_goal">아직 목표가 없어요!</string>
+    <string name="stats_stamp_not_has_complete_goal">아직 끝낸 목표가 없어요!</string>
+    <string name="stats_stamp_total_end_count">총 목표 %d번</string>
+    <string name="stats_stamp_end_count">%d번 완료</string>
+    <string name="stats_stamp_in_progress_tap_title">진행중</string>
+    <string name="stats_stamp_end_tap_title">종료</string>
+
     <!-- 토스트 메시지 -->
     <string name="toast_end_date_before_start_date">종료 날짜가 시작 날짜보다 이전입니다.</string>
     <string name="toast_goal_fetch_failed">목표 조회에 실패했습니다.</string>
@@ -86,6 +96,7 @@
     <string name="toast_logout_failed">로그아웃에 실패했습니다.</string>
     <string name="toast_account_deleted">계정이 삭제되었습니다.</string>
     <string name="toast_account_delete_failed">계정 삭제에 실패했습니다.</string>
+    <string name="toast_fetch_stats_failed">통계 조회에 실패했습니다.</string>
     <string name="toast_already_certificated">이미 인증되었어요.</string>
     <string name="toast_camera_permission_request">인증샷 촬영을 위해서 카메라 권한이 필요해요.</string>
 

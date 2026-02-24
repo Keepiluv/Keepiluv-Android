@@ -22,6 +22,7 @@ import com.twix.home.HomeRoute
 import com.twix.home.HomeViewModel
 import com.twix.main.component.MainBottomBar
 import com.twix.main.model.MainTab
+import com.twix.stats.StatsRoute
 import org.koin.androidx.compose.koinViewModel
 import java.time.LocalDate
 
@@ -99,7 +100,7 @@ private fun MainScreen(
                             navigateToCertification = navigateToCertification,
                         )
 
-                    MainTab.STATS -> Box(modifier = Modifier.fillMaxSize())
+                    MainTab.STATS -> StatsRoute()
                     MainTab.COUPLE -> Box(modifier = Modifier.fillMaxSize())
                 }
             }

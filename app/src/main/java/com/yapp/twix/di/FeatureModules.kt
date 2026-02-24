@@ -9,6 +9,7 @@ import com.twix.onboarding.di.onBoardingModule
 import com.twix.settings.di.settingsModule
 import com.twix.stats.di.statsModule
 import com.twix.task_certification.di.taskCertificationModule
+import com.yapp.detail.di.statsDetailModule
 import org.koin.core.module.Module
 
 val featureModules: List<Module> =
@@ -22,4 +23,5 @@ val featureModules: List<Module> =
         settingsModule,
         onBoardingModule,
         statsModule,
+        statsDetailModule,
     )

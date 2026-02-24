@@ -1,5 +1,6 @@
 package com.twix.network.service
 
+import com.twix.network.model.request.notification.InitNotificationSettingsRequest
 import com.twix.network.model.request.notification.RegisterFcmTokenRequest
 import com.twix.network.model.request.notification.TokenRequest
 import de.jensklingenberg.ktorfit.http.Body
@@ -22,5 +23,10 @@ interface NotificationService {
     @PATCH("api/v1/notifications/{notificationId}/read")
     suspend fun markNotificationAsRead(
         @Path("notificationId") notificationId: Long,
+    )
+
+    @POST("api/v1/notifications/settings/init")
+    suspend fun initNotificationSettings(
+        @Body request: InitNotificationSettingsRequest,
     )
 }

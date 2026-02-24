@@ -2,6 +2,7 @@ package com.twix.data.repository
 
 import com.twix.domain.repository.NotificationRepository
 import com.twix.network.execute.safeApiCall
+import com.twix.network.model.request.notification.InitNotificationSettingsRequest
 import com.twix.network.model.request.notification.RegisterFcmTokenRequest
 import com.twix.network.model.request.notification.TokenRequest
 import com.twix.network.service.NotificationService
@@ -17,4 +18,18 @@ class DefaultNotificationRepository(
     override suspend fun deleteFcmToken(token: String) = safeApiCall { service.deleteFcmToken(TokenRequest(token)) }
 
     override suspend fun markNotificationAsRead(notificationId: Long) = safeApiCall { service.markNotificationAsRead(notificationId) }
+
+    override suspend fun initNotificationSettings(
+        isPushEnabled: Boolean,
+        isMarketingPushEnabled: Boolean,
+        isNightPushEnabled: Boolean,
+    ) = safeApiCall {
+        service.initNotificationSettings(
+            InitNotificationSettingsRequest(
+                isPushEnabled = isPushEnabled,
+                isMarketingPushEnabled = isMarketingPushEnabled,
+                isNightPushEnabled = isNightPushEnabled,
+            ),
+        )
+    }
 }

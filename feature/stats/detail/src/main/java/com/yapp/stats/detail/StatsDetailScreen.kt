@@ -18,10 +18,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -35,26 +37,49 @@ import com.twix.designsystem.components.calendar.CalendarNavigator
 import com.twix.designsystem.components.dialog.CommonDialog
 import com.twix.designsystem.components.stats.StatsCalendar
 import com.twix.designsystem.components.text.AppText
+import com.twix.designsystem.components.toast.ToastManager
+import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.extension.toRes
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.domain.model.enums.GoalIconType
+import com.twix.ui.base.ObserveAsEvents
 import com.yapp.stats.detail.component.StatsDetailTopbar
 import com.yapp.stats.detail.component.SummaryContent
 import com.yapp.stats.detail.contract.StatsDetailIntent
+import com.yapp.stats.detail.contract.StatsDetailSideEffect
 import com.yapp.stats.detail.contract.StatsDetailUiState
 import com.yapp.stats.detail.preview.StatsDetailUiStatePreviewProvider
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.LocalDate
 
 @Composable
 fun StatsDetailRoute(
     onBack: () -> Unit,
+    toastManager: ToastManager = koinInject(),
     viewModel: StatsDetailViewModel = koinViewModel(),
 ) {
+    val context = LocalContext.current
+    val currentContext by rememberUpdatedState(context)
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
+        when (sideEffect) {
+            StatsDetailSideEffect.NavigateToBack -> onBack()
+            is StatsDetailSideEffect.ShowToast -> {
+                toastManager.tryShow(
+                    ToastData(
+                        message = currentContext.getString(sideEffect.message),
+                        type = sideEffect.type,
+                    ),
+                )
+            }
+        }
+    }
 
     StatsDetailScreen(
         uiSate = uiState,

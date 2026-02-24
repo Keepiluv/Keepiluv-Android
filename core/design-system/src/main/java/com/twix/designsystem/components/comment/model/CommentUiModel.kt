@@ -4,19 +4,19 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class CommentUiModel(
-    val comment: String = "",
+    val value: String = "",
     val isFocused: Boolean = false,
 ) {
     val hasMaxCommentLength: Boolean
-        get() = comment.length == COMMENT_COUNT
+        get() = value.length == COMMENT_COUNT
 
     val canUpload: Boolean
         get() =
-            comment.isEmpty() ||
-                comment.isNotEmpty() &&
+            value.isEmpty() ||
+                value.isNotEmpty() &&
                 hasMaxCommentLength
 
-    fun updateComment(newComment: String): CommentUiModel = copy(comment = newComment)
+    fun updateComment(newComment: String): CommentUiModel = copy(value = newComment)
 
     fun updateFocus(isFocused: Boolean) = copy(isFocused = isFocused)
 

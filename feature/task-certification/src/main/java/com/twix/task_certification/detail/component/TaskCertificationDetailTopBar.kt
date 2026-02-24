@@ -14,6 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.twix.designsystem.R
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.topbar.CommonTopBar
 import com.twix.designsystem.theme.CommonColor
@@ -21,7 +22,6 @@ import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.ui.extension.noRippleClickable
-import com.twix.designsystem.R as DesR
 
 @Composable
 internal fun TaskCertificationDetailTopBar(
@@ -34,7 +34,7 @@ internal fun TaskCertificationDetailTopBar(
         title = title,
         left = {
             Image(
-                painter = painterResource(DesR.drawable.ic_arrow3_left),
+                painter = painterResource(R.drawable.ic_arrow3_left),
                 contentDescription = "back",
                 modifier =
                     Modifier
@@ -54,7 +54,7 @@ internal fun TaskCertificationDetailTopBar(
                     contentAlignment = Alignment.Center,
                 ) {
                     AppText(
-                        text = stringResource(DesR.string.word_modify),
+                        text = stringResource(R.string.word_modify),
                         style = AppTextStyle.T2,
                         color = GrayColor.C500,
                     )

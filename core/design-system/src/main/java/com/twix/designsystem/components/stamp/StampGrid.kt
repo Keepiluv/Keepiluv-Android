@@ -39,7 +39,7 @@ fun StampGrid(
 
                 if (rowIndices.size < maxItemsInEachRow) {
                     repeat(maxItemsInEachRow - rowIndices.size) {
-                        Spacer(modifier = Modifier.size(15.dp))
+                        Spacer(modifier = Modifier.size(18.dp))
                     }
                 }
             }

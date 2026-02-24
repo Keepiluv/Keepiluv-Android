@@ -1,6 +1,5 @@
 package com.twix.stats
 
-import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.repository.StatsRepository
@@ -8,21 +7,17 @@ import com.twix.stats.contract.StatsIntent
 import com.twix.stats.contract.StatsSideEffect
 import com.twix.stats.contract.StatsUiState
 import com.twix.ui.base.BaseViewModel
-import com.twix.util.bus.StatsRefreshBus
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class StatsViewModel(
     private val statsRepository: StatsRepository,
-    private val eventBus: StatsRefreshBus,
 ) : BaseViewModel<StatsUiState, StatsIntent, StatsSideEffect>(StatsUiState()) {
     private var inProgressStatsJob: Job? = null
 
     init {
         fetchInProgressStats(LocalDate.now())
         fetchEndStats()
-        collectEventBus()
     }
 
     override suspend fun handleIntent(intent: StatsIntent) {
@@ -60,17 +55,6 @@ class StatsViewModel(
             onSuccess = { reduce { copy(endStats = it) } },
             onError = { showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR) },
         )
-    }
-
-    private fun collectEventBus() {
-        viewModelScope.launch {
-            eventBus.events.collect { publisher ->
-                when (publisher) {
-                    StatsRefreshBus.Publisher.InProgress -> fetchInProgressStats(currentState.currentDate)
-                    StatsRefreshBus.Publisher.End -> fetchEndStats()
-                }
-            }
-        }
     }
 
     private suspend fun showToast(

@@ -163,8 +163,8 @@ private fun StatsTabPager(
                 InProgressStatsContent(
                     currentDate = uiState.currentDate,
                     stats = uiState.inProgressStats,
-                    onClickPreviousMonth = { onClickPreviousMonth() },
-                    onClickNextMonth = { onClickNextMonth() },
+                    onClickPreviousMonth = onClickPreviousMonth,
+                    onClickNextMonth = onClickNextMonth,
                 )
 
             StatsTabDestination.END ->

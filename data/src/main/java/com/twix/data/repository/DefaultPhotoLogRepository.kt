@@ -8,11 +8,13 @@ import com.twix.domain.repository.PhotoLogRepository
 import com.twix.network.execute.safeApiCall
 import com.twix.network.model.request.ReactionRequest
 import com.twix.network.model.request.photolog.mapper.toRequest
+import com.twix.network.model.request.photolog.model.PhotologModifyRequest
 import com.twix.network.model.response.photo.mapper.toDomain
 import com.twix.network.model.response.photolog.mapper.toDomain
 import com.twix.network.service.PhotoLogService
 import com.twix.network.upload.PresignedUploader
 import com.twix.result.AppResult
+import java.time.LocalDate
 
 class DefaultPhotoLogRepository(
     private val service: PhotoLogService,
@@ -20,10 +22,10 @@ class DefaultPhotoLogRepository(
 ) : PhotoLogRepository {
     override suspend fun getUploadUrl(goalId: Long): AppResult<PhotoLogUploadInfo> = safeApiCall { service.getUploadUrl(goalId).toDomain() }
 
-    override suspend fun uploadPhotoLog(photologParam: PhotologParam): AppResult<Unit> =
+    override suspend fun uploadPhotolog(photologParam: PhotologParam): AppResult<Unit> =
         safeApiCall { service.uploadPhotoLog(photologParam.toRequest()) }
 
-    override suspend fun uploadPhotoLogImage(
+    override suspend fun uploadPhotologImage(
         goalId: Long,
         bytes: ByteArray,
         contentType: String,
@@ -49,7 +51,7 @@ class DefaultPhotoLogRepository(
         return AppResult.Success(info.fileName)
     }
 
-    override suspend fun fetchPhotoLogs(targetDate: String): AppResult<PhotoLogs> =
+    override suspend fun fetchPhotologs(targetDate: LocalDate): AppResult<PhotoLogs> =
         safeApiCall {
             service.fetchPhotoLogs(targetDate).toDomain()
         }
@@ -58,4 +60,10 @@ class DefaultPhotoLogRepository(
         photologId: Long,
         reaction: GoalReactionType,
     ): AppResult<Unit> = safeApiCall { service.reactToPhotolog(photologId, ReactionRequest(reaction.toApi())) }
+
+    override suspend fun modifyPhotolog(
+        photologId: Long,
+        fileName: String,
+        comment: String,
+    ): AppResult<Unit> = safeApiCall { service.modifyPhotolog(photologId, PhotologModifyRequest(fileName, comment)) }
 }

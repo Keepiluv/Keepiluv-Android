@@ -26,9 +26,9 @@ import com.twix.domain.model.enums.AppTextStyle
 fun AppRoundButton(
     text: String,
     textColor: Color,
+    backgroundColor: Color,
     modifier: Modifier = Modifier,
     textStyle: AppTextStyle = AppTextStyle.T2,
-    backgroundColor: Color,
     borderColor: Color = GrayColor.C500,
     hasBorder: Boolean = true,
 ) {

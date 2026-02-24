@@ -81,6 +81,7 @@ reviews:
         - 재사용 가능한 Composable로 설계되었는가?
         - 커스터마이징 포인트가 적절한가?
         - 다양한 상태에 대한 Preview가 제공되는가?
+        - 접근성 설정 관련 리뷰 제거
 
     # 디자인 시스템
     - path: core/design-system/**
@@ -123,7 +124,7 @@ reviews:
         [리소스 리뷰 가이드]
         - 하드코딩 문자열이 없는가?
         - 다국어 지원을 고려했는가?
-        - 색상과 테마가 디자인 시스템에 포함되는가?
+        - 색상과 테마가 디자인 시스템에 포함되는가?  
 
   abort_on_close: true
   disable_cache: false

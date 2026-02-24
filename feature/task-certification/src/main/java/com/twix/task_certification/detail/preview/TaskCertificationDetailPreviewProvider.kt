@@ -5,7 +5,7 @@ import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalIconType
 import com.twix.domain.model.enums.GoalReactionType
 import com.twix.domain.model.photolog.PhotologDetail
-import com.twix.task_certification.detail.model.TaskCertificationDetailUiState
+import com.twix.task_certification.detail.contract.TaskCertificationDetailUiState
 
 class TaskCertificationDetailPreviewProvider : PreviewParameterProvider<TaskCertificationDetailUiState> {
     override val values =

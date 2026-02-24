@@ -10,4 +10,5 @@ dependencies {
 
     implementation(libs.bundles.cameraX)
     implementation(libs.guava)
+    implementation(libs.kotlinx.serialization.json)
 }

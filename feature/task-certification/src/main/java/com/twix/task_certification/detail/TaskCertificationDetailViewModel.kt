@@ -2,16 +2,16 @@ package com.twix.task_certification.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalReactionType
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
-import com.twix.task_certification.R
-import com.twix.task_certification.detail.model.TaskCertificationDetailIntent
-import com.twix.task_certification.detail.model.TaskCertificationDetailSideEffect
-import com.twix.task_certification.detail.model.TaskCertificationDetailUiState
-import com.twix.task_certification.detail.model.toUiState
+import com.twix.task_certification.detail.contract.TaskCertificationDetailIntent
+import com.twix.task_certification.detail.contract.TaskCertificationDetailSideEffect
+import com.twix.task_certification.detail.contract.TaskCertificationDetailUiState
+import com.twix.task_certification.detail.contract.toUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.TaskCertificationRefreshBus
@@ -22,10 +22,11 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class TaskCertificationDetailViewModel(
     private val photologRepository: PhotoLogRepository,
-    private val taskCertificationRefreshBus: TaskCertificationRefreshBus,
+    private val detailRefreshBus: TaskCertificationRefreshBus,
     private val goalRefreshBus: GoalRefreshBus,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<TaskCertificationDetailUiState, TaskCertificationDetailIntent, TaskCertificationDetailSideEffect>(
@@ -35,9 +36,11 @@ class TaskCertificationDetailViewModel(
         savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_GOAL_ID]
             ?: error(GOAL_ID_NOT_FOUND)
 
-    private val argTargetDate: String =
-        savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_DATE]
-            ?: error(TARGET_DATE_NOT_FOUND)
+    private val argTargetDate: LocalDate =
+        LocalDate.parse(
+            savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_DATE]
+                ?: error(TARGET_DATE_NOT_FOUND),
+        )
 
     private val argBetweenUs: String =
         savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_BETWEEN_US]
@@ -59,8 +62,8 @@ class TaskCertificationDetailViewModel(
 
     private fun fetchPhotolog() {
         launchResult(
-            block = { photologRepository.fetchPhotoLogs(argTargetDate) },
-            onSuccess = { reduce { it.toUiState(argGoalId, argBetweenUs) } },
+            block = { photologRepository.fetchPhotologs(argTargetDate) },
+            onSuccess = { reduce { it.toUiState(argGoalId, argBetweenUs, argTargetDate) } },
             onError = {
                 showToast(R.string.task_certification_detail_fetch_photolog_fail, ToastType.ERROR)
             },
@@ -98,17 +101,17 @@ class TaskCertificationDetailViewModel(
         }
     }
 
-    private suspend fun reduceReaction(reaction: GoalReactionType) {
-        lastReaction = currentState.partnerPhotolog?.reaction
-        reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(reaction)) }
-        reactionFlow.emit(reaction)
-    }
-
     private fun collectEventBus() {
         viewModelScope.launch {
-            taskCertificationRefreshBus.events.collect {
-                fetchPhotolog()
-                goalRefreshBus.notifyGoalListChanged()
+            detailRefreshBus.events.collect { publisher ->
+                when (publisher) {
+                    TaskCertificationRefreshBus.Publisher.PHOTOLOG -> {
+                        fetchPhotolog()
+                        goalRefreshBus.notifyGoalListChanged()
+                    }
+
+                    TaskCertificationRefreshBus.Publisher.EDITOR -> fetchPhotolog()
+                }
             }
         }
     }
@@ -119,6 +122,12 @@ class TaskCertificationDetailViewModel(
             TaskCertificationDetailIntent.Sting -> TODO("찌르기 API 연동")
             TaskCertificationDetailIntent.SwipeCard -> reduceShownCard()
         }
+    }
+
+    private suspend fun reduceReaction(reaction: GoalReactionType) {
+        lastReaction = currentState.partnerPhotolog?.reaction
+        reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(reaction)) }
+        reactionFlow.emit(reaction)
     }
 
     private fun reduceShownCard() {

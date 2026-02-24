@@ -25,12 +25,12 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import com.twix.designsystem.R
 import com.twix.designsystem.components.button.AppRoundButton
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
-import com.twix.task_certification.R
 import com.twix.task_certification.certification.model.CaptureStatus
 import com.twix.ui.extension.noRippleClickable
 

@@ -12,6 +12,7 @@
     <string name="word_start_date">시작일</string>
     <string name="word_end_date">종료일</string>
     <string name="word_repeat_type">반복 주기</string>
+    <string name="word_end_count">달성 횟수</string>
     <string name="word_not_set">미설정</string>
     <string name="word_cancel">취소</string>
     <string name="word_delete">삭제</string>
@@ -78,6 +79,9 @@
     <string name="stats_stamp_end_count">%d번 완료</string>
     <string name="stats_stamp_in_progress_tap_title">진행중</string>
     <string name="stats_stamp_end_tap_title">종료</string>
+
+    <!-- 통계 상세 화면 -->
+    <string name="stats_complete_count">%1$s %2$d/%3$d</string>
 
     <!-- 토스트 메시지 -->
     <string name="toast_end_date_before_start_date">종료 날짜가 시작 날짜보다 이전입니다.</string>

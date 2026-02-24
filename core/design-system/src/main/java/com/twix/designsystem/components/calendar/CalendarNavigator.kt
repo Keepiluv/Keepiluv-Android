@@ -42,7 +42,7 @@ fun CalendarNavigator(
             contentDescription = "previous month",
             modifier =
                 Modifier
-                    .noRippleClickable(onClick = onPreviousMonth)
+                    .noRippleClickable(enabled = hasPrevious, onClick = onPreviousMonth)
                     .padding(6.dp)
                     .size(24.dp),
             colorFilter = ColorFilter.tint(if (hasPrevious) GrayColor.C500 else GrayColor.C200),
@@ -60,7 +60,7 @@ fun CalendarNavigator(
             contentDescription = "next month",
             modifier =
                 Modifier
-                    .noRippleClickable(onClick = onNextMonth)
+                    .noRippleClickable(enabled = hasNext, onClick = onNextMonth)
                     .padding(6.dp)
                     .size(24.dp),
             colorFilter = ColorFilter.tint(if (hasNext) GrayColor.C500 else GrayColor.C200),

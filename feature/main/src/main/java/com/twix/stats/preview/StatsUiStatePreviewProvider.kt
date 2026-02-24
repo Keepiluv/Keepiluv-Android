@@ -33,7 +33,7 @@ class StatsUiStatePreviewProvider : PreviewParameterProvider<StatsUiState> {
                                 myStats =
                                     ParticipantStats(
                                         nickname = "Me",
-                                        endCount = 5,
+                                        completedCount = 5,
                                         stampColors =
                                             listOf(
                                                 StampColor.YELLOW400,
@@ -43,7 +43,7 @@ class StatsUiStatePreviewProvider : PreviewParameterProvider<StatsUiState> {
                                 partnerStats =
                                     ParticipantStats(
                                         nickname = "Partner",
-                                        endCount = 7,
+                                        completedCount = 7,
                                         stampColors =
                                             listOf(
                                                 StampColor.PINK400,

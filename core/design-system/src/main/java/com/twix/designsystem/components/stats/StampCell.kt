@@ -37,7 +37,7 @@ fun StampCell(
             Spacer(modifier = Modifier.weight(1f))
 
             AppText(
-                text = stringResource(R.string.stats_stamp_end_count).format(stats.endCount),
+                text = stringResource(R.string.stats_stamp_end_count).format(stats.completedCount),
                 style = AppTextStyle.B4,
                 color = GrayColor.C500,
             )
@@ -55,7 +55,7 @@ private fun StampCellPreview() {
             stats =
                 ParticipantStats(
                     nickname = "페토",
-                    endCount = 6,
+                    completedCount = 6,
                     stampColors = listOf(StampColor.PINK400),
                 ),
         )

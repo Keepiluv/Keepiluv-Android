@@ -4,6 +4,7 @@ import android.content.Context
 import com.twix.data.di.dataModule
 import com.twix.datastore.di.dataStoreModule
 import com.twix.network.di.networkModule
+import com.twix.notification.di.notificationModule
 import com.twix.ui.di.imageModule
 import com.twix.util.di.utilModule
 import org.koin.android.ext.koin.androidContext
@@ -28,6 +29,8 @@ fun initKoin(
                 add(appModule)
                 add(utilModule)
                 add(imageModule)
+                add(notificationModule)
+                add(coroutineModule)
             },
         )
     }

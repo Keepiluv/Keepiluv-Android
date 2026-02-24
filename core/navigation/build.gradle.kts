@@ -11,5 +11,9 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.navigationContract)
+    implementation(projects.core.ui)
+    implementation(projects.domain)
+
     implementation(libs.kotlinx.serialization.json)
 }

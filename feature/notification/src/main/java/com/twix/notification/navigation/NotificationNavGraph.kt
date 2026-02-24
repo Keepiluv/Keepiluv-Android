@@ -8,7 +8,7 @@ import com.twix.navigation.NavRoutes
 import com.twix.navigation.base.NavGraphContributor
 import com.twix.notification.NotificationRoute
 
-object NotificationNavGraph: NavGraphContributor {
+object NotificationNavGraph : NavGraphContributor {
     override val graphRoute: NavRoutes
         get() = NavRoutes.NotificationGraph
     override val startDestination: String

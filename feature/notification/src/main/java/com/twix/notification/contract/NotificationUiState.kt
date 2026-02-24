@@ -5,4 +5,5 @@ import com.twix.ui.base.State
 
 data class NotificationUiState(
     val notificationList: List<Notification> = emptyList(),
-): State
+    val hasNext: Boolean = false,
+) : State

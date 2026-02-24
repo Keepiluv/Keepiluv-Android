@@ -22,14 +22,54 @@ class NotificationLaunchDispatcher : NotificationLaunchEventSource {
     override fun dispatchFromIntent(intent: Intent?) {
         if (intent == null) return
 
-        val isPushClick = intent.getBooleanExtra(EXTRA_FROM_PUSH_CLICK, false)
-        val deepLink = intent.getStringExtra(EXTRA_DEEP_LINK)
+        val deepLink = extractDeepLink(intent) ?: return
+        val isPushClick = isPushClickIntent(intent)
 
-        if (!isPushClick || deepLink.isNullOrBlank()) return
+        // 푸시 클릭이 아닌 일반 앱 실행에서 deepLink extra가 들어온 경우 방지
+        if (!isPushClick) return
 
         if (shouldIgnoreDuplicate(deepLink)) return
 
         _pendingDeepLink.value = deepLink
+
+        // 커스텀 extras만 소비
+        intent.removeExtra(EXTRA_DEEP_LINK)
+        intent.removeExtra(EXTRA_FROM_PUSH_CLICK)
+    }
+
+    private fun extractDeepLink(intent: Intent): String? {
+        // 직접 만든 PendingIntent extras
+        intent
+            .getStringExtra(EXTRA_DEEP_LINK)
+            ?.takeIf { it.isNotBlank() }
+            ?.let { return it }
+
+        // Firebase 자동 알림 클릭 시 data payload가 extras로 들어오는 케이스
+        val extras = intent.extras ?: return null
+        val candidates = listOf("deepLink", "deeplink", "deep_link", "link")
+
+        for (key in candidates) {
+            val value = extras.getString(key)
+            if (!value.isNullOrBlank()) return value
+        }
+
+        return null
+    }
+
+    private fun isPushClickIntent(intent: Intent): Boolean {
+        // 커스텀 PendingIntent 클릭
+        if (intent.getBooleanExtra(EXTRA_FROM_PUSH_CLICK, false)) return true
+
+        // Firebase 시스템 자동 알림 클릭 추정
+        val extras = intent.extras ?: return false
+        val hasFcmMessageId = extras.containsKey("google.message_id")
+        val hasDeepLink =
+            extras.containsKey("deepLink") ||
+                extras.containsKey("deeplink") ||
+                extras.containsKey("deep_link") ||
+                extras.containsKey("link")
+
+        return hasFcmMessageId && hasDeepLink
     }
 
     override fun consumePendingDeepLink(expected: String?) {

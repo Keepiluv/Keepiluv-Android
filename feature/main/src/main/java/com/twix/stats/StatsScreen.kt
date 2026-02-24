@@ -129,12 +129,14 @@ private fun StatsTabRow(pagerState: PagerState) {
                         text = stringResource(destination.label),
                         style = AppTextStyle.T2,
                         color = if (isSelected) GrayColor.C500 else GrayColor.C200,
-                        modifier = Modifier.padding(bottom = 12.dp)
+                        modifier = Modifier.padding(bottom = 12.dp),
                     )
                 },
                 selected = isSelected,
                 interactionSource = noRippleInteractionSource,
                 onClick = {
+                    if (pagerState.currentPage == index || pagerState.isScrollInProgress) return@Tab
+
                     coroutineScope.launch {
                         pagerState.animateScrollToPage(index)
                     }

@@ -53,7 +53,7 @@ class NotificationDeepLinkParser {
                 }
             }
         } catch (e: Exception) {
-            logger.e("notification deepLink 파싱에 실패했습니다.: $raw")
+            logger.e(e) { "notification deepLink 파싱에 실패했습니다.: $raw" }
             null
         }
     }

@@ -61,6 +61,11 @@ object MainNavGraph : NavGraphContributor {
                             launchSingleTop = true
                         }
                     },
+                    navigateToNotification = {
+                        navController.navigate(NavRoutes.NotificationRoute.route) {
+                            launchSingleTop = true
+                        }
+                    }
                 )
             }
         }

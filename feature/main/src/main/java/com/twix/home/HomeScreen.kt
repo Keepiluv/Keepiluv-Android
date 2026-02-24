@@ -72,6 +72,7 @@ fun HomeRoute(
     navigateToSettings: () -> Unit,
     navigateToCertification: (Long, LocalDate) -> Unit,
     navigateToCertificationDetail: (Long, LocalDate, BetweenUs) -> Unit,
+    navigateToNotification: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -143,6 +144,7 @@ fun HomeRoute(
         },
         onClickCard = navigateToCertificationDetail,
         onSettingClick = navigateToSettings,
+        onNotificationClick = navigateToNotification,
     )
 }
 
@@ -160,6 +162,7 @@ fun HomeScreen(
     onVerificationClick: (Long, GoalCheckState) -> Unit,
     onClickCard: (Long, LocalDate, BetweenUs) -> Unit,
     onSettingClick: () -> Unit,
+    onNotificationClick: () -> Unit,
 ) {
     Box(
         modifier =
@@ -173,7 +176,7 @@ fun HomeScreen(
         ) {
             HomeTopBar(
                 monthYearText = uiState.monthYear,
-                onNotificationClick = {},
+                onNotificationClick = onNotificationClick,
                 onSettingClick = onSettingClick,
                 onMoveToToday = onMoveToToday,
                 onShowCalendarBottomSheet = onShowCalendarBottomSheet,

@@ -5,3 +5,7 @@ plugins {
 android {
     namespace = "com.twix.notification"
 }
+
+dependencies {
+    implementation(projects.core.notification)
+}

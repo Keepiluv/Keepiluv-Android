@@ -2,15 +2,12 @@ package com.twix.designsystem.components.stamp
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.twix.designsystem.extension.toBackgroundRes
 import com.twix.designsystem.extension.toBorderRes
 import com.twix.designsystem.extension.toRes
@@ -25,10 +22,7 @@ fun StampIcon(
     stampColor: StampColor?,
     modifier: Modifier = Modifier,
 ) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier.size(15.dp),
-    ) {
+    Box(modifier = modifier) {
         if (stampColor != null) {
             Icon(
                 imageVector = ImageVector.vectorResource(stamp.toBackgroundRes()),

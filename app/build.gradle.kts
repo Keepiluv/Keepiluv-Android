@@ -64,6 +64,7 @@ dependencies {
     implementation(projects.feature.goalEditor)
     implementation(projects.feature.goalManage)
     implementation(projects.feature.settings)
+    implementation(projects.feature.notification)
 
     // Firebase
     implementation(platform(libs.google.firebase.bom))

@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import com.twix.designsystem.R
+import com.twix.designsystem.components.photolog.BackgroundCard
+import com.twix.designsystem.components.photolog.ForegroundCard
 import com.twix.domain.model.enums.BetweenUs
-import com.twix.task_certification.R
-import com.twix.task_certification.detail.model.TaskCertificationDetailUiState
-import com.twix.task_certification.detail.swipe.SwipeableCard
+import com.twix.task_certification.detail.component.swipe.SwipeableCard
+import com.twix.task_certification.detail.contract.TaskCertificationDetailUiState
 
 @Composable
 internal fun TaskCertificationCardContent(
@@ -26,8 +28,8 @@ internal fun TaskCertificationCardContent(
                     BetweenUs.ME -> stringResource(R.string.task_certification_take_picture)
                     BetweenUs.PARTNER -> stringResource(R.string.task_certification_detail_partner_sting)
                 },
-            rotation = if (uiState.currentShow == BetweenUs.ME) -8f else 0f,
-            onClick = if (uiState.currentShow == BetweenUs.ME) onClickUpload else onClickSting,
+            rotation = if (uiState.isDisplayedMyPhotolog) -8f else 0f,
+            onClick = if (uiState.isDisplayedMyPhotolog) onClickUpload else onClickSting,
         )
 
         SwipeableCard(
@@ -40,7 +42,7 @@ internal fun TaskCertificationCardContent(
                 imageUrl = uiState.displayedGoalImageUrl,
                 comment = uiState.displayedGoalComment,
                 currentShow = uiState.currentShow,
-                rotation = if (uiState.currentShow == BetweenUs.ME) 0f else -8f,
+                rotation = if (uiState.isDisplayedMyPhotolog) 0f else -8f,
             )
         }
     }

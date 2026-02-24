@@ -21,13 +21,12 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -50,13 +49,30 @@ fun CommentTextField(
     enabled: Boolean = true,
     onCommitComment: (String) -> Unit = {},
     onFocusChanged: (Boolean) -> Unit = {},
-    onPositioned: (Rect) -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
     val keyboardState by keyboardAsState()
 
-    var internalValue by rememberSaveable(uiModel.comment) { mutableStateOf(uiModel.comment) }
+    var internalValue by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(
+            TextFieldValue(
+                text = uiModel.value,
+                selection = TextRange(uiModel.value.length),
+            ),
+        )
+    }
+
+    LaunchedEffect(uiModel.value) {
+        if (uiModel.value != internalValue.text) {
+            internalValue =
+                TextFieldValue(
+                    text = uiModel.value,
+                    selection = TextRange(uiModel.value.length),
+                )
+        }
+    }
+
     var isInitialized by remember { mutableStateOf(false) }
 
     LaunchedEffect(keyboardState) {
@@ -66,7 +82,7 @@ fun CommentTextField(
             when (keyboardState) {
                 Keyboard.Opened -> Unit
                 Keyboard.Closed -> {
-                    onCommitComment(internalValue.trim())
+                    onCommitComment(internalValue.text.trim())
                     focusManager.clearFocus()
                 }
             }
@@ -74,23 +90,28 @@ fun CommentTextField(
     }
 
     LaunchedEffect(uiModel.isFocused) {
+        /**
+         * 외부에서 포커스 상태를 제어하는 경우
+         * e.g 사진 촬영 & 사진 선택
+         * */
         if (uiModel.isFocused) focusRequester.requestFocus()
     }
 
     Box(
         modifier =
             modifier
-                .onGloballyPositioned { coordinates ->
-                    onPositioned(coordinates.boundsInRoot())
-                }.noRippleClickable {
+                .noRippleClickable {
                     focusRequester.requestFocus()
                 },
     ) {
         TextField(
             value = internalValue,
             onValueChange = { newValue ->
-                if (newValue.length <= CommentUiModel.COMMENT_COUNT) {
-                    internalValue = newValue
+                if (newValue.text.length <= CommentUiModel.COMMENT_COUNT) {
+                    internalValue =
+                        newValue.copy(
+                            selection = TextRange(newValue.text.length),
+                        )
                 }
             },
             enabled = enabled,
@@ -130,16 +151,16 @@ fun CommentTextField(
         ) {
             repeat(CommentUiModel.COMMENT_COUNT) { index ->
                 val char =
-                    if (uiModel.isFocused || internalValue.isNotEmpty()) {
-                        internalValue.getOrNull(index)?.toString()
+                    if (uiModel.isFocused || internalValue.text.isNotEmpty()) {
+                        internalValue.text.getOrNull(index)?.toString()
                     } else {
                         stringResource(R.string.comment_text_field_placeholder)[index].toString()
                     }.orEmpty()
 
                 CommentCircle(
                     text = char,
-                    showPlaceholder = !uiModel.isFocused && internalValue.isEmpty(),
-                    showCursor = uiModel.isFocused && index == internalValue.length,
+                    showPlaceholder = !uiModel.isFocused && internalValue.text.isEmpty(),
+                    showCursor = uiModel.isFocused && index == internalValue.text.length,
                     modifier =
                         Modifier.noRippleClickable {
                             focusRequester.requestFocus()
@@ -159,7 +180,6 @@ private fun CommentTextFieldPreview() {
         CommentTextField(
             uiModel = CommentUiModel(text, isFocused),
             onFocusChanged = { isFocused = it },
-            onPositioned = {},
         )
     }
 }

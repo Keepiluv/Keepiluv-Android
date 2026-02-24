@@ -7,9 +7,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.twix.navigation.NavRoutes
+import com.twix.navigation.args.DetailNavArgs
 import com.twix.navigation.base.NavGraphContributor
 import com.twix.task_certification.certification.TaskCertificationRoute
 import com.twix.task_certification.detail.TaskCertificationDetailRoute
+import com.twix.task_certification.editor.TaskCertificationEditorRoute
 
 object TaskCertificationGraph : NavGraphContributor {
     override val graphRoute: NavRoutes
@@ -35,22 +37,55 @@ object TaskCertificationGraph : NavGraphContributor {
                         navArgument(NavRoutes.TaskCertificationDetailRoute.ARG_BETWEEN_US) {
                             type = NavType.StringType
                         },
-                        navArgument(NavRoutes.TaskCertificationDetailRoute.ARG_DATE) {
-                            type = NavType.StringType
-                        },
                     ),
             ) {
                 TaskCertificationDetailRoute(
                     navigateToBack = navController::popBackStack,
-                    navigateToUpload = {
+                    navigateToCertification = { goalId, date ->
                         val destination =
                             NavRoutes.TaskCertificationRoute.createRoute(
-                                goalId = it,
-                                from = NavRoutes.TaskCertificationRoute.From.DETAIL,
+                                DetailNavArgs(
+                                    goalId = goalId,
+                                    from = NavRoutes.TaskCertificationRoute.From.DETAIL,
+                                    selectedDate = date.toString(),
+                                ),
                             )
                         navController.navigate(destination)
                     },
-                    navigateToEditor = { },
+                    navigateToEditor = { uiState ->
+                        val serializer = uiState.toSerializer()
+                        navController.navigate(
+                            NavRoutes.TaskCertificationEditorRoute.createRoute(
+                                serializer,
+                            ),
+                        )
+                    },
+                )
+            }
+
+            composable(
+                route = NavRoutes.TaskCertificationEditorRoute.route,
+                arguments =
+                    listOf(
+                        navArgument(NavRoutes.TaskCertificationEditorRoute.ARG_DATA) {
+                            type = NavType.StringType
+                        },
+                    ),
+            ) {
+                TaskCertificationEditorRoute(
+                    navigateToBack = navController::popBackStack,
+                    navigateToCertification = { goalId, photologId, comment ->
+                        val destination =
+                            NavRoutes.TaskCertificationRoute.createRoute(
+                                DetailNavArgs(
+                                    goalId = goalId,
+                                    from = NavRoutes.TaskCertificationRoute.From.EDITOR,
+                                    photologId = photologId,
+                                    comment = comment,
+                                ),
+                            )
+                        navController.navigate(destination)
+                    },
                 )
             }
 
@@ -58,17 +93,18 @@ object TaskCertificationGraph : NavGraphContributor {
                 route = NavRoutes.TaskCertificationRoute.route,
                 arguments =
                     listOf(
-                        navArgument(NavRoutes.TaskCertificationRoute.ARG_GOAL_ID) {
-                            type = NavType.LongType
-                        },
-                        navArgument(NavRoutes.TaskCertificationRoute.ARG_FROM) {
+                        navArgument(NavRoutes.TaskCertificationRoute.ARG_DATA) {
                             type = NavType.StringType
                         },
                     ),
             ) {
                 TaskCertificationRoute(
-                    navigateToBack = {
-                        navController.popBackStack()
+                    navigateToBack = navController::popBackStack,
+                    navigateToDetail = {
+                        navController.popBackStack(
+                            route = NavRoutes.TaskCertificationDetailRoute.route,
+                            inclusive = false,
+                        )
                     },
                 )
             }

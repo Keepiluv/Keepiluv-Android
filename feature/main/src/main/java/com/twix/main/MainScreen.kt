@@ -32,7 +32,7 @@ fun MainRoute(
     navigateToGoalEditor: () -> Unit,
     navigateToGoalManage: (LocalDate) -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToCertification: (Long) -> Unit,
+    navigateToCertification: (Long, LocalDate) -> Unit,
     navigateToCertificationDetail: (Long, LocalDate, BetweenUs) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -58,7 +58,7 @@ private fun MainScreen(
     navigateToGoalEditor: () -> Unit,
     navigateToGoalManage: (LocalDate) -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToCertification: (Long) -> Unit,
+    navigateToCertification: (Long, LocalDate) -> Unit,
     navigateToCertificationDetail: (Long, LocalDate, BetweenUs) -> Unit,
 ) {
     val calendarState by homeViewModel.calendarState.collectAsStateWithLifecycle()

@@ -8,14 +8,13 @@ import com.twix.notification.deeplink.NotificationDeepLinkParser
 import com.twix.notification.routing.NotificationLaunchDispatcher
 import com.twix.notification.routing.NotificationRouter
 import com.twix.notification.token.NotificationTokenRegistrar
-import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
 val notificationModule =
     module {
         single { NotificationDeepLinkParser() }
         single { TwixNotificationChannelManager(get<Context>()) }
-        single { NotificationTokenRegistrar(get(), get(), get(named("AppScope"))) }
-        single<NotificationDeepLinkHandler> { NotificationRouter(get(), get(named("AppScope"))) }
+        single { NotificationTokenRegistrar(get(), get(), get()) }
+        single<NotificationDeepLinkHandler> { NotificationRouter(get(), get(), get()) }
         single<NotificationLaunchEventSource> { NotificationLaunchDispatcher() }
     }

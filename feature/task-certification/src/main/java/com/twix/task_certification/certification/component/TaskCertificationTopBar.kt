@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -12,8 +13,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.twix.designsystem.R
 import com.twix.designsystem.theme.GrayColor
-import com.twix.task_certification.R
 import com.twix.ui.extension.noRippleClickable
 
 @Composable
@@ -25,6 +26,7 @@ internal fun TaskCertificationTopBar(
         modifier =
             modifier
                 .fillMaxWidth()
+                .height(72.dp)
                 .background(color = GrayColor.C500),
     ) {
         Image(

@@ -25,7 +25,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -71,7 +70,7 @@ fun HomeRoute(
     navigateToGoalEditor: () -> Unit,
     navigateToGoalManage: (LocalDate) -> Unit,
     navigateToSettings: () -> Unit,
-    navigateToCertification: (Long) -> Unit,
+    navigateToCertification: (Long, LocalDate) -> Unit,
     navigateToCertificationDetail: (Long, LocalDate, BetweenUs) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -84,7 +83,7 @@ fun HomeRoute(
             ActivityResultContracts.RequestPermission(),
         ) { granted ->
             if (granted) {
-                navigateToCertification(uiState.selectedGoalId)
+                navigateToCertification(uiState.selectedGoalId, uiState.selectedDate)
                 return@rememberLauncherForActivityResult
             }
 

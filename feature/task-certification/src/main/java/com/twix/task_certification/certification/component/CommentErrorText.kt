@@ -12,12 +12,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.twix.designsystem.R
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
-import com.twix.task_certification.R
 
 @Composable
 fun CommentErrorText(modifier: Modifier = Modifier) {

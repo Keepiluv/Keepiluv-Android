@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.twix.main.MainRoute
 import com.twix.navigation.NavRoutes
+import com.twix.navigation.args.DetailNavArgs
 import com.twix.navigation.base.NavGraphContributor
 
 object MainNavGraph : NavGraphContributor {
@@ -36,24 +37,27 @@ object MainNavGraph : NavGraphContributor {
                             launchSingleTop = true
                         }
                     },
-                    navigateToCertification = {
+                    navigateToCertification = { goalId, date ->
                         val destination =
                             NavRoutes.TaskCertificationRoute.createRoute(
-                                goalId = it,
-                                from = NavRoutes.TaskCertificationRoute.From.HOME,
+                                DetailNavArgs(
+                                    goalId = goalId,
+                                    from = NavRoutes.TaskCertificationRoute.From.HOME,
+                                    selectedDate = date.toString(),
+                                ),
                             )
                         navController.navigate(destination) {
                             launchSingleTop = true
                         }
                     },
                     navigateToCertificationDetail = { goalId, date, betweenUs ->
-                        navController.navigate(
+                        val destination =
                             NavRoutes.TaskCertificationDetailRoute.createRoute(
                                 goalId,
                                 date,
                                 betweenUs.name,
-                            ),
-                        ) {
+                            )
+                        navController.navigate(destination) {
                             launchSingleTop = true
                         }
                     },

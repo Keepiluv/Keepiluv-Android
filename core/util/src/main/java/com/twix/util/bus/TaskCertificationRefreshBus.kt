@@ -5,13 +5,18 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 class TaskCertificationRefreshBus {
+    enum class Publisher {
+        PHOTOLOG,
+        EDITOR,
+    }
+
     private val _events =
-        MutableSharedFlow<Unit>(
+        MutableSharedFlow<Publisher>(
             replay = 0,
             extraBufferCapacity = 1,
         )
 
-    val events: SharedFlow<Unit> = _events.asSharedFlow()
+    val events: SharedFlow<Publisher> = _events.asSharedFlow()
 
-    fun notifyChanged() = _events.tryEmit(Unit)
+    fun notifyChanged(value: Publisher) = _events.tryEmit(value)
 }

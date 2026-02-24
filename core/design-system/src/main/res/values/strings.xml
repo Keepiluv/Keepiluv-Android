@@ -17,10 +17,12 @@
     <string name="word_cancel">취소</string>
     <string name="word_delete">삭제</string>
     <string name="word_modify">수정</string>
+    <string name="word_save">저장</string>
     <string name="word_setting">설정</string>
     <string name="word_account">계정</string>
     <string name="word_information">정보</string>
     <string name="word_logout">로그아웃</string>
+    <string name="word_sting">찌르기</string>
 
     <string name="word_daily">매일</string>
     <string name="word_weekly">매주</string>
@@ -49,6 +51,9 @@
     <!-- 코멘트 입력 -->
     <string name="comment_text_field_placeholder">코멘트추가</string>
     <string name="comment_condition_guide">5글자로 코멘트를 남길 수 있어요</string>
+
+    <!-- 인증샷 화면 -->
+    <string name="partner_not_task_certification">%s님은\n아직…</string>
 
     <!-- 목표 생성, 편집 화면 -->
     <string name="goal_editor_title">목표 직접 만들기</string>
@@ -107,10 +112,34 @@
     <string name="dialog_withdraw_account_title">정말 탈퇴하시겠어요?</string>
     <string name="dialog_withdraw_account_content">커플 연결이 끊어집니다.\n데이터는 전부 삭제되며 복구가 불가능합니다.</string>
 
-    <!-- 로그인 화면 -->
+    <!-- 인증샷 촬영 화면 !-->
+    <string name="task_certification_upload">업로드</string>
+    <string name="task_certification_image_capture_fail">이미지 캡처에 실패했습니다. 다시 시도해 주세요.</string>
+    <string name="task_certification_image_pick_fail">이미지를 불러오는 데 실패했습니다. 다시 시도해 주세요.</string>
+    <string name="task_certification_take_picture">인증샷 찍기</string>
+    <string name="task_certification_upload_fail">인증샷 등록에 실패했습니다.</string>
+    <string name="task_certification_image_translate_fail">이미지 변환에 실패했습니다.</string>
+    <string name="comment_error_message">코멘트는 5글자로 입력해주세요!</string>
+
+    <!-- 인증샷 보기 화면 !-->
+    <string name="task_certification_detail_fetch_photolog_fail">인증샷 조회에 실패했습니다.</string>
+    <string name="task_certification_modify_fail">인증샷 수정에 실패했어요.</string>
+
+    <!-- 인증샷 수정 화면 !-->
+    <string name="task_certification_editor_retake">다시 찍기</string>
+    <string name="task_certification_editor_modify_success">코멘트가 수정 되었어요.</string>
+    <string name="task_certification_editor_not_modified">코멘트가 수정되지 않았어요.</string>
+    <string name="task_certification_editor_modify_fail">코멘트 수정에 실패했어요.</string>
+    <string name="task_certification_detail_partner_sting">찌르기</string>
+    <string name="task_certification_detail_reaction_fail">리액션 요청에 실패했어요.</string>
+
+    <string name="task_certification_camera_permission_denied_permanently">인증샷 촬영을 위해서 카메라 권한이 필요해요.</string>
+
+  <!-- 로그인 화면 -->
     <string name="google_login_button_title">Google로 시작하기</string>
     <string name="kakao_login_button_title">카카오로 시작하기</string>
     <string name="login_fail_message">로그인에 실패했습니다. 다시 시도해주세요</string>
     <string name="fetch_onboarding_status_fail_message">온보딩 정보를 불러오는 데 실패했습니다. 다시 시도해주세요</string>
     <string name="login_title_message">함께니까 멈추지 않아요.\n지금 바로 키피럽 시작하기!</string>
+
 </resources>

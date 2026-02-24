@@ -30,9 +30,12 @@ class FakeStatsRepository : StatsRepository {
     ): AppResult<StatsDetail> =
         safeApiCall {
             val isEnd = fakeEndGoals.any { it.goalId == goalId }
-
-            val monthStart = (date ?: LocalDate.now()).withDayOfMonth(1)
-
+            val monthStart =
+                when {
+                    date != null -> date.withDayOfMonth(1)
+                    isEnd -> LocalDate.of(2025, 9, 1)
+                    else -> LocalDate.now().withDayOfMonth(1)
+                }
             val today = LocalDate.now()
             val lastDay = monthStart.lengthOfMonth()
 
@@ -45,7 +48,7 @@ class FakeStatsRepository : StatsRepository {
             val goalName = matchedGoal?.goalName ?: "운동 인증 챌린지"
             val goalIcon = matchedGoal?.goalIconType ?: GoalIconType.DEFAULT
             val status = if (isEnd) "COMPLETED" else "IN_PROGRESS"
-            val monthlyTarget = matchedGoal?.monthlyTargetCount ?: 20
+            val monthlyTarget = matchedGoal?.monthlyTargetCount ?: 15
 
             val maxDay =
                 when {
@@ -66,6 +69,9 @@ class FakeStatsRepository : StatsRepository {
                         )
                     }
 
+            val startDate = LocalDate.of(2025, 1, 1)
+            val endDate = if (isEnd) LocalDate.of(2025, 9, 30) else null
+
             StatsDetail(
                 goalId = goalId,
                 goalName = goalName,
@@ -81,8 +87,8 @@ class FakeStatsRepository : StatsRepository {
                         myCompletedCount = completedDates.count { it.myImageUrl != null },
                         partnerCompletedCount = completedDates.count { it.partnerImageUrl != null },
                         repeatCycle = RepeatCycle.DAILY,
-                        startDate = monthStart.minusMonths(2),
-                        endDate = if (isEnd) monthStart.plusMonths(1).minusDays(1) else null,
+                        startDate = startDate,
+                        endDate = endDate,
                     ),
             )
         }

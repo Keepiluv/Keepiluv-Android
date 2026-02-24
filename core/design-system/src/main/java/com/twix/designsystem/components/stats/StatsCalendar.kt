@@ -45,7 +45,7 @@ fun StatsCalendar(
                 ) {
                     week.forEach { date ->
                         if (date == null) {
-                            Box(modifier = Modifier.size(44.dp))
+                            Box(modifier = Modifier.weight(1f))
                         } else {
                             PictureDayCell(
                                 date = date,
@@ -58,7 +58,7 @@ fun StatsCalendar(
 
                     if (week.size < 7) {
                         repeat(7 - week.size) {
-                            Box(modifier = Modifier.size(44.dp))
+                            Box(modifier = Modifier.weight(1f))
                         }
                     }
                 }

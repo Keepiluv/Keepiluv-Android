@@ -106,6 +106,7 @@ private fun StatsTabRow(pagerState: PagerState) {
     val coroutineScope = rememberCoroutineScope()
 
     PrimaryTabRow(
+        modifier = Modifier.padding(horizontal = 20.dp),
         selectedTabIndex = pagerState.currentPage,
         indicator = {
             TabRowDefaults.PrimaryIndicator(
@@ -114,7 +115,6 @@ private fun StatsTabRow(pagerState: PagerState) {
                         .tabIndicatorOffset(pagerState.currentPage)
                         .fillMaxWidth()
                         .height(1.4.dp)
-                        .padding(horizontal = 20.dp)
                         .background(GrayColor.C500),
                 color = GrayColor.C500,
             )
@@ -129,6 +129,7 @@ private fun StatsTabRow(pagerState: PagerState) {
                         text = stringResource(destination.label),
                         style = AppTextStyle.T2,
                         color = if (isSelected) GrayColor.C500 else GrayColor.C200,
+                        modifier = Modifier.padding(bottom = 12.dp)
                     )
                 },
                 selected = isSelected,
@@ -179,7 +180,7 @@ private val noRippleInteractionSource =
         override fun tryEmit(interaction: Interaction) = true
     }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun StatsRoutePreview(
     @PreviewParameter(StatsUiStatePreviewProvider::class)

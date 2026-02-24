@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.R
 import com.twix.designsystem.components.stats.model.StatsCalendarUiModel
 import com.twix.designsystem.components.toast.model.ToastType
+import com.twix.domain.model.stats.detail.StatsDetail
 import com.twix.domain.repository.GoalRepository
 import com.twix.domain.repository.StatsRepository
 import com.twix.navigation.NavRoutes
@@ -13,10 +14,16 @@ import com.twix.util.bus.StatsRefreshBus
 import com.yapp.stats.detail.contract.StatsDetailIntent
 import com.yapp.stats.detail.contract.StatsDetailSideEffect
 import com.yapp.stats.detail.contract.StatsDetailUiState
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import kotlin.collections.get
 
+@OptIn(FlowPreview::class)
 class StatsDetailViewModel(
     private val statsRefreshBus: StatsRefreshBus,
     private val goalRepository: GoalRepository,
@@ -30,7 +37,24 @@ class StatsDetailViewModel(
 
     private val argDate: String? = savedSateHandle.get<String>(NavRoutes.StatsDetailRoute.ARG_DATE)
 
-    private var fetchStatsDetailJob: Job? = null
+    private val cache = mutableMapOf<LocalDate, StatsDetail>()
+
+    private val monthChangeFlow =
+        MutableSharedFlow<LocalDate>(
+            extraBufferCapacity = 1,
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        )
+
+    init {
+        viewModelScope.launch {
+            monthChangeFlow
+                .distinctUntilChanged()
+                .debounce(DEBOUNCE_INTERVAL)
+                .collect { date ->
+                    fetchStatsDetail(date)
+                }
+        }
+    }
 
     init {
         reduceNavArguments()
@@ -47,25 +71,45 @@ class StatsDetailViewModel(
     }
 
     private fun fetchStatsDetail(date: LocalDate?) {
-        fetchStatsDetailJob?.cancel()
-        fetchStatsDetailJob =
-            launchResult(
-                block = { statsRepository.fetchStatsDetail(currentState.goalId, date) },
-                onSuccess = {
-                    reduce {
-                        copy(
-                            detail = it,
-                            selectedDate = it.monthDate,
-                            calendarUiModel =
-                                StatsCalendarUiModel.create(
-                                    currentDate = it.monthDate,
-                                    completedDate = it.completedDate,
-                                ),
-                        )
-                    }
-                },
-                onError = { showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR) },
-            )
+        val result = date?.let { checkCache(date) }
+        if (result == true) return
+        launchResult(
+            block = { statsRepository.fetchStatsDetail(currentState.goalId, date) },
+            onSuccess = {
+                cache[it.monthDate] = it
+                reduce {
+                    copy(
+                        detail = it,
+                        calendarUiModel =
+                            StatsCalendarUiModel.create(
+                                currentDate = it.monthDate,
+                                completedDate = it.completedDate,
+                            ),
+                    )
+                }
+            },
+            onError = {
+                reduce { copy(detail = detail.copy(monthDate = date ?: LocalDate.now())) }
+                showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
+            },
+        )
+    }
+
+    private fun checkCache(date: LocalDate): Boolean {
+        cache[date]?.let {
+            reduce {
+                copy(
+                    detail = it,
+                    calendarUiModel =
+                        StatsCalendarUiModel.create(
+                            currentDate = it.monthDate,
+                            completedDate = it.completedDate,
+                        ),
+                )
+            }
+            return true
+        }
+        return false
     }
 
     override suspend fun handleIntent(intent: StatsDetailIntent) {
@@ -83,15 +127,15 @@ class StatsDetailViewModel(
     }
 
     private fun fetchPreviousMonth() {
-        val previousMonth = currentState.selectedDate?.minusMonths(1) ?: return
-        reduce { copy(selectedDate = previousMonth) }
-        fetchStatsDetail(previousMonth)
+        val previousMonth = currentState.detail.monthDate.minusMonths(1)
+        reduce { copy(detail = detail.copy(monthDate = previousMonth)) }
+        monthChangeFlow.tryEmit(previousMonth)
     }
 
     private fun fetchNextMonth() {
-        val nextMonth = currentState.selectedDate?.plusMonths(1) ?: return
-        reduce { copy(selectedDate = nextMonth) }
-        fetchStatsDetail(nextMonth)
+        val nextMonth = currentState.detail.monthDate.plusMonths(1)
+        reduce { copy(detail = detail.copy(monthDate = nextMonth)) }
+        monthChangeFlow.tryEmit(nextMonth)
     }
 
     private fun endGoal() {
@@ -132,5 +176,6 @@ class StatsDetailViewModel(
 
     companion object {
         private const val GOAL_ID_NOT_FOUND = "Goal Id Argument Not Found"
+        private const val DEBOUNCE_INTERVAL = 600L
     }
 }

@@ -124,10 +124,10 @@ class TaskCertificationDetailViewModel(
         }
     }
 
-    private suspend fun reduceReaction(reaction: GoalReactionType) {
+    private fun reduceReaction(reaction: GoalReactionType) {
         lastReaction = currentState.partnerPhotolog?.reaction
         reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(reaction)) }
-        reactionFlow.emit(reaction)
+        reactionFlow.tryEmit(reaction)
     }
 
     private fun reduceShownCard() {

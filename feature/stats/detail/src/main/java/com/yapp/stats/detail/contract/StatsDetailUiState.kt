@@ -10,7 +10,6 @@ import java.time.YearMonth
 @Immutable
 data class StatsDetailUiState(
     val goalId: Long = -1,
-    val selectedDate: LocalDate? = null,
     val detail: StatsDetail = StatsDetail.EMPTY,
     val isInProgressStatsDetail: Boolean = true,
     val calendarUiModel: StatsCalendarUiModel = StatsCalendarUiModel(),
@@ -18,7 +17,7 @@ data class StatsDetailUiState(
     val hasNext: Boolean
         get() {
             val limitYm = YearMonth.from(detail.statsSummary.endDate ?: LocalDate.now())
-            val nextYm = YearMonth.from(selectedDate).plusMonths(1)
+            val nextYm = YearMonth.from(detail.monthDate).plusMonths(1)
 
             return nextYm <= limitYm
         }
@@ -26,7 +25,7 @@ data class StatsDetailUiState(
     val hasPrevious: Boolean
         get() {
             val limitYm = YearMonth.from(detail.statsSummary.startDate)
-            val previousYm = YearMonth.from(selectedDate).minusMonths(1)
+            val previousYm = YearMonth.from(detail.monthDate).minusMonths(1)
             return previousYm >= limitYm
         }
 }

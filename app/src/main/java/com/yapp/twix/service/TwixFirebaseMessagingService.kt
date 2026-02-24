@@ -7,6 +7,7 @@ import androidx.annotation.RequiresPermission
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
+import co.touchlab.kermit.Logger
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.twix.designsystem.R
@@ -22,6 +23,7 @@ import org.koin.core.component.inject
 class TwixFirebaseMessagingService :
     FirebaseMessagingService(),
     KoinComponent {
+    private val logger = Logger.withTag("TwixFirebaseMessagingService")
     private val tokenRegistrar: NotificationTokenRegistrar by inject()
     private val notificationChannelManager: TwixNotificationChannelManager by inject()
 
@@ -89,6 +91,7 @@ class TwixFirebaseMessagingService :
                     try {
                         it.toUri()
                     } catch (e: Exception) {
+                        logger.e(e) { "deepLink 파싱 실패: $it" }
                         null
                     }
                 }?.getQueryParameter("notificationId")

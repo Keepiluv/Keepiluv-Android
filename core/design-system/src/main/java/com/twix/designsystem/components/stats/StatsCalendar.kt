@@ -49,7 +49,7 @@ fun StatsCalendar(
                             PictureDayCell(
                                 date = date,
                                 completed = uiModel.completedDateMap[date],
-                                onDateSelected = { onSelectedDate(it) },
+                                onDateSelected = onSelectedDate,
                                 modifier = Modifier.weight(1f),
                             )
                         }

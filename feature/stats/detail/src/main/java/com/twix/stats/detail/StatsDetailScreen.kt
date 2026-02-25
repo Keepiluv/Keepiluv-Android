@@ -113,8 +113,7 @@ fun StatsDetailScreen(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .background(GrayColor.C050)
-                    .verticalScroll(scrollState),
+                    .background(GrayColor.C050),
         ) {
             StatsDetailTopbar(
                 goalName = uiState.detail.goalName,
@@ -137,7 +136,12 @@ fun StatsDetailScreen(
                 },
             )
 
-            Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(scrollState),
+            ) {
                 Image(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_hug),
                     contentDescription = null,

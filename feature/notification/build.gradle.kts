@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.twix.notification"
+    namespace = "com.twix.feature.notification"
 }
 
 dependencies {

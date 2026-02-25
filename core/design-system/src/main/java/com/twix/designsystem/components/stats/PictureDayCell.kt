@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +42,7 @@ fun PictureDayCell(
     val textColor = if (hasImage) CommonColor.White else GrayColor.C500
     val borderColor = if (showBackgroundCard) CommonColor.White else GrayColor.C400
     val cornerShape = RoundedCornerShape(7.dp)
+    val context = LocalContext.current
 
     Box(
         modifier =
@@ -76,13 +78,17 @@ fun PictureDayCell(
         ) {
             val displayImageUrl = completed?.partnerImageUrl ?: completed?.myImageUrl
             if (displayImageUrl != null) {
-                AsyncImage(
-                    model =
+                val imageRequest =
+                    remember(displayImageUrl, context) {
                         ImageRequest
-                            .Builder(LocalContext.current)
+                            .Builder(context)
                             .data(displayImageUrl)
                             .crossfade(true)
-                            .build(),
+                            .build()
+                    }
+
+                AsyncImage(
+                    model = imageRequest,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),

@@ -26,7 +26,7 @@ internal fun TaskCertificationCardContent(
             buttonTitle =
                 when (uiState.currentShow) {
                     BetweenUs.ME -> stringResource(R.string.task_certification_take_picture)
-                    BetweenUs.PARTNER -> stringResource(R.string.task_certification_detail_partner_sting)
+                    BetweenUs.PARTNER -> stringResource(R.string.action_sting)
                 },
             rotation = if (uiState.isDisplayedMyPhotolog) -8f else 0f,
             onClick = if (uiState.isDisplayedMyPhotolog) onClickUpload else onClickSting,

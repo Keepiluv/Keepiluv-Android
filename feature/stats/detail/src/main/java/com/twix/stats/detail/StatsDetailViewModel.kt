@@ -1,4 +1,4 @@
-package com.yapp.stats.detail
+package com.twix.stats.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -9,11 +9,11 @@ import com.twix.domain.model.stats.detail.StatsDetail
 import com.twix.domain.repository.GoalRepository
 import com.twix.domain.repository.StatsRepository
 import com.twix.navigation.NavRoutes
+import com.twix.stats.detail.contract.StatsDetailSideEffect
+import com.twix.stats.detail.contract.StatsDetailUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.StatsRefreshBus
 import com.yapp.stats.detail.contract.StatsDetailIntent
-import com.yapp.stats.detail.contract.StatsDetailSideEffect
-import com.yapp.stats.detail.contract.StatsDetailUiState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,44 +21,43 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import kotlin.collections.get
+import java.time.YearMonth
 
 @OptIn(FlowPreview::class)
 class StatsDetailViewModel(
     private val statsRefreshBus: StatsRefreshBus,
     private val goalRepository: GoalRepository,
     private val statsRepository: StatsRepository,
-    savedSateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<StatsDetailUiState, StatsDetailIntent, StatsDetailSideEffect>(
         StatsDetailUiState(),
     ) {
     private val argGoalId: Long =
-        requireNotNull(savedSateHandle[NavRoutes.StatsDetailRoute.ARG_GOAL_ID]) { GOAL_ID_NOT_FOUND }
+        requireNotNull(savedStateHandle[NavRoutes.StatsDetailRoute.ARG_GOAL_ID]) { GOAL_ID_NOT_FOUND }
 
-    private val argDate: String? = savedSateHandle.get<String>(NavRoutes.StatsDetailRoute.ARG_DATE)
+    private val argDate: String? = savedStateHandle.get<String>(NavRoutes.StatsDetailRoute.ARG_DATE)
 
-    private val cache = mutableMapOf<LocalDate, StatsDetail>()
+    private val cache = mutableMapOf<YearMonth, StatsDetail>()
 
     private val monthChangeFlow =
-        MutableSharedFlow<LocalDate>(
+        MutableSharedFlow<YearMonth>(
             extraBufferCapacity = 1,
             onBufferOverflow = BufferOverflow.DROP_OLDEST,
         )
 
     init {
+        collectMonthChangeFlow()
+        reduceNavArguments()
+        fetchStatsDetail(argDate?.let { LocalDate.parse(it) })
+    }
+
+    private fun collectMonthChangeFlow() {
         viewModelScope.launch {
             monthChangeFlow
                 .distinctUntilChanged()
                 .debounce(DEBOUNCE_INTERVAL)
-                .collect { date ->
-                    fetchStatsDetail(date)
-                }
+                .collect { yearMonth -> fetchStatsDetail(yearMonth.atDay(1)) }
         }
-    }
-
-    init {
-        reduceNavArguments()
-        fetchStatsDetail(argDate?.let { LocalDate.parse(it) })
     }
 
     private fun reduceNavArguments() {
@@ -71,12 +70,12 @@ class StatsDetailViewModel(
     }
 
     private fun fetchStatsDetail(date: LocalDate?) {
-        val result = date?.let { checkCache(date) }
+        val result = date?.let { checkCache(YearMonth.from(it)) }
         if (result == true) return
         launchResult(
             block = { statsRepository.fetchStatsDetail(currentState.goalId, date) },
             onSuccess = {
-                cache[it.monthDate] = it
+                cache[YearMonth.from(it.monthDate)] = it
                 reduce {
                     copy(
                         detail = it,
@@ -95,8 +94,8 @@ class StatsDetailViewModel(
         )
     }
 
-    private fun checkCache(date: LocalDate): Boolean {
-        cache[date]?.let {
+    private fun checkCache(yearMonth: YearMonth): Boolean {
+        cache[yearMonth]?.let {
             reduce {
                 copy(
                     detail = it,
@@ -129,13 +128,13 @@ class StatsDetailViewModel(
     private fun fetchPreviousMonth() {
         val previousMonth = currentState.detail.monthDate.minusMonths(1)
         reduce { copy(detail = detail.copy(monthDate = previousMonth)) }
-        monthChangeFlow.tryEmit(previousMonth)
+        monthChangeFlow.tryEmit(YearMonth.from(previousMonth))
     }
 
     private fun fetchNextMonth() {
         val nextMonth = currentState.detail.monthDate.plusMonths(1)
         reduce { copy(detail = detail.copy(monthDate = nextMonth)) }
-        monthChangeFlow.tryEmit(nextMonth)
+        monthChangeFlow.tryEmit(YearMonth.from(nextMonth))
     }
 
     private fun endGoal() {
@@ -176,6 +175,6 @@ class StatsDetailViewModel(
 
     companion object {
         private const val GOAL_ID_NOT_FOUND = "Goal Id Argument Not Found"
-        private const val DEBOUNCE_INTERVAL = 600L
+        private const val DEBOUNCE_INTERVAL = 300L
     }
 }

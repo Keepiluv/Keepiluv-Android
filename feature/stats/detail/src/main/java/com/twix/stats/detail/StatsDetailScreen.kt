@@ -1,4 +1,4 @@
-package com.yapp.stats.detail
+package com.twix.stats.detail
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,13 +45,13 @@ import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.domain.model.enums.GoalIconType
+import com.twix.stats.detail.component.StatsDetailTopbar
+import com.twix.stats.detail.component.SummaryContent
+import com.twix.stats.detail.contract.StatsDetailSideEffect
+import com.twix.stats.detail.contract.StatsDetailUiState
+import com.twix.stats.detail.preview.StatsDetailUiStatePreviewProvider
 import com.twix.ui.base.ObserveAsEvents
-import com.yapp.stats.detail.component.StatsDetailTopbar
-import com.yapp.stats.detail.component.SummaryContent
 import com.yapp.stats.detail.contract.StatsDetailIntent
-import com.yapp.stats.detail.contract.StatsDetailSideEffect
-import com.yapp.stats.detail.contract.StatsDetailUiState
-import com.yapp.stats.detail.preview.StatsDetailUiStatePreviewProvider
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.LocalDate
@@ -82,7 +82,7 @@ fun StatsDetailRoute(
     }
 
     StatsDetailScreen(
-        uiSate = uiState,
+        uiState = uiState,
         onBack = onBack,
         onSelectDate = {},
         onPreviousMonth = { viewModel.dispatch(StatsDetailIntent.PreviousMonth) },
@@ -95,7 +95,7 @@ fun StatsDetailRoute(
 
 @Composable
 fun StatsDetailScreen(
-    uiSate: StatsDetailUiState,
+    uiState: StatsDetailUiState,
     onBack: () -> Unit,
     onSelectDate: (LocalDate) -> Unit,
     onPreviousMonth: () -> Unit,
@@ -113,16 +113,15 @@ fun StatsDetailScreen(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .background(GrayColor.C050)
-                    .verticalScroll(scrollState),
+                    .background(GrayColor.C050),
         ) {
             StatsDetailTopbar(
-                goalName = uiSate.detail.goalName,
-                isInProgressStatsDetail = uiSate.isInProgressStatsDetail,
+                goalName = uiState.detail.goalName,
+                isInProgressStatsDetail = uiState.isInProgressStatsDetail,
                 popupMenuVisibility = popupMenuVisibility,
                 onBack = onBack,
                 onClickAction = {
-                    if (uiSate.isInProgressStatsDetail) {
+                    if (uiState.isInProgressStatsDetail) {
                         popupMenuVisibility = true
                     } else {
                         statsDeleteDialogVisibility = true
@@ -137,7 +136,12 @@ fun StatsDetailScreen(
                 },
             )
 
-            Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(scrollState),
+            ) {
                 Image(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_hug),
                     contentDescription = null,
@@ -157,11 +161,11 @@ fun StatsDetailScreen(
                     Spacer(Modifier.height(32.dp))
 
                     CalendarNavigator(
-                        currentDate = uiSate.detail.monthDate,
+                        currentDate = uiState.detail.monthDate,
                         onPreviousMonth = onPreviousMonth,
                         onNextMonth = onNextMonth,
-                        hasPrevious = uiSate.hasPrevious,
-                        hasNext = uiSate.hasNext,
+                        hasPrevious = uiState.hasPrevious,
+                        hasNext = uiState.hasNext,
                     )
 
                     Box(
@@ -176,7 +180,7 @@ fun StatsDetailScreen(
                             .padding(top = 24.dp, bottom = 32.dp),
                     ) {
                         StatsCalendar(
-                            uiModel = uiSate.calendarUiModel,
+                            uiModel = uiState.calendarUiModel,
                             onSelectedDate = onSelectDate,
                         )
                     }
@@ -194,7 +198,7 @@ fun StatsDetailScreen(
 
             Spacer(Modifier.height(44.dp))
 
-            SummaryContent(uiSate.detail.statsSummary)
+            SummaryContent(uiState.detail.statsSummary)
         }
 
         CommonDialog(
@@ -209,10 +213,10 @@ fun StatsDetailScreen(
                     title =
                         stringResource(
                             R.string.dialog_delete_goal_title,
-                            uiSate.detail.goalName,
+                            uiState.detail.goalName,
                         ),
                     content = stringResource(R.string.dialog_delete_goal_content),
-                    icon = uiSate.detail.goalIcon,
+                    icon = uiState.detail.goalIcon,
                 )
             },
         )
@@ -267,7 +271,7 @@ private fun StatsDetailScreenPreview(
 ) {
     TwixTheme {
         StatsDetailScreen(
-            uiSate = uiState,
+            uiState = uiState,
             onBack = {},
             onSelectDate = {},
             onPreviousMonth = {},

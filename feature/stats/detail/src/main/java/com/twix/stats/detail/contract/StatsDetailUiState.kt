@@ -1,4 +1,4 @@
-package com.yapp.stats.detail.contract
+package com.twix.stats.detail.contract
 
 import androidx.compose.runtime.Immutable
 import com.twix.designsystem.components.stats.model.StatsCalendarUiModel

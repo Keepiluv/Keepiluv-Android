@@ -1,10 +1,11 @@
-package com.yapp.stats.detail.component
+package com.twix.stats.detail.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -42,38 +43,22 @@ fun SummaryContent(
 
         Spacer(Modifier.height(20.dp))
 
-        Row(modifier = Modifier.padding(horizontal = 20.dp)) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 AppText(
                     text = stringResource(R.string.word_end_count),
                     style = AppTextStyle.C1,
                     color = GrayColor.C400,
+                    modifier = Modifier.width(56.dp),
                 )
-                AppText(
-                    text = stringResource(R.string.word_repeat_type),
-                    style = AppTextStyle.C1,
-                    color = GrayColor.C400,
-                )
-                AppText(
-                    text = stringResource(R.string.word_start_date),
-                    style = AppTextStyle.C1,
-                    color = GrayColor.C400,
-                )
-                AppText(
-                    text = stringResource(R.string.word_end_date),
-                    style = AppTextStyle.C1,
-                    color = GrayColor.C400,
-                )
-            }
-
-            Spacer(Modifier.width(28.dp))
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Spacer(Modifier.width(28.dp))
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     Image(
                         painter = painterResource(R.drawable.ic_checked_you),
                         contentDescription = null,
@@ -110,39 +95,34 @@ fun SummaryContent(
                         color = GrayColor.C500,
                     )
                 }
+            }
 
-                AppText(
-                    text = statsSummary.repeatCycle.label(),
-                    style = AppTextStyle.B4,
-                    color = GrayColor.C500,
-                )
-
-                AppText(
-                    text =
+            SummaryRow(
+                label = stringResource(R.string.word_repeat_type),
+                value = statsSummary.repeatCycle.label(),
+            )
+            SummaryRow(
+                label = stringResource(R.string.word_start_date),
+                value =
+                    stringResource(
+                        R.string.date_year_month_day,
+                        statsSummary.startDate.year,
+                        statsSummary.startDate.monthValue,
+                        statsSummary.startDate.dayOfMonth,
+                    ),
+            )
+            SummaryRow(
+                label = stringResource(R.string.word_end_date),
+                value =
+                    statsSummary.endDate?.let {
                         stringResource(
                             R.string.date_year_month_day,
-                            statsSummary.startDate.year,
-                            statsSummary.startDate.monthValue,
-                            statsSummary.startDate.dayOfMonth,
-                        ),
-                    style = AppTextStyle.B4,
-                    color = GrayColor.C500,
-                )
-
-                AppText(
-                    text =
-                        statsSummary.endDate?.let {
-                            stringResource(
-                                R.string.date_year_month_day,
-                                it.year,
-                                it.monthValue,
-                                it.dayOfMonth,
-                            )
-                        } ?: stringResource(R.string.word_not_set),
-                    style = AppTextStyle.B4,
-                    color = GrayColor.C500,
-                )
-            }
+                            it.year,
+                            it.monthValue,
+                            it.dayOfMonth,
+                        )
+                    } ?: stringResource(R.string.word_not_set),
+            )
         }
 
         Spacer(Modifier.height(20.dp))
@@ -153,6 +133,27 @@ fun SummaryContent(
         )
 
         Spacer(Modifier.height(52.dp))
+    }
+}
+
+@Composable
+private fun SummaryRow(
+    label: String,
+    value: String,
+) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        AppText(
+            text = label,
+            style = AppTextStyle.C1,
+            color = GrayColor.C400,
+            modifier = Modifier.width(56.dp),
+        )
+        Spacer(Modifier.width(28.dp))
+        AppText(
+            text = value,
+            style = AppTextStyle.B4,
+            color = GrayColor.C500,
+        )
     }
 }
 

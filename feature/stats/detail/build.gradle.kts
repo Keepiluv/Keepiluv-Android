@@ -3,5 +3,5 @@ plugins {
 }
 
 android {
-    namespace = "com.yapp.stats.detail"
+    namespace = "com.twix.stats.detail"
 }

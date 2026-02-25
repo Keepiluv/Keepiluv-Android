@@ -52,9 +52,8 @@ class NotificationTokenRegistrar(
         appScope.launch {
             try {
                 val fcmToken = FirebaseMessaging.getInstance().token.await()
-                val result = notificationRepository.deleteFcmToken(fcmToken)
 
-                when (result) {
+                when (val result = notificationRepository.deleteFcmToken(fcmToken)) {
                     is AppResult.Success -> logger.d { "FCM token 삭제 성공" }
                     is AppResult.Error -> logger.e { "FCM token 삭제 실패: ${result.error}" }
                 }

@@ -113,7 +113,7 @@ private fun RepeatTypeSettings(
             Modifier
                 .padding(16.dp),
     ) {
-        HeaderText(stringResource(R.string.header_repeat_type))
+        HeaderText(stringResource(R.string.word_repeat_type))
 
         Spacer(Modifier.height(12.dp))
 

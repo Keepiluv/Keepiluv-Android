@@ -61,13 +61,11 @@ class StatsDetailUiStatePreviewProvider : PreviewParameterProvider<StatsDetailUi
         sequenceOf(
             StatsDetailUiState(
                 goalId = 1,
-                selectedDate = LocalDate.now(),
                 detail = baseDetail,
                 calendarUiModel = baseCalendarUiModel,
             ),
             StatsDetailUiState(
                 goalId = 1,
-                selectedDate = null,
                 detail = baseDetail.copy(status = "종료"),
                 calendarUiModel = baseCalendarUiModel,
             ),

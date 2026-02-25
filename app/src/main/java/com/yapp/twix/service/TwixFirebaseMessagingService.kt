@@ -44,7 +44,6 @@ class TwixFirebaseMessagingService :
                 title = dataPayload.title ?: notification?.title,
                 body = dataPayload.body ?: notification?.body,
             )
-        logger.e { "onMessageReceived: $payload" }
 
         // 앱 실행 중에 토스트나 인앱 배너를 렌더링할 때 여기에서 분기처리하면 됨
         showSystemNotification(payload)

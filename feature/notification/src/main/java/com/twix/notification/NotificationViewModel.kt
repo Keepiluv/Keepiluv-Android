@@ -38,9 +38,19 @@ class NotificationViewModel(
         launchResult(
             block = { notificationRepository.fetchNotifications(lastId = lastId) },
             onSuccess = {
-                reduce { copy(notificationList = currentState.notificationList + it.notifications, hasNext = it.hasNext) }
+                reduce {
+                    markAllNotificationAsRead()
+                    copy(notificationList = currentState.notificationList + it.notifications, hasNext = it.hasNext)
+                }
             },
             onError = { emitSideEffect(NotificationSideEffect.ShowToast(R.string.toast_fetch_notification_failed, ToastType.ERROR)) },
+        )
+    }
+
+    private fun markAllNotificationAsRead() {
+        launchResult(
+            block = { notificationRepository.markAllNotificationsAsRead() },
+            onSuccess = {},
         )
     }
 

@@ -23,4 +23,6 @@ interface NotificationRepository {
         lastId: Long? = null,
         size: Int = 20,
     ): AppResult<NotificationPage>
+
+    suspend fun markAllNotificationsAsRead(): AppResult<Unit>
 }

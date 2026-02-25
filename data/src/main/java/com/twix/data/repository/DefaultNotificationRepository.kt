@@ -44,4 +44,6 @@ class DefaultNotificationRepository(
                 size = size,
             ).toDomain()
     }
+
+    override suspend fun markAllNotificationsAsRead() = safeApiCall { service.markAllNotificationsAsRead() }
 }

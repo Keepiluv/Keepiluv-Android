@@ -38,4 +38,7 @@ interface NotificationService {
         @Query("lastId") lastId: Long? = null,
         @Query("size") size: Int = 20,
     ): NotificationListResponse
+
+    @PATCH("api/v1/notifications/read-all")
+    suspend fun markAllNotificationsAsRead()
 }

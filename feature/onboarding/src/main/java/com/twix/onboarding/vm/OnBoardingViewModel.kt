@@ -2,6 +2,7 @@ package com.twix.onboarding.vm
 
 import androidx.lifecycle.viewModelScope
 import com.twix.domain.model.OnboardingStatus
+import com.twix.domain.repository.NotificationRepository
 import com.twix.domain.repository.OnBoardingRepository
 import com.twix.onboarding.model.OnBoardingIntent
 import com.twix.onboarding.model.OnBoardingSideEffect
@@ -13,7 +14,12 @@ import java.time.LocalDate
 
 class OnBoardingViewModel(
     private val onBoardingRepository: OnBoardingRepository,
+    private val notificationRepository: NotificationRepository,
 ) : BaseViewModel<OnBoardingUiState, OnBoardingIntent, OnBoardingSideEffect>(OnBoardingUiState()) {
+    init {
+        initNotificationSettings()
+    }
+
     fun fetchMyInviteCode() {
         launchResult(
             block = { onBoardingRepository.fetchInviteCode() },
@@ -136,6 +142,13 @@ class OnBoardingViewModel(
             onError = {
                 emitSideEffect(OnBoardingSideEffect.DdaySetting.ShowAnniversarySetupFailToast)
             },
+        )
+    }
+
+    private fun initNotificationSettings() {
+        launchResult(
+            block = { notificationRepository.initNotificationSettings(true, true, true) },
+            onSuccess = {},
         )
     }
 

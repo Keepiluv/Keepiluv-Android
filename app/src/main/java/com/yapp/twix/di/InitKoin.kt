@@ -30,7 +30,6 @@ fun initKoin(
                 add(utilModule)
                 add(imageModule)
                 add(notificationModule)
-                add(coroutineModule)
             },
         )
     }

@@ -4,12 +4,14 @@ import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.repository.AuthRepository
 import com.twix.domain.repository.UserRepository
+import com.twix.notification.token.NotificationTokenRegistrar
 import com.twix.settings.model.SettingsUiState
 import com.twix.ui.base.BaseViewModel
 
 class SettingsViewModel(
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
+    private val tokenRegistrar: NotificationTokenRegistrar,
 ) : BaseViewModel<SettingsUiState, SettingsIntent, SettingsSideEffect>(SettingsUiState()) {
     init {
         fetchUserInfo()
@@ -38,6 +40,7 @@ class SettingsViewModel(
         launchResult(
             block = { authRepository.logout() },
             onSuccess = {
+                tokenRegistrar.unregisterCurrentToken()
                 tryEmitSideEffect(SettingsSideEffect.ShowToast(R.string.toast_logout_completed, ToastType.SUCCESS))
                 tryEmitSideEffect(SettingsSideEffect.NavigateToLogin)
             },

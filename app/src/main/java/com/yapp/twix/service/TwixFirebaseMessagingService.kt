@@ -37,7 +37,13 @@ class TwixFirebaseMessagingService :
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        val payload = message.data.toTwixPushPayload()
+        val dataPayload = message.data.toTwixPushPayload()
+        val notification = message.notification
+        val payload =
+            dataPayload.copy(
+                title = dataPayload.title ?: notification?.title,
+                body = dataPayload.body ?: notification?.body,
+            )
 
         // 앱 실행 중에 토스트나 인앱 배너를 렌더링할 때 여기에서 분기처리하면 됨
         showSystemNotification(payload)
@@ -70,7 +76,7 @@ class TwixFirebaseMessagingService :
         val notification =
             NotificationCompat
                 .Builder(this, TwixNotificationChannelManager.CHANNEL_DEFAULT)
-                .setSmallIcon(R.drawable.ic_app_logo)
+                .setSmallIcon(R.drawable.ic_app)
                 .setContentTitle(payload.title ?: getString(com.yapp.twix.R.string.app_name))
                 .setContentText(payload.body.orEmpty())
                 .setAutoCancel(true)

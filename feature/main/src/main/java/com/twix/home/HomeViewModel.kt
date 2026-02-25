@@ -128,7 +128,7 @@ class HomeViewModel(
         launchResult(
             block = { pokeRepository.pokeGoal(goalId) },
             onSuccess = { tryEmitSideEffect(HomeSideEffect.ShowPokeToast(it.message)) },
-            onError = { emitSideEffect(HomeSideEffect.ShowToast(R.string.toast_poke_goal_failed, ToastType.ERROR)) }
+            onError = { emitSideEffect(HomeSideEffect.ShowToast(R.string.toast_poke_goal_failed, ToastType.ERROR)) },
         )
     }
 

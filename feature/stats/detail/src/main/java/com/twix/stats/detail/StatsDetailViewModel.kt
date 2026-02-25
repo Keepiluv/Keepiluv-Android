@@ -80,9 +80,10 @@ class StatsDetailViewModel(
 
         viewModelScope.launch {
             val summaryDeferred = async { statsRepository.fetchStatsSummary(currentState.goalId) }
-            handleInitialSummary(summaryDeferred.await())
+            val detailDeferred =
+                async { statsRepository.fetchStatsDetail(currentState.goalId, initialDate) }
 
-            val detailDeferred = async { statsRepository.fetchStatsDetail(currentState.goalId, initialDate) }
+            handleInitialSummary(summaryDeferred.await())
             handleInitialDetail(detailDeferred.await(), initialDate)
         }
     }
@@ -102,23 +103,10 @@ class StatsDetailViewModel(
         initialDate: YearMonth,
     ) {
         when (result) {
-            is AppResult.Success -> {
-                val detail = result.data
-                cache[YearMonth.from(detail.yearMonth)] = detail
-                reduce {
-                    copy(
-                        detail = detail,
-                        calendarUiModel =
-                            StatsCalendarUiModel.create(
-                                currentDate = detail.yearMonth,
-                                completedDate = detail.completedDate,
-                            ),
-                    )
-                }
-            }
+            is AppResult.Success -> handleFetchStatsDetailSuccess(result.data)
             is AppResult.Error -> {
                 handleError(result.error)
-                reduce { copy(detail = detail.copy(yearMonth = initialDate.atDay(1))) }
+                reduceDetailWithEmptyCompletedDate(initialDate)
                 showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
             }
         }
@@ -128,24 +116,44 @@ class StatsDetailViewModel(
         if (checkCache(date)) return
         launchResult(
             block = { statsRepository.fetchStatsDetail(currentState.goalId, date) },
-            onSuccess = {
-                cache[YearMonth.from(it.yearMonth)] = it
-                reduce {
-                    copy(
-                        detail = it,
-                        calendarUiModel =
-                            StatsCalendarUiModel.create(
-                                currentDate = it.yearMonth,
-                                completedDate = it.completedDate,
-                            ),
-                    )
-                }
-            },
+            onSuccess = { handleFetchStatsDetailSuccess(it) },
             onError = {
-                reduce { copy(detail = detail.copy(yearMonth = date.atDay(1))) }
+                reduceDetailWithEmptyCompletedDate(date)
                 showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
             },
         )
+    }
+
+    private fun handleFetchStatsDetailSuccess(result: StatsDetail) {
+        cache[YearMonth.from(result.yearMonth)] = result
+        reduce {
+            copy(
+                detail = result,
+                calendarUiModel =
+                    StatsCalendarUiModel.create(
+                        currentDate = result.yearMonth,
+                        completedDate = result.completedDate,
+                    ),
+            )
+        }
+    }
+
+    private fun reduceDetailWithEmptyCompletedDate(date: YearMonth) {
+        val currentDate = date.atDay(1)
+        reduce {
+            copy(
+                detail =
+                    detail.copy(
+                        yearMonth = currentDate,
+                        completedDate = emptyList(),
+                    ),
+                calendarUiModel =
+                    StatsCalendarUiModel.create(
+                        currentDate = currentDate,
+                        completedDate = emptyList(),
+                    ),
+            )
+        }
     }
 
     private fun checkCache(yearMonth: YearMonth): Boolean {

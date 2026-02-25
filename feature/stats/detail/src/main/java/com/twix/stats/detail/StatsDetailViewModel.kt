@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.YearMonth
 
 @OptIn(FlowPreview::class)
 class StatsDetailViewModel(
@@ -36,10 +37,10 @@ class StatsDetailViewModel(
 
     private val argDate: String? = savedStateHandle.get<String>(NavRoutes.StatsDetailRoute.ARG_DATE)
 
-    private val cache = mutableMapOf<LocalDate, StatsDetail>()
+    private val cache = mutableMapOf<YearMonth, StatsDetail>()
 
     private val monthChangeFlow =
-        MutableSharedFlow<LocalDate>(
+        MutableSharedFlow<YearMonth>(
             extraBufferCapacity = 1,
             onBufferOverflow = BufferOverflow.DROP_OLDEST,
         )
@@ -55,7 +56,7 @@ class StatsDetailViewModel(
             monthChangeFlow
                 .distinctUntilChanged()
                 .debounce(DEBOUNCE_INTERVAL)
-                .collect { date -> fetchStatsDetail(date) }
+                .collect { yearMonth -> fetchStatsDetail(yearMonth.atDay(1)) }
         }
     }
 
@@ -69,12 +70,12 @@ class StatsDetailViewModel(
     }
 
     private fun fetchStatsDetail(date: LocalDate?) {
-        val result = date?.let { checkCache(date) }
+        val result = date?.let { checkCache(YearMonth.from(it)) }
         if (result == true) return
         launchResult(
             block = { statsRepository.fetchStatsDetail(currentState.goalId, date) },
             onSuccess = {
-                cache[it.monthDate] = it
+                cache[YearMonth.from(it.monthDate)] = it
                 reduce {
                     copy(
                         detail = it,
@@ -93,8 +94,8 @@ class StatsDetailViewModel(
         )
     }
 
-    private fun checkCache(date: LocalDate): Boolean {
-        cache[date]?.let {
+    private fun checkCache(yearMonth: YearMonth): Boolean {
+        cache[yearMonth]?.let {
             reduce {
                 copy(
                     detail = it,
@@ -127,13 +128,13 @@ class StatsDetailViewModel(
     private fun fetchPreviousMonth() {
         val previousMonth = currentState.detail.monthDate.minusMonths(1)
         reduce { copy(detail = detail.copy(monthDate = previousMonth)) }
-        monthChangeFlow.tryEmit(previousMonth)
+        monthChangeFlow.tryEmit(YearMonth.from(previousMonth))
     }
 
     private fun fetchNextMonth() {
         val nextMonth = currentState.detail.monthDate.plusMonths(1)
         reduce { copy(detail = detail.copy(monthDate = nextMonth)) }
-        monthChangeFlow.tryEmit(nextMonth)
+        monthChangeFlow.tryEmit(YearMonth.from(nextMonth))
     }
 
     private fun endGoal() {

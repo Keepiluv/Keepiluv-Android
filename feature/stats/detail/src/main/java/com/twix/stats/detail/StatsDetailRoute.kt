@@ -1,4 +1,4 @@
-package com.yapp.stats.detail
+package com.twix.stats.detail
 
 import androidx.compose.runtime.Composable
 

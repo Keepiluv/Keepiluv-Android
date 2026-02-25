@@ -12,7 +12,7 @@ sealed interface HomeSideEffect : SideEffect {
         val type: ToastType,
     ) : HomeSideEffect
 
-    data class ShotPokeToast(
+    data class ShowPokeToast(
         val message: String,
     ) : HomeSideEffect
 

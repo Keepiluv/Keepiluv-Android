@@ -58,8 +58,8 @@ class NotificationViewModel(
                 reduce {
                     copy(
                         notificationList =
-                            (currentState.notificationList + it.notifications).distinctBy { n ->
-                                n.id
+                            (currentState.notificationList + it.notifications).distinctBy { notification ->
+                                notification.id
                             },
                         hasNext = it.hasNext,
                     )

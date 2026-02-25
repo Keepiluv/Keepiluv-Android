@@ -41,7 +41,6 @@ fun StatsCalendar(
             uiModel.weeks.forEach { week ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround,
                 ) {
                     week.forEach { date ->
                         if (date == null) {

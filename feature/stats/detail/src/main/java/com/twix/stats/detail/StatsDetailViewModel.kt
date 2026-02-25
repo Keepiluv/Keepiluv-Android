@@ -1,4 +1,4 @@
-package com.yapp.stats.detail
+package com.twix.stats.detail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
@@ -9,11 +9,11 @@ import com.twix.domain.model.stats.detail.StatsDetail
 import com.twix.domain.repository.GoalRepository
 import com.twix.domain.repository.StatsRepository
 import com.twix.navigation.NavRoutes
+import com.twix.stats.detail.contract.StatsDetailSideEffect
+import com.twix.stats.detail.contract.StatsDetailUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.StatsRefreshBus
 import com.yapp.stats.detail.contract.StatsDetailIntent
-import com.yapp.stats.detail.contract.StatsDetailSideEffect
-import com.yapp.stats.detail.contract.StatsDetailUiState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import kotlin.collections.get
 
 @OptIn(FlowPreview::class)
 class StatsDetailViewModel(

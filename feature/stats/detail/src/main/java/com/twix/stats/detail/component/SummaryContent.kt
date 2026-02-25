@@ -1,4 +1,4 @@
-package com.yapp.stats.detail.component
+package com.twix.stats.detail.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement

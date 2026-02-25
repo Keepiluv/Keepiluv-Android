@@ -1,4 +1,4 @@
-package com.yapp.stats.detail
+package com.twix.stats.detail
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,13 +45,13 @@ import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.domain.model.enums.GoalIconType
+import com.twix.stats.detail.component.StatsDetailTopbar
+import com.twix.stats.detail.component.SummaryContent
+import com.twix.stats.detail.contract.StatsDetailSideEffect
+import com.twix.stats.detail.contract.StatsDetailUiState
+import com.twix.stats.detail.preview.StatsDetailUiStatePreviewProvider
 import com.twix.ui.base.ObserveAsEvents
-import com.yapp.stats.detail.component.StatsDetailTopbar
-import com.yapp.stats.detail.component.SummaryContent
 import com.yapp.stats.detail.contract.StatsDetailIntent
-import com.yapp.stats.detail.contract.StatsDetailSideEffect
-import com.yapp.stats.detail.contract.StatsDetailUiState
-import com.yapp.stats.detail.preview.StatsDetailUiStatePreviewProvider
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 import java.time.LocalDate

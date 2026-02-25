@@ -41,7 +41,6 @@ fun StatsCalendar(
             uiModel.weeks.forEach { week ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround,
                 ) {
                     week.forEach { date ->
                         if (date == null) {
@@ -50,7 +49,7 @@ fun StatsCalendar(
                             PictureDayCell(
                                 date = date,
                                 completed = uiModel.completedDateMap[date],
-                                onDateSelected = { onSelectedDate(it) },
+                                onDateSelected = onSelectedDate,
                                 modifier = Modifier.weight(1f),
                             )
                         }

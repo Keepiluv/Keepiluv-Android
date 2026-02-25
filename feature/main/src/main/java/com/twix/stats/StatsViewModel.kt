@@ -26,6 +26,16 @@ class StatsViewModel(
 ) : BaseViewModel<StatsUiState, StatsIntent, StatsSideEffect>(StatsUiState()) {
     private val inProgressStatsCache = mutableMapOf<YearMonth, Stats>()
 
+    /**
+     * 진행 중인 통계 조회의 최신 요청 식별자.
+     *
+     * 월 전환이 빠르게 연속으로 일어날 때 비동기 응답 역전으로
+     * 이전 월 데이터가 현재 화면을 덮어쓰는 것을 방지하기 위해 사용한다.
+     * 성공/실패 콜백에서 `requestId == latestInProgressRequestId`를 만족할 때만
+     * 현재 UI 상태를 갱신한다.
+     */
+    private var latestInProgressRequestId = 0L
+
     private val monthChangeFlow =
         MutableSharedFlow<YearMonth>(
             extraBufferCapacity = 1,
@@ -59,15 +69,38 @@ class StatsViewModel(
         refresh: Boolean = false,
     ) {
         if (!refresh && applyCached(date)) return
+        val requestId = ++latestInProgressRequestId
 
         launchResult(
             block = { statsRepository.fetchStats(date, StatsStatus.IN_PROGRESS) },
-            onSuccess = {
-                inProgressStatsCache[date] = it
-                reduce { copy(inProgressStats = it) }
-            },
-            onError = { showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR) },
+            onSuccess = { stats -> handleFetchInProgressStatsSuccess(stats, date, requestId) },
+            onError = { handleFetchInProgressStatsFail(requestId, date) },
         )
+    }
+
+    private fun handleFetchInProgressStatsSuccess(
+        stats: Stats,
+        date: YearMonth,
+        requestId: Long,
+    ) {
+        inProgressStatsCache[date] = stats
+
+        val isLatestRequest = requestId == latestInProgressRequestId
+        val isCurrentMonth = YearMonth.from(currentState.currentDate) == date
+        if (isLatestRequest && isCurrentMonth) {
+            reduce { copy(inProgressStats = stats) }
+        }
+    }
+
+    private suspend fun handleFetchInProgressStatsFail(
+        requestId: Long,
+        date: YearMonth,
+    ) {
+        val isLatestRequest = requestId == latestInProgressRequestId
+        val isCurrentMonth = YearMonth.from(currentState.currentDate) == date
+        if (isLatestRequest && isCurrentMonth) {
+            showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
+        }
     }
 
     private fun fetchPreviousMonthStats() {
@@ -103,18 +136,19 @@ class StatsViewModel(
         viewModelScope.launch {
             eventBus.events.collect { publisher ->
                 when (publisher) {
-                    StatsRefreshBus.Publisher.InProgress -> {
-                        inProgressStatsCache.remove(YearMonth.from(currentState.currentDate))
-                        fetchInProgressStats(
-                            YearMonth.from(currentState.currentDate),
-                            refresh = true,
-                        )
-                    }
-
+                    StatsRefreshBus.Publisher.InProgress -> refreshInProgressStats()
                     StatsRefreshBus.Publisher.End -> fetchCompletedStats()
                 }
             }
         }
+    }
+
+    private fun refreshInProgressStats() {
+        inProgressStatsCache.remove(YearMonth.from(currentState.currentDate))
+        fetchInProgressStats(
+            YearMonth.from(currentState.currentDate),
+            refresh = true,
+        )
     }
 
     private fun applyCached(yearMonth: YearMonth): Boolean {

@@ -27,14 +27,14 @@ class StatsDetailViewModel(
     private val statsRefreshBus: StatsRefreshBus,
     private val goalRepository: GoalRepository,
     private val statsRepository: StatsRepository,
-    savedSateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<StatsDetailUiState, StatsDetailIntent, StatsDetailSideEffect>(
         StatsDetailUiState(),
     ) {
     private val argGoalId: Long =
-        requireNotNull(savedSateHandle[NavRoutes.StatsDetailRoute.ARG_GOAL_ID]) { GOAL_ID_NOT_FOUND }
+        requireNotNull(savedStateHandle[NavRoutes.StatsDetailRoute.ARG_GOAL_ID]) { GOAL_ID_NOT_FOUND }
 
-    private val argDate: String? = savedSateHandle.get<String>(NavRoutes.StatsDetailRoute.ARG_DATE)
+    private val argDate: String? = savedStateHandle.get<String>(NavRoutes.StatsDetailRoute.ARG_DATE)
 
     private val cache = mutableMapOf<LocalDate, StatsDetail>()
 

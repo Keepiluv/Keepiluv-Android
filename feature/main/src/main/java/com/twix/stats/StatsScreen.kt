@@ -51,7 +51,7 @@ import java.time.LocalDate
 
 @Composable
 fun StatsRoute(
-    navigateToDetail: (Long, LocalDate?) -> Unit,
+    navigateToDetail: (Long, LocalDate) -> Unit,
     toastManager: ToastManager = koinInject(),
     viewModel: StatsViewModel = koinViewModel(),
 ) {
@@ -79,7 +79,7 @@ fun StatsRoute(
             val currentDate =
                 when (destination) {
                     StatsTabDestination.IN_PROGRESS -> uiState.inProgressStats.selectedDate
-                    StatsTabDestination.END -> null
+                    StatsTabDestination.END -> uiState.currentDate
                 }
 
             navigateToDetail(goalId, currentDate)

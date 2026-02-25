@@ -26,8 +26,6 @@ object StatsDetailGraph : NavGraphContributor {
                     },
                     navArgument(NavRoutes.StatsDetailRoute.ARG_DATE) {
                         type = NavType.StringType
-                        nullable = true
-                        defaultValue = null
                     },
                 ),
         ) {

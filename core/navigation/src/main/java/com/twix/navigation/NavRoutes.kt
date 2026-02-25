@@ -128,18 +128,14 @@ sealed class NavRoutes(
      * */
     object StatsDetailGraph : NavRoutes("stats_detail_graph")
 
-    object StatsDetailRoute : NavRoutes("stats_detail_graph/{goalId}?date={date}") {
+    object StatsDetailRoute : NavRoutes("stats_detail_graph/{goalId}/{date}") {
         const val ARG_GOAL_ID = "goalId"
         const val ARG_DATE = "date"
 
         fun createRoute(
             goalId: Long,
-            date: LocalDate?,
-        ): String {
-            val baseRoute = "stats_detail_graph/$goalId"
-            if (date != null) return "$baseRoute?date=$date"
-            return baseRoute
-        }
+            date: LocalDate,
+        ): String = "stats_detail_graph/$goalId/$date"
     }
 
     /**

@@ -53,7 +53,7 @@ class StatsUiStatePreviewProvider : PreviewParameterProvider<StatsUiState> {
                             ),
                         ),
                 ),
-            endStats = emptyList(),
+            completedStats = emptyList(),
         )
 
     private fun emptyState() =
@@ -63,6 +63,6 @@ class StatsUiStatePreviewProvider : PreviewParameterProvider<StatsUiState> {
                     selectedDate = LocalDate.now(),
                     statsGoals = emptyList(),
                 ),
-            endStats = emptyList(),
+            completedStats = emptyList(),
         )
 }

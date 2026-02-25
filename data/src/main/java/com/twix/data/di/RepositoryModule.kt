@@ -5,8 +5,8 @@ import com.twix.data.repository.DefaultGoalRepository
 import com.twix.data.repository.DefaultNotificationRepository
 import com.twix.data.repository.DefaultOnboardingRepository
 import com.twix.data.repository.DefaultPhotoLogRepository
+import com.twix.data.repository.DefaultStatsRepository
 import com.twix.data.repository.DefaultUserRepository
-import com.twix.data.repository.FakeStatsRepository
 import com.twix.domain.repository.AuthRepository
 import com.twix.domain.repository.GoalRepository
 import com.twix.domain.repository.NotificationRepository
@@ -34,7 +34,7 @@ internal val repositoryModule =
             DefaultUserRepository(get())
         }
         single<StatsRepository> {
-            FakeStatsRepository()
+            DefaultStatsRepository(get())
         }
         single<NotificationRepository> {
             DefaultNotificationRepository(get())

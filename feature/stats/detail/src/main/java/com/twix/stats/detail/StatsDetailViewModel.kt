@@ -175,6 +175,7 @@ class StatsDetailViewModel(
 
     override suspend fun handleIntent(intent: StatsDetailIntent) {
         when (intent) {
+            is StatsDetailIntent.SelectDate -> navigateToTaskCertificationDetail(intent.date)
             StatsDetailIntent.PreviousMonth -> fetchPreviousMonth()
             StatsDetailIntent.NextMonth -> fetchNextMonth()
             StatsDetailIntent.GoalEnd -> {
@@ -197,6 +198,18 @@ class StatsDetailViewModel(
         val nextMonth = currentState.detail.yearMonth.plusMonths(1)
         reduce { copy(detail = detail.copy(yearMonth = nextMonth)) }
         monthChangeFlow.tryEmit(YearMonth.from(nextMonth))
+    }
+
+    private fun navigateToTaskCertificationDetail(date: LocalDate) {
+        viewModelScope.launch {
+            emitSideEffect(
+                StatsDetailSideEffect.NavigateToTaskCertificationDetail(
+                    goalId = currentState.goalId,
+                    date = date,
+                    betweenUs = currentState.resolveBetweenUs(date),
+                ),
+            )
+        }
     }
 
     private fun endGoal() {

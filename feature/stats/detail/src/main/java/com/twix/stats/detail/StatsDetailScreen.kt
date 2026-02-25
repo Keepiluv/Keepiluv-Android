@@ -44,6 +44,7 @@ import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
+import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalIconType
 import com.twix.stats.detail.component.StatsDetailTopbar
 import com.twix.stats.detail.component.SummaryContent
@@ -59,6 +60,7 @@ import java.time.LocalDate
 @Composable
 fun StatsDetailRoute(
     onBack: () -> Unit,
+    navigateToTaskCertificationDetail: (Long, LocalDate, BetweenUs) -> Unit,
     toastManager: ToastManager = koinInject(),
     viewModel: StatsDetailViewModel = koinViewModel(),
 ) {
@@ -70,6 +72,12 @@ fun StatsDetailRoute(
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
             StatsDetailSideEffect.NavigateToBack -> onBack()
+            is StatsDetailSideEffect.NavigateToTaskCertificationDetail ->
+                navigateToTaskCertificationDetail(
+                    sideEffect.goalId,
+                    sideEffect.date,
+                    sideEffect.betweenUs,
+                )
             is StatsDetailSideEffect.ShowToast -> {
                 toastManager.tryShow(
                     ToastData(
@@ -84,7 +92,7 @@ fun StatsDetailRoute(
     StatsDetailScreen(
         uiState = uiState,
         onBack = onBack,
-        onSelectDate = {},
+        onSelectDate = { selectedDate -> viewModel.dispatch(StatsDetailIntent.SelectDate(selectedDate)) },
         onPreviousMonth = { viewModel.dispatch(StatsDetailIntent.PreviousMonth) },
         onNextMonth = { viewModel.dispatch(StatsDetailIntent.NextMonth) },
         onClickDeleteStats = { },

@@ -2,6 +2,7 @@ package com.twix.stats.detail.contract
 
 import androidx.compose.runtime.Immutable
 import com.twix.designsystem.components.stats.model.StatsCalendarUiModel
+import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.stats.detail.StatsDetail
 import com.twix.domain.model.stats.detail.StatsSummary
 import com.twix.ui.base.State
@@ -29,4 +30,16 @@ data class StatsDetailUiState(
             val previousYm = YearMonth.from(detail.yearMonth).minusMonths(1)
             return previousYm >= limitYm
         }
+
+    fun resolveBetweenUs(selectedDate: LocalDate): BetweenUs {
+        val completedDate =
+            detail.completedDate.firstOrNull { completed ->
+                completed.date == selectedDate
+            }
+
+        return when {
+            completedDate?.myImageUrl != null && completedDate.partnerImageUrl == null -> BetweenUs.ME
+            else -> BetweenUs.PARTNER
+        }
+    }
 }

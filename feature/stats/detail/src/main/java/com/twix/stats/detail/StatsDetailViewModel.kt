@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import java.time.YearMonth
 
 @OptIn(FlowPreview::class)
@@ -46,9 +45,14 @@ class StatsDetailViewModel(
         )
 
     init {
-        collectMonthChangeFlow()
+//        fetchStatsDetail(
+//            argDate
+//                ?.let { LocalDate.parse(it) }
+//                ?.let(YearMonth::from)
+//                ?: YearMonth.now(),
+//        )
         reduceNavArguments()
-        fetchStatsDetail(argDate?.let { LocalDate.parse(it) })
+        collectMonthChangeFlow()
     }
 
     private fun collectMonthChangeFlow() {
@@ -56,7 +60,9 @@ class StatsDetailViewModel(
             monthChangeFlow
                 .distinctUntilChanged()
                 .debounce(DEBOUNCE_INTERVAL)
-                .collect { yearMonth -> fetchStatsDetail(yearMonth.atDay(1)) }
+                .collect { yearMonth ->
+                    // fetchStatsDetail(yearMonth)
+                }
         }
     }
 
@@ -69,9 +75,9 @@ class StatsDetailViewModel(
         }
     }
 
-    private fun fetchStatsDetail(date: LocalDate?) {
-        val result = date?.let { checkCache(YearMonth.from(it)) }
-        if (result == true) return
+    private fun fetchStatsDetail(date: YearMonth) {
+        val result = checkCache(date)
+        if (result) return
         launchResult(
             block = { statsRepository.fetchStatsDetail(currentState.goalId, date) },
             onSuccess = {
@@ -88,7 +94,7 @@ class StatsDetailViewModel(
                 }
             },
             onError = {
-                reduce { copy(detail = detail.copy(monthDate = date ?: LocalDate.now())) }
+                reduce { copy(detail = detail.copy(monthDate = date.atDay(1))) }
                 showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
             },
         )
@@ -164,13 +170,11 @@ class StatsDetailViewModel(
         )
     }
 
-    private fun showToast(
+    private suspend fun showToast(
         message: Int,
         type: ToastType,
     ) {
-        viewModelScope.launch {
-            emitSideEffect(StatsDetailSideEffect.ShowToast(message, type))
-        }
+        emitSideEffect(StatsDetailSideEffect.ShowToast(message, type))
     }
 
     companion object {

@@ -186,7 +186,7 @@ private fun StatsTabPager(
 
             StatsTabDestination.END ->
                 EndStatsContent(
-                    statsGoals = uiState.endStats,
+                    statsGoals = uiState.completedStats,
                     onClickStatsCard = { onClickStatsCard(it, tab) },
                 )
         }

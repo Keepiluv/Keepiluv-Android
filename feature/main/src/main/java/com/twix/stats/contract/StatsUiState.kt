@@ -10,5 +10,5 @@ import java.time.LocalDate
 data class StatsUiState(
     val currentDate: LocalDate = LocalDate.now(),
     val inProgressStats: Stats = Stats.EMPTY,
-    val endStats: List<StatsGoal> = emptyList(),
+    val completedStats: List<StatsGoal> = emptyList(),
 ) : State

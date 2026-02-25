@@ -10,6 +10,7 @@ android {
 
 dependencies {
     implementation(projects.core.token)
+    implementation(projects.core.deviceContract)
 
     implementation(libs.androidx.datastore)
     implementation(libs.kotlinx.serialization.json)

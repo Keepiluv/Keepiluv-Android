@@ -61,6 +61,12 @@ object MainNavGraph : NavGraphContributor {
                             launchSingleTop = true
                         }
                     },
+                    navigateToStatsDetail = { goalId, date ->
+                        val destination = NavRoutes.StatsDetailRoute.createRoute(goalId, date)
+                        navController.navigate(destination) {
+                            launchSingleTop = true
+                        }
+                    },
                     navigateToNotification = {
                         navController.navigate(NavRoutes.NotificationRoute.route) {
                             launchSingleTop = true

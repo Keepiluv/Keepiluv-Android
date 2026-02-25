@@ -124,6 +124,25 @@ sealed class NavRoutes(
     object SettingsAboutRoute : NavRoutes("settings/about")
 
     /**
+     * StatsGraph
+     * */
+    object StatsDetailGraph : NavRoutes("stats_detail_graph")
+
+    object StatsDetailRoute : NavRoutes("stats_detail_graph/{goalId}?date={date}") {
+        const val ARG_GOAL_ID = "goalId"
+        const val ARG_DATE = "date"
+
+        fun createRoute(
+            goalId: Long,
+            date: LocalDate?,
+        ): String {
+            val baseRoute = "stats_detail_graph/$goalId"
+            if (date != null) return "$baseRoute?date=$date"
+            return baseRoute
+        }
+    }
+
+    /**
      * NotificationGraph
      * */
     object NotificationGraph : NavRoutes("notification_graph")

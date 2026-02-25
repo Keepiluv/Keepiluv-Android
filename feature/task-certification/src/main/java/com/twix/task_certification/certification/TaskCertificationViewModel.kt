@@ -125,7 +125,9 @@ class TaskCertificationViewModel(
     }
 
     private fun upload(image: ByteArray) {
+        reduce { copy(isLoading = true) }
         launchResult(
+            onStart = { reduce { copy(isLoading = true) } },
             block = {
                 photologRepository.uploadPhotologImage(
                     goalId = navArgs.goalId,
@@ -145,6 +147,7 @@ class TaskCertificationViewModel(
             onError = {
                 showToast(R.string.task_certification_upload_fail, ToastType.ERROR)
             },
+            onFinally = { reduce { copy(isLoading = false) } },
         )
     }
 
@@ -171,8 +174,10 @@ class TaskCertificationViewModel(
         when (navArgs.from) {
             NavRoutes.TaskCertificationRoute.From.HOME ->
                 goalRefreshBus.notifyGoalListChanged()
+
             NavRoutes.TaskCertificationRoute.From.DETAIL ->
                 detailRefreshBus.notifyChanged(TaskCertificationRefreshBus.Publisher.PHOTOLOG)
+
             NavRoutes.TaskCertificationRoute.From.EDITOR -> Unit
         }
         tryEmitSideEffect(TaskCertificationSideEffect.NavigateToBack)

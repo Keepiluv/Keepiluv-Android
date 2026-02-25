@@ -78,7 +78,7 @@ data class TaskCertificationDetailUiState(
         get() =
             currentShow == BetweenUs.PARTNER && isDisplayedGoalCertificated
 
-    fun toSerializer() =
+    fun toNavArgs() =
         EditorNavArgs(
             goalId = goalId,
             nickname = myNickname,

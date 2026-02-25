@@ -16,13 +16,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.R
+import com.twix.designsystem.components.button.AppRoundButton
 import com.twix.designsystem.components.goal.GoalVerificationCell
 import com.twix.designsystem.components.text.AppText
+import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
+import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.domain.model.goal.GoalVerification
+import com.twix.ui.extension.noRippleClickable
 
 @Composable
 fun GoalVerifications(
@@ -31,6 +36,7 @@ fun GoalVerifications(
     partnerVerification: GoalVerification?,
     onMyClick: (() -> Unit)? = null,
     onPartnerClick: (() -> Unit)? = null,
+    onPokeGoal: () -> Unit,
 ) {
     val shape = RoundedCornerShape(bottomEnd = 16.dp, bottomStart = 16.dp)
 
@@ -60,7 +66,7 @@ fun GoalVerifications(
             emptyContent = {
                 EmptyContent(
                     isPartner = true,
-                    onClick = {},
+                    onClick = onPokeGoal,
                 )
             },
             onClick = onPartnerClick,
@@ -75,15 +81,25 @@ private fun EmptyContent(
 ) {
     if (isPartner) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(9.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Image(
                 painter = painterResource(R.drawable.ic_goal_action_poke),
                 contentDescription = null,
-                modifier = Modifier.size(width = 78.dp, height = 52.dp),
+                modifier = Modifier.size(width = 85.dp, height = 53.dp),
             )
-            // TODO: 찌르기 API 구현된 이후에 찌르기 버튼 추가
+
+            AppRoundButton(
+                text = stringResource(R.string.action_sting) + "!",
+                textColor = GrayColor.C500,
+                textStyle = AppTextStyle.C2,
+                backgroundColor = CommonColor.White,
+                modifier =
+                    Modifier
+                        .size(width = 64.dp, height = 28.dp)
+                        .noRippleClickable { onClick() },
+            )
         }
     } else {
         Column(
@@ -102,5 +118,16 @@ private fun EmptyContent(
                 color = GrayColor.C400,
             )
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun PreviewEmptyContent() {
+    TwixTheme {
+        EmptyContent(
+            isPartner = true,
+            onClick = {},
+        )
     }
 }

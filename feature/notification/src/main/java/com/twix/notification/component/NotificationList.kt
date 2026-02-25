@@ -2,6 +2,7 @@ package com.twix.notification.component
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
@@ -17,10 +18,12 @@ import com.twix.domain.model.notification.Notification
 fun NotificationList(
     modifier: Modifier = Modifier,
     notificationsList: List<Notification>,
+    listState: LazyListState,
     onNotificationClick: (Long) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier.padding(horizontal = 20.dp),
+        state = listState,
     ) {
         itemsIndexed(
             items = notificationsList,
@@ -65,6 +68,7 @@ private fun Preview() {
                     ),
                 ),
             onNotificationClick = {},
+            listState = LazyListState(),
         )
     }
 }

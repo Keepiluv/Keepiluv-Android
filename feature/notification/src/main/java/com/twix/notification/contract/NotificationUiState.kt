@@ -8,4 +8,5 @@ import com.twix.ui.base.State
 data class NotificationUiState(
     val notificationList: List<Notification> = emptyList(),
     val hasNext: Boolean = true,
+    val isLoading: Boolean = false, // 알림 리스트를 중복으로 조회하지 않도록 방어 목적의 플래그 변수
 ) : State

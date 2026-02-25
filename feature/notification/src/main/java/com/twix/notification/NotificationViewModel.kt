@@ -17,30 +17,51 @@ class NotificationViewModel(
         NotificationUiState(),
     ) {
     init {
-        fetchNotificationList()
+        fetchInitialNotificationList()
     }
 
     override suspend fun handleIntent(intent: NotificationIntent) {
         when (intent) {
-            NotificationIntent.FetchNextPage -> fetchNotificationList()
-            is NotificationIntent.NotificationClicked -> openNotification(intent.notificationId)
+            NotificationIntent.FetchNextPage -> fetchNextNotificationList()
+            is NotificationIntent.NotificationClicked -> handleNotificationClick(intent.notificationId)
         }
     }
 
-    private fun fetchNotificationList() {
-        if (!currentState.hasNext) return
+    private fun fetchInitialNotificationList() {
+        if (currentState.isLoading) return
+
+        launchResult(
+            onStart = { reduce { copy(isLoading = true) } },
+            onFinally = { reduce { copy(isLoading = false) } },
+            block = { notificationRepository.fetchNotifications() },
+            onSuccess = {
+                markAllNotificationAsRead()
+                reduce { copy(notificationList = it.notifications, hasNext = it.hasNext) }
+            },
+        )
+    }
+
+    private fun fetchNextNotificationList() {
+        if (!currentState.hasNext || currentState.isLoading) return
 
         val lastId =
-            uiState.value.notificationList
+            currentState.notificationList
                 .lastOrNull()
                 ?.id
 
         launchResult(
+            onStart = { reduce { copy(isLoading = true) } },
+            onFinally = { reduce { copy(isLoading = false) } },
             block = { notificationRepository.fetchNotifications(lastId = lastId) },
             onSuccess = {
                 reduce {
-                    markAllNotificationAsRead()
-                    copy(notificationList = currentState.notificationList + it.notifications, hasNext = it.hasNext)
+                    copy(
+                        notificationList =
+                            (currentState.notificationList + it.notifications).distinctBy { n ->
+                                n.id
+                            },
+                        hasNext = it.hasNext,
+                    )
                 }
             },
             onError = { emitSideEffect(NotificationSideEffect.ShowToast(R.string.toast_fetch_notification_failed, ToastType.ERROR)) },
@@ -54,9 +75,11 @@ class NotificationViewModel(
         )
     }
 
-    private suspend fun openNotification(id: Long) {
+    private suspend fun handleNotificationClick(id: Long) {
         val notification = uiState.value.notificationList.find { it.id == id } ?: return
         val intent = notificationDeepLinkParser.parse(notification.deepLink)
+
+        markNotificationAsRead(id)
 
         when (intent) {
             is NotificationDeepLink.DailyGoalAchieved -> emitSideEffect(NotificationSideEffect.NavigateToHome)
@@ -71,5 +94,13 @@ class NotificationViewModel(
             is NotificationDeepLink.Reaction -> emitSideEffect(NotificationSideEffect.NavigateToMyPhotolog(intent.goalId, intent.date))
             null -> emitSideEffect(NotificationSideEffect.NavigateToHome)
         }
+    }
+
+    // 알림 읽음 처리는 best effort가 정책이므로 에러 처리는 생략
+    private fun markNotificationAsRead(id: Long) {
+        launchResult(
+            block = { notificationRepository.markNotificationAsRead(id) },
+            onSuccess = {},
+        )
     }
 }

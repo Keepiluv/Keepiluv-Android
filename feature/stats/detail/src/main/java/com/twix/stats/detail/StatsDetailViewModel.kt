@@ -45,19 +45,18 @@ class StatsDetailViewModel(
         )
 
     init {
+        collectMonthChangeFlow()
+        reduceNavArguments()
+        fetchStatsDetail(argDate?.let { LocalDate.parse(it) })
+    }
+
+    private fun collectMonthChangeFlow() {
         viewModelScope.launch {
             monthChangeFlow
                 .distinctUntilChanged()
                 .debounce(DEBOUNCE_INTERVAL)
-                .collect { date ->
-                    fetchStatsDetail(date)
-                }
+                .collect { date -> fetchStatsDetail(date) }
         }
-    }
-
-    init {
-        reduceNavArguments()
-        fetchStatsDetail(argDate?.let { LocalDate.parse(it) })
     }
 
     private fun reduceNavArguments() {

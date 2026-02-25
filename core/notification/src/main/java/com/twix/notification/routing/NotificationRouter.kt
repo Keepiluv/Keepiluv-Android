@@ -1,15 +1,18 @@
 package com.twix.notification.routing
 
 import co.touchlab.kermit.Logger
+import com.twix.domain.repository.NotificationRepository
 import com.twix.navigation_contract.AppNavigator
 import com.twix.navigation_contract.NotificationDeepLinkHandler
 import com.twix.notification.deeplink.NotificationDeepLink
 import com.twix.notification.deeplink.NotificationDeepLinkParser
+import com.twix.result.AppResult
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class NotificationRouter(
     private val parser: NotificationDeepLinkParser,
-//    private val notificationRepository: NotificationRepository,
+    private val notificationRepository: NotificationRepository,
     private val appScope: CoroutineScope,
 ) : NotificationDeepLinkHandler {
     private val logger = Logger.withTag("NotificationRouter")
@@ -58,20 +61,23 @@ class NotificationRouter(
             }
 
             is NotificationDeepLink.Marketing -> {
-                navigator.toHome() // 문서상 확인 필요, 현재 홈으로 가정
+                navigator.toHome()
             }
         }
     }
 
     private fun markAsReadBestEffort(notificationId: Long) {
-//        appScope.launch {
-//            try {
-//                notificationRepository.markNotification(notificationId)
-//            } catch (ce: CancellationException) {
-//                throw ce
-//            } catch (e: Exception) {
-//                logger.w(it, "알림 읽음 처리 실패: $notificationId")
-//            }
-//        }
+        appScope.launch {
+            val result = notificationRepository.markNotificationAsRead(notificationId)
+
+            when (result) {
+                is AppResult.Error -> {
+                    logger.e { "알림 읽음 처리 실패: $notificationId, ${result.error}" }
+                }
+                is AppResult.Success -> {
+                    logger.d { "알림 읽음 처리 성공: $notificationId" }
+                }
+            }
+        }
     }
 }

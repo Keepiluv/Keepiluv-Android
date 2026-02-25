@@ -32,5 +32,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.notification)
+
     implementation(libs.browser)
 }

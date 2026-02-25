@@ -45,11 +45,11 @@ fun AppNavHost(
         remember(navController) {
             object : AppNavigator {
                 override fun toHome() {
-                    navController.navigate(NavRoutes.MainGraph) { launchSingleTop = true }
+                    navController.navigate(NavRoutes.MainGraph.route) { launchSingleTop = true }
                 }
 
                 override fun toLogin() {
-                    navController.navigate(NavRoutes.LoginGraph) {
+                    navController.navigate(NavRoutes.LoginGraph.route) {
                         launchSingleTop = true
                         popUpTo(NavRoutes.LoginGraph) {
                             inclusive = true
@@ -155,7 +155,7 @@ private fun ensureMainStack(navController: NavHostController) {
             ?.any { it.route == NavRoutes.MainGraph.route } == true
 
     if (!inMainGraph) {
-        navController.navigate(NavRoutes.MainGraph) {
+        navController.navigate(NavRoutes.MainGraph.route) {
             launchSingleTop = true
         }
     }

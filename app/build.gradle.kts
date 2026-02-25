@@ -65,6 +65,7 @@ dependencies {
     implementation(projects.feature.goalEditor)
     implementation(projects.feature.goalManage)
     implementation(projects.feature.settings)
+    implementation(projects.feature.stats.detail)
     implementation(projects.core.notification)
     implementation(projects.core.navigationContract)
 

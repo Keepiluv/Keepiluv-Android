@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,6 +27,8 @@ fun CalendarNavigator(
     onNextMonth: () -> Unit,
     onPreviousMonth: () -> Unit,
     modifier: Modifier = Modifier,
+    hasPrevious: Boolean = true,
+    hasNext: Boolean = true,
 ) {
     Row(
         modifier =
@@ -39,9 +42,10 @@ fun CalendarNavigator(
             contentDescription = "previous month",
             modifier =
                 Modifier
-                    .noRippleClickable(onClick = onPreviousMonth)
+                    .noRippleClickable(enabled = hasPrevious, onClick = onPreviousMonth)
                     .padding(6.dp)
                     .size(24.dp),
+            colorFilter = ColorFilter.tint(if (hasPrevious) GrayColor.C500 else GrayColor.C200),
         )
 
         AppText(
@@ -56,14 +60,15 @@ fun CalendarNavigator(
             contentDescription = "next month",
             modifier =
                 Modifier
-                    .noRippleClickable(onClick = onNextMonth)
+                    .noRippleClickable(enabled = hasNext, onClick = onNextMonth)
                     .padding(6.dp)
                     .size(24.dp),
+            colorFilter = ColorFilter.tint(if (hasNext) GrayColor.C500 else GrayColor.C200),
         )
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun CalendarNavigatorPreview() {
     TwixTheme {
@@ -71,6 +76,8 @@ fun CalendarNavigatorPreview() {
             currentDate = LocalDate.now(),
             onNextMonth = {},
             onPreviousMonth = {},
+            hasPrevious = false,
+            hasNext = true,
         )
     }
 }

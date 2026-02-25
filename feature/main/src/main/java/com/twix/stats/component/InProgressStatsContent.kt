@@ -22,6 +22,7 @@ import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.stats.Stats
 import com.twix.stats.contract.StatsUiState
 import com.twix.stats.preview.StatsUiStatePreviewProvider
+import com.twix.ui.extension.noRippleClickable
 import java.time.LocalDate
 
 @Composable
@@ -31,6 +32,7 @@ fun InProgressStatsContent(
     modifier: Modifier = Modifier,
     onClickPreviousMonth: () -> Unit,
     onClickNextMonth: () -> Unit,
+    onClickStatsCard: (Long) -> Unit,
 ) {
     LazyColumn(
         modifier =
@@ -62,7 +64,13 @@ fun InProgressStatsContent(
                 items = stats.statsGoals,
                 key = { it.goalId },
             ) {
-                StatsGoalCard(it, true)
+                StatsGoalCard(
+                    statsGoal = it,
+                    showStamp = true,
+                    modifier =
+                        Modifier
+                            .noRippleClickable(onClick = { onClickStatsCard(it.goalId) }),
+                )
             }
         }
     }
@@ -80,6 +88,7 @@ fun InProgressStatsContentPreview(
             stats = uiState.inProgressStats,
             onClickPreviousMonth = {},
             onClickNextMonth = {},
+            onClickStatsCard = {},
         )
     }
 }

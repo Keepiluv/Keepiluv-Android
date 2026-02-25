@@ -52,11 +52,11 @@ object TaskCertificationGraph : NavGraphContributor {
                             )
                         navController.navigate(destination)
                     },
-                    navigateToEditor = { uiState ->
-                        val serializer = uiState.toSerializer()
+                    navigateToEditor = { goalId, date ->
                         navController.navigate(
                             NavRoutes.TaskCertificationEditorRoute.createRoute(
-                                serializer,
+                                goalId = goalId,
+                                date = date,
                             ),
                         )
                     },
@@ -67,7 +67,10 @@ object TaskCertificationGraph : NavGraphContributor {
                 route = NavRoutes.TaskCertificationEditorRoute.route,
                 arguments =
                     listOf(
-                        navArgument(NavRoutes.TaskCertificationEditorRoute.ARG_DATA) {
+                        navArgument(NavRoutes.TaskCertificationEditorRoute.ARG_GOAL_ID) {
+                            type = NavType.LongType
+                        },
+                        navArgument(NavRoutes.TaskCertificationEditorRoute.ARG_DATE) {
                             type = NavType.StringType
                         },
                     ),

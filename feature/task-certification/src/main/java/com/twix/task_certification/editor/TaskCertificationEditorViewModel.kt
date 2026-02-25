@@ -6,29 +6,33 @@ import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
-import com.twix.navigation.args.EditorNavArgs
-import com.twix.navigation.savedstate.decodeNavArgs
 import com.twix.result.AppResult
 import com.twix.task_certification.editor.contract.TaskCertificationEditorIntent
 import com.twix.task_certification.editor.contract.TaskCertificationEditorSideEffect
 import com.twix.task_certification.editor.contract.TaskCertificationEditorUiState
-import com.twix.task_certification.editor.contract.toUiState
+import com.twix.task_certification.editor.contract.toEditorUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.TaskCertificationRefreshBus
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class TaskCertificationEditorViewModel(
     private val photologRepository: PhotoLogRepository,
     private val detailRefreshBus: TaskCertificationRefreshBus,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<TaskCertificationEditorUiState, TaskCertificationEditorIntent, TaskCertificationEditorSideEffect>(
-        TaskCertificationEditorUiState(),
-    ) {
-    private val navArgs: EditorNavArgs =
-        savedStateHandle.decodeNavArgs<EditorNavArgs>(NavRoutes.TaskCertificationEditorRoute.ARG_DATA)
+    TaskCertificationEditorUiState(),
+) {
+    private val argGoalId: Long =
+        requireNotNull(savedStateHandle[NavRoutes.TaskCertificationEditorRoute.ARG_GOAL_ID]) { GOAL_ID_NOT_FOUND }
+
+    private val argTargetDate: LocalDate =
+        LocalDate.parse(
+            requireNotNull(savedStateHandle[NavRoutes.TaskCertificationEditorRoute.ARG_DATE]) { TARGET_DATE_NOT_FOUND }
+        )
 
     init {
-        reduce { navArgs.toUiState() }
+        fetchPhotolog()
     }
 
     override suspend fun handleIntent(intent: TaskCertificationEditorIntent) {
@@ -77,10 +81,25 @@ class TaskCertificationEditorViewModel(
         }
     }
 
+    private fun fetchPhotolog() {
+        launchResult(
+            block = { photologRepository.fetchPhotologs(argTargetDate, argGoalId) },
+            onSuccess = { reduce { it.toEditorUiState(argGoalId) } },
+            onError = {
+                showToast(R.string.task_certification_detail_fetch_photolog_fail, ToastType.ERROR)
+            },
+        )
+    }
+
     private suspend fun launchModifyComment(): AppResult<Unit> =
         photologRepository.modifyPhotolog(
             currentState.photologId,
             currentState.imageName,
             currentState.comment.value,
         )
+
+    companion object {
+        private const val GOAL_ID_NOT_FOUND = "Goal Id Argument Not Found"
+        private const val TARGET_DATE_NOT_FOUND = "Target Date Argument Not Found"
+    }
 }

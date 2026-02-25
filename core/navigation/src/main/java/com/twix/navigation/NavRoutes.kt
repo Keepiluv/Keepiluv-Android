@@ -2,7 +2,6 @@ package com.twix.navigation
 
 import android.net.Uri
 import com.twix.navigation.args.DetailNavArgs
-import com.twix.navigation.args.EditorNavArgs
 import kotlinx.serialization.json.Json
 import java.time.LocalDate
 
@@ -65,14 +64,14 @@ sealed class NavRoutes(
     }
 
     object TaskCertificationEditorRoute :
-        NavRoutes("task_certification_editor/{data}") {
-        const val ARG_DATA = "data"
+        NavRoutes("task_certification_editor/{goalId}/{date}") {
+        const val ARG_GOAL_ID = "goalId"
+        const val ARG_DATE = "date"
 
-        fun createRoute(data: EditorNavArgs): String {
-            val json = Json.encodeToString(data)
-            val encoded = Uri.encode(json)
-            return "task_certification_editor/$encoded"
-        }
+        fun createRoute(
+            goalId: Long,
+            date: LocalDate,
+        ) = "task_certification_editor/$goalId/$date"
     }
 
     /**

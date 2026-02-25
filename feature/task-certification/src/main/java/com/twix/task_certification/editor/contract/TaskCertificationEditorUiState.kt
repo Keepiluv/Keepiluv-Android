@@ -2,7 +2,7 @@ package com.twix.task_certification.editor.contract
 
 import androidx.compose.runtime.Immutable
 import com.twix.designsystem.components.comment.model.CommentUiModel
-import com.twix.navigation.args.EditorNavArgs
+import com.twix.domain.model.photolog.PhotoLogs
 import com.twix.ui.base.State
 
 @Immutable
@@ -26,13 +26,17 @@ data class TaskCertificationEditorUiState(
     }
 }
 
-internal fun EditorNavArgs.toUiState() =
-    TaskCertificationEditorUiState(
+internal fun PhotoLogs.toEditorUiState(goalId: Long): TaskCertificationEditorUiState {
+    val goalPhotolog = goals.firstOrNull { it.goalId == goalId }
+    val myPhotolog = goalPhotolog?.myPhotolog
+
+    return TaskCertificationEditorUiState(
         goalId = goalId,
-        nickname = nickname,
-        goalName = goalName,
-        photologId = photologId,
-        imageUrl = imageUrl,
-        comment = CommentUiModel(comment.orEmpty()),
-        originComment = comment.orEmpty(),
+        photologId = myPhotolog?.photologId ?: -1,
+        nickname = myNickname,
+        goalName = goalPhotolog?.goalName.orEmpty(),
+        imageUrl = myPhotolog?.imageUrl.orEmpty(),
+        comment = CommentUiModel(myPhotolog?.comment.orEmpty()),
+        originComment = myPhotolog?.comment.orEmpty(),
     )
+}

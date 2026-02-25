@@ -12,8 +12,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.text.AppText
+import com.twix.designsystem.components.toast.ToastManager
+import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.components.topbar.CommonTopBar
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
@@ -29,18 +33,40 @@ import com.twix.domain.model.enums.NotificationType
 import com.twix.domain.model.notification.Notification
 import com.twix.notification.component.NotificationList
 import com.twix.notification.contract.NotificationIntent
+import com.twix.notification.contract.NotificationSideEffect
 import com.twix.notification.contract.NotificationUiState
+import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.noRippleClickable
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
+import java.time.LocalDate
 
 @Composable
 fun NotificationRoute(
     viewModel: NotificationViewModel = koinViewModel(),
+    toastManager: ToastManager = koinInject(),
     popBackStack: () -> Unit,
+    navigateToMyPhotolog: (Long, LocalDate) -> Unit,
+    navigateToPartnerPhotolog: (Long, LocalDate) -> Unit,
+    navigateToStatisticsEndedGoals: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val currentContext by rememberUpdatedState(context)
+
+    ObserveAsEvents(viewModel.sideEffect) { effect ->
+        when (effect) {
+            is NotificationSideEffect.NavigateToHome -> popBackStack()
+            is NotificationSideEffect.NavigateToMyPhotolog -> navigateToMyPhotolog(effect.goalId, effect.date)
+            is NotificationSideEffect.NavigateToPartnerPhotolog -> navigateToPartnerPhotolog(effect.goalId, effect.date)
+            is NotificationSideEffect.NavigateToStatisticsEndedGoals -> navigateToStatisticsEndedGoals()
+            is NotificationSideEffect.ShowToast -> {
+                toastManager.show(ToastData(currentContext.getString(effect.resId), effect.type))
+            }
+        }
+    }
 
     NotificationScreen(
         uiState = uiState,

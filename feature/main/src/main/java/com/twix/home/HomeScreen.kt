@@ -126,6 +126,13 @@ fun HomeRoute(
                 )
 
             HomeSideEffect.ShowMonthPickerBottomSheet -> Unit
+            is HomeSideEffect.ShowPokeToast ->
+                toastManager.show(
+                    ToastData(
+                        sideEffect.message,
+                        ToastType.SUCCESS,
+                    ),
+                )
         }
     }
 
@@ -145,7 +152,7 @@ fun HomeRoute(
         onClickCard = navigateToCertificationDetail,
         onSettingClick = navigateToSettings,
         onNotificationClick = navigateToNotification,
-        onPokeGoal = { viewModel.dispatch(HomeIntent.PokeGoal(it)) }
+        onPokeGoal = { viewModel.dispatch(HomeIntent.PokeGoal(it)) },
     )
 }
 

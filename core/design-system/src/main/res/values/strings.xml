@@ -105,6 +105,7 @@
     <string name="toast_fetch_stats_failed">통계 조회에 실패했습니다.</string>
     <string name="toast_already_certificated">이미 인증되었어요.</string>
     <string name="toast_camera_permission_request">인증샷 촬영을 위해서 카메라 권한이 필요해요.</string>
+    <string name="toast_fetch_notification_failed">알림 목록 조회에 실패했습니다.</string>
 
     <!-- 다이얼로그 -->
     <string name="dialog_end_goal_title">%s\n목표를 이루셨나요?</string>

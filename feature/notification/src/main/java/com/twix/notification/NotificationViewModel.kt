@@ -1,5 +1,8 @@
 package com.twix.notification
 
+import com.twix.designsystem.R
+import com.twix.designsystem.components.toast.model.ToastType
+import com.twix.domain.repository.NotificationRepository
 import com.twix.notification.contract.NotificationIntent
 import com.twix.notification.contract.NotificationSideEffect
 import com.twix.notification.contract.NotificationUiState
@@ -9,9 +12,14 @@ import com.twix.ui.base.BaseViewModel
 
 class NotificationViewModel(
     private val notificationDeepLinkParser: NotificationDeepLinkParser,
+    private val notificationRepository: NotificationRepository,
 ) : BaseViewModel<NotificationUiState, NotificationIntent, NotificationSideEffect>(
         NotificationUiState(),
     ) {
+    init {
+        fetchNotificationList()
+    }
+
     override suspend fun handleIntent(intent: NotificationIntent) {
         when (intent) {
             NotificationIntent.FetchNextPage -> fetchNotificationList()
@@ -20,7 +28,20 @@ class NotificationViewModel(
     }
 
     private fun fetchNotificationList() {
-        // TODO: NotificationRepository로 조회
+        if (!currentState.hasNext) return
+
+        val lastId =
+            uiState.value.notificationList
+                .lastOrNull()
+                ?.id
+
+        launchResult(
+            block = { notificationRepository.fetchNotifications(lastId = lastId) },
+            onSuccess = {
+                reduce { copy(notificationList = currentState.notificationList + it.notifications, hasNext = it.hasNext) }
+            },
+            onError = { emitSideEffect(NotificationSideEffect.ShowToast(R.string.toast_fetch_notification_failed, ToastType.ERROR)) },
+        )
     }
 
     private suspend fun openNotification(id: Long) {

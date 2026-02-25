@@ -17,6 +17,7 @@ data class TaskCertificationUiState(
     val preview: CameraPreview? = null,
     val comment: CommentUiModel = CommentUiModel(),
     val showCommentError: Boolean = false,
+    val isLoading: Boolean = false,
 ) : State {
     val hasMaxCommentLength: Boolean
         get() = comment.hasMaxCommentLength

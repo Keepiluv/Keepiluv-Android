@@ -119,6 +119,8 @@
     <string name="task_certification_take_picture">인증샷 찍기</string>
     <string name="task_certification_upload_fail">인증샷 등록에 실패했습니다.</string>
     <string name="task_certification_image_translate_fail">이미지 변환에 실패했습니다.</string>
+    <string name="task_certification_loading">인증샷 업로드 중...</string>
+    <string name="task_certification_plz_waiting">잠시만 기다려 주세요.</string>
     <string name="comment_error_message">코멘트는 5글자로 입력해주세요!</string>
 
     <!-- 인증샷 보기 화면 !-->

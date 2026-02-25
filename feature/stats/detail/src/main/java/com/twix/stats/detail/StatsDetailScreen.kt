@@ -107,6 +107,7 @@ fun StatsDetailScreen(
     val scrollState = rememberScrollState()
     var popupMenuVisibility by remember { mutableStateOf(false) }
     var statsDeleteDialogVisibility by remember { mutableStateOf(false) }
+    val isInProgressStatsDetail = !uiState.detail.isCompleted
 
     Box {
         Column(
@@ -117,11 +118,11 @@ fun StatsDetailScreen(
         ) {
             StatsDetailTopbar(
                 goalName = uiState.detail.goalName,
-                isInProgressStatsDetail = uiState.isInProgressStatsDetail,
+                isInProgressStatsDetail = isInProgressStatsDetail,
                 popupMenuVisibility = popupMenuVisibility,
                 onBack = onBack,
                 onClickAction = {
-                    if (uiState.isInProgressStatsDetail) {
+                    if (isInProgressStatsDetail) {
                         popupMenuVisibility = true
                     } else {
                         statsDeleteDialogVisibility = true
@@ -161,7 +162,7 @@ fun StatsDetailScreen(
                     Spacer(Modifier.height(32.dp))
 
                     CalendarNavigator(
-                        currentDate = uiState.detail.monthDate,
+                        currentDate = uiState.detail.yearMonth,
                         onPreviousMonth = onPreviousMonth,
                         onNextMonth = onNextMonth,
                         hasPrevious = uiState.hasPrevious,
@@ -198,7 +199,7 @@ fun StatsDetailScreen(
 
             Spacer(Modifier.height(44.dp))
 
-            SummaryContent(uiState.detail.statsSummary)
+            SummaryContent(uiState.summary)
         }
 
         CommonDialog(

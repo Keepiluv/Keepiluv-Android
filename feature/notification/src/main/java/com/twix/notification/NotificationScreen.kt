@@ -96,7 +96,9 @@ private fun NotificationScreen(
         }.distinctUntilChanged()
             .filter { it }
             .collect {
-                onNextPage()
+                if (uiState.hasNext && !uiState.isLoading) {
+                    onNextPage()
+                }
             }
     }
 
@@ -138,6 +140,7 @@ private fun NotificationScreen(
                     .weight(1f)
                     .fillMaxWidth(),
             notificationsList = uiState.notificationList,
+            listState = listState,
             onNotificationClick = onNotificationClick,
         )
     }

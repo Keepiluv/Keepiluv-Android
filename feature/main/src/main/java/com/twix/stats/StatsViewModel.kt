@@ -14,6 +14,7 @@ import com.twix.util.bus.StatsRefreshBus
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -47,7 +48,7 @@ class StatsViewModel(
             monthChangeFlow
                 .distinctUntilChanged()
                 .debounce(DEBOUNCE_INTERVAL)
-                .collect { yearMonth ->
+                .collectLatest { yearMonth ->
                     fetchInProgressStats(yearMonth)
                 }
         }

@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.NotificationType
-import com.twix.domain.model.goal.Notification
+import com.twix.domain.model.notification.Notification
 
 @Composable
 fun NotificationList(

@@ -26,7 +26,7 @@ import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.domain.model.enums.NotificationType
-import com.twix.domain.model.goal.Notification
+import com.twix.domain.model.notification.Notification
 import com.twix.notification.component.NotificationList
 import com.twix.notification.contract.NotificationIntent
 import com.twix.notification.contract.NotificationUiState

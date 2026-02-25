@@ -1,4 +1,4 @@
-package com.twix.domain.model.goal
+package com.twix.domain.model.notification
 
 import com.twix.domain.model.enums.NotificationType
 import java.time.LocalDateTime

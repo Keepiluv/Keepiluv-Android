@@ -62,11 +62,14 @@ internal fun LoadingContent() {
 
 @Composable
 private fun FloatingPlane() {
+    val planeXOffset = 6f
+    val planeYOffset = 8f
+    val planeRotation = 6f
     val transition = rememberInfiniteTransition(label = "plane")
 
     val offsetY by transition.animateFloat(
-        -8f,
-        8f,
+        -planeYOffset,
+        planeYOffset,
         infiniteRepeatable(
             tween(1500, easing = EaseInOut),
             RepeatMode.Reverse,
@@ -74,8 +77,8 @@ private fun FloatingPlane() {
     )
 
     val offsetX by transition.animateFloat(
-        -6f,
-        6f,
+        -planeXOffset,
+        planeXOffset,
         infiniteRepeatable(
             tween(2200, easing = LinearEasing),
             RepeatMode.Reverse,
@@ -83,8 +86,8 @@ private fun FloatingPlane() {
     )
 
     val rotation by transition.animateFloat(
-        -6f,
-        6f,
+        -planeRotation,
+        planeRotation,
         infiniteRepeatable(
             tween(1300, easing = EaseInOut),
             RepeatMode.Reverse,

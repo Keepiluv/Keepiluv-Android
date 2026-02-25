@@ -1,5 +1,6 @@
 package com.twix.domain.repository
 
+import com.twix.domain.model.notification.NotificationPage
 import com.twix.result.AppResult
 
 interface NotificationRepository {
@@ -17,4 +18,9 @@ interface NotificationRepository {
         isMarketingPushEnabled: Boolean,
         isNightPushEnabled: Boolean,
     ): AppResult<Unit>
+
+    suspend fun fetchNotifications(
+        lastId: Long? = null,
+        size: Int = 20,
+    ): AppResult<NotificationPage>
 }

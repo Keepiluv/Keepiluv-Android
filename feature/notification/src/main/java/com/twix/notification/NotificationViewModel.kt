@@ -2,6 +2,7 @@ package com.twix.notification
 
 import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
+import com.twix.domain.model.notification.Notification
 import com.twix.domain.repository.NotificationRepository
 import com.twix.notification.contract.NotificationIntent
 import com.twix.notification.contract.NotificationSideEffect
@@ -79,7 +80,7 @@ class NotificationViewModel(
         val notification = uiState.value.notificationList.find { it.id == id } ?: return
         val intent = notificationDeepLinkParser.parse(notification.deepLink)
 
-        markNotificationAsRead(id)
+        if (!notification.isRead) markNotificationAsRead(notification)
 
         when (intent) {
             is NotificationDeepLink.DailyGoalAchieved -> emitSideEffect(NotificationSideEffect.NavigateToHome)
@@ -97,9 +98,18 @@ class NotificationViewModel(
     }
 
     // 알림 읽음 처리는 best effort가 정책이므로 에러 처리는 생략
-    private fun markNotificationAsRead(id: Long) {
+    private fun markNotificationAsRead(notification: Notification) {
+        reduce {
+            copy(
+                notificationList =
+                    currentState.notificationList.map { item ->
+                        if (item.id == notification.id) item.copy(isRead = true) else item
+                    },
+            )
+        }
+
         launchResult(
-            block = { notificationRepository.markNotificationAsRead(id) },
+            block = { notificationRepository.markNotificationAsRead(notification.id) },
             onSuccess = {},
         )
     }

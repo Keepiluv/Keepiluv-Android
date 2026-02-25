@@ -141,4 +141,11 @@ sealed class NavRoutes(
             return baseRoute
         }
     }
+
+    /**
+     * NotificationGraph
+     * */
+    object NotificationGraph : NavRoutes("notification_graph")
+
+    object NotificationRoute : NavRoutes("notification")
 }

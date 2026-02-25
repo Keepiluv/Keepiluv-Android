@@ -23,6 +23,8 @@
     <string name="word_information">정보</string>
     <string name="word_logout">로그아웃</string>
     <string name="word_sting">찌르기</string>
+    <string name="word_notification">알림</string>
+    <string name="word_new">NEW</string>
 
     <string name="word_daily">매일</string>
     <string name="word_weekly">매주</string>
@@ -74,6 +76,7 @@
     <!-- 설정 화면 -->
     <string name="settings_privacy_policy">개인정보 처리방침</string>
     <string name="settings_my_app_version">나의 버전</string>
+    <string name="settings_notification">알림 설정</string>
 
     <!-- 통계 화면 -->
     <string name="stats_top_bar_title">스탬프 통계</string>
@@ -87,6 +90,9 @@
 
     <!-- 통계 상세 화면 -->
     <string name="stats_complete_count">%1$s %2$d/%3$d</string>
+
+    <!-- 알림 화면 -->
+    <string name="notification_recent_14_days">최근 14일</string>
 
     <!-- 토스트 메시지 -->
     <string name="toast_end_date_before_start_date">종료 날짜가 시작 날짜보다 이전입니다.</string>
@@ -103,6 +109,7 @@
     <string name="toast_fetch_stats_failed">통계 조회에 실패했습니다.</string>
     <string name="toast_already_certificated">이미 인증되었어요.</string>
     <string name="toast_camera_permission_request">인증샷 촬영을 위해서 카메라 권한이 필요해요.</string>
+    <string name="toast_fetch_notification_failed">알림 목록 조회에 실패했습니다.</string>
 
     <!-- 다이얼로그 -->
     <string name="dialog_end_goal_title">%s\n목표를 이루셨나요?</string>

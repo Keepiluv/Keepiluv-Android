@@ -35,6 +35,7 @@ fun MainRoute(
     navigateToCertification: (Long, LocalDate) -> Unit,
     navigateToCertificationDetail: (Long, LocalDate, BetweenUs) -> Unit,
     navigateToStatsDetail: (Long, LocalDate?) -> Unit,
+    navigateToNotification: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val homeViewModel: HomeViewModel = koinViewModel()
@@ -49,6 +50,7 @@ fun MainRoute(
         navigateToCertification = navigateToCertification,
         navigateToSettings = navigateToSettings,
         navigateToStatsDetail = navigateToStatsDetail,
+        navigateToNotification = navigateToNotification,
     )
 }
 
@@ -63,6 +65,7 @@ private fun MainScreen(
     navigateToCertification: (Long, LocalDate) -> Unit,
     navigateToCertificationDetail: (Long, LocalDate, BetweenUs) -> Unit,
     navigateToStatsDetail: (Long, LocalDate?) -> Unit,
+    navigateToNotification: () -> Unit,
 ) {
     val calendarState by homeViewModel.calendarState.collectAsStateWithLifecycle()
     var showCalendarBottomSheet by remember { mutableStateOf(false) }
@@ -101,6 +104,7 @@ private fun MainScreen(
                             navigateToCertificationDetail = navigateToCertificationDetail,
                             navigateToSettings = navigateToSettings,
                             navigateToCertification = navigateToCertification,
+                            navigateToNotification = navigateToNotification,
                         )
 
                     MainTab.STATS -> StatsRoute(navigateToDetail = navigateToStatsDetail)

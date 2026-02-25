@@ -68,6 +68,7 @@ dependencies {
     implementation(projects.feature.stats.detail)
     implementation(projects.core.notification)
     implementation(projects.core.navigationContract)
+    implementation(projects.feature.notification)
 
     // Firebase
     implementation(platform(libs.google.firebase.bom))

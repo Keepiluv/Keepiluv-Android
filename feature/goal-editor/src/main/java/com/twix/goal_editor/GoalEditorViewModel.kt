@@ -11,12 +11,14 @@ import com.twix.domain.repository.GoalRepository
 import com.twix.goal_editor.model.GoalEditorUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.GoalRefreshBus
+import com.twix.util.bus.StatsDetailRefreshBus
 import com.twix.util.bus.StatsRefreshBus
 import java.time.LocalDate
 
 class GoalEditorViewModel(
     private val goalRepository: GoalRepository,
     private val goalRefreshBus: GoalRefreshBus,
+    private val statsDetailRefreshBus: StatsDetailRefreshBus,
     private val statsRefreshBus: StatsRefreshBus,
 ) : BaseViewModel<GoalEditorUiState, GoalEditorIntent, GoalEditorSideEffect>(
         GoalEditorUiState(),
@@ -81,46 +83,90 @@ class GoalEditorViewModel(
     }
 
     private suspend fun save(id: Long) {
+        if (!validateSaveInput()) return
+
+        if (id == -1L) createGoal() else updateGoal(id)
+    }
+
+    private suspend fun validateSaveInput(): Boolean {
         if (!currentState.isEnabled) {
-            emitSideEffect(GoalEditorSideEffect.ShowToast(R.string.toast_input_goal_title, ToastType.ERROR))
-            return
+            emitSideEffect(
+                GoalEditorSideEffect.ShowToast(
+                    R.string.toast_input_goal_title,
+                    ToastType.ERROR,
+                ),
+            )
+            return false
         }
 
         if (currentState.endDateEnabled && currentState.endDate.isBefore(currentState.startDate)) {
-            emitSideEffect(GoalEditorSideEffect.ShowToast(R.string.toast_end_date_before_start_date, ToastType.ERROR))
-            return
+            emitSideEffect(
+                GoalEditorSideEffect.ShowToast(
+                    R.string.toast_end_date_before_start_date,
+                    ToastType.ERROR,
+                ),
+            )
+            return false
         }
 
-        if (id == -1L) {
-            launchResult(
-                block = { goalRepository.createGoal(currentState.toCreateParam()) },
-                onSuccess = {
-                    goalRefreshBus.notifyGoalListChanged()
-                    statsRefreshBus.notifyChanged(StatsRefreshBus.Publisher.InProgress)
-                    tryEmitSideEffect(GoalEditorSideEffect.NavigateToHome)
-                },
-                onError = { emitSideEffect(GoalEditorSideEffect.ShowToast(R.string.toast_create_goal_failed, ToastType.ERROR)) },
-            )
-        } else {
-            launchResult(
-                block = { goalRepository.updateGoal(currentState.toUpdateParam(id)) },
-                onSuccess = {
-                    goalRefreshBus.notifyGoalListChanged()
-                    goalRefreshBus.notifyGoalSummariesChanged()
-                    statsRefreshBus.notifyChanged(StatsRefreshBus.Publisher.InProgress)
-                    statsRefreshBus.notifyChanged(StatsRefreshBus.Publisher.End)
-                    tryEmitSideEffect(GoalEditorSideEffect.NavigateToHome)
-                },
-                onError = { emitSideEffect(GoalEditorSideEffect.ShowToast(R.string.toast_update_goal_failed, ToastType.ERROR)) },
-            )
+        return true
+    }
+
+    private fun createGoal() {
+        launchResult(
+            block = { goalRepository.createGoal(currentState.toCreateParam()) },
+            onSuccess = { onGoalSaveSuccess(isUpdate = false) },
+            onError = {
+                emitSideEffect(
+                    GoalEditorSideEffect.ShowToast(
+                        R.string.toast_create_goal_failed,
+                        ToastType.ERROR,
+                    ),
+                )
+            },
+        )
+    }
+
+    private fun updateGoal(id: Long) {
+        launchResult(
+            block = { goalRepository.updateGoal(currentState.toUpdateParam(id)) },
+            onSuccess = { onGoalSaveSuccess(isUpdate = true) },
+            onError = {
+                emitSideEffect(
+                    GoalEditorSideEffect.ShowToast(
+                        R.string.toast_update_goal_failed,
+                        ToastType.ERROR,
+                    ),
+                )
+            },
+        )
+    }
+
+    private fun onGoalSaveSuccess(isUpdate: Boolean) {
+        goalRefreshBus.notifyGoalListChanged()
+        statsDetailRefreshBus.notifyChanged(StatsDetailRefreshBus.Publisher.GoalUpdated)
+        statsRefreshBus.notifyChanged(StatsRefreshBus.Publisher.InProgress)
+
+        if (isUpdate) {
+            goalRefreshBus.notifyGoalSummariesChanged()
+            statsRefreshBus.notifyChanged(StatsRefreshBus.Publisher.End)
         }
+
+        tryEmitSideEffect(GoalEditorSideEffect.NavigateToHome)
     }
 
     private fun initGoal(id: Long) {
         launchResult(
             block = { goalRepository.fetchGoalDetail(id) },
             onSuccess = { setGoal(it) },
-            onError = { emitSideEffect(GoalEditorSideEffect.ShowToast(R.string.toast_goal_fetch_failed, ToastType.ERROR)) },
+            onError = {
+                emitSideEffect(
+                    GoalEditorSideEffect.ShowToast(
+                        R.string.toast_goal_fetch_failed,
+                        ToastType.ERROR,
+                    ),
+                )
+            },
         )
     }
 

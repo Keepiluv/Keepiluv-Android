@@ -17,6 +17,7 @@ import com.twix.stats.detail.contract.StatsDetailSideEffect
 import com.twix.stats.detail.contract.StatsDetailUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.GoalRefreshBus
+import com.twix.util.bus.StatsDetailRefreshBus
 import com.twix.util.bus.StatsRefreshBus
 import com.yapp.stats.detail.contract.StatsDetailIntent
 import kotlinx.coroutines.FlowPreview
@@ -33,6 +34,7 @@ import java.time.YearMonth
 @OptIn(FlowPreview::class)
 class StatsDetailViewModel(
     private val statsRefreshBus: StatsRefreshBus,
+    private val statsDetailRefreshBus: StatsDetailRefreshBus,
     private val goalRefreshBus: GoalRefreshBus,
     private val goalRepository: GoalRepository,
     private val statsRepository: StatsRepository,
@@ -180,11 +182,9 @@ class StatsDetailViewModel(
 
     private fun collectEventBus() {
         viewModelScope.launch {
-            statsRefreshBus.events.collect { publisher ->
+            statsDetailRefreshBus.events.collect { publisher ->
                 when (publisher) {
-                    StatsRefreshBus.Publisher.InProgress,
-                    StatsRefreshBus.Publisher.End,
-                    -> refreshCurrentMonthStats()
+                    StatsDetailRefreshBus.Publisher.GoalUpdated -> refreshCurrentMonthStats()
                 }
             }
         }

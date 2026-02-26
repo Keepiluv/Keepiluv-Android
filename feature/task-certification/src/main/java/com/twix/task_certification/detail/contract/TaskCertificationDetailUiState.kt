@@ -5,7 +5,6 @@ import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalIconType
 import com.twix.domain.model.photolog.PhotoLogs
 import com.twix.domain.model.photolog.PhotologDetail
-import com.twix.navigation.args.EditorNavArgs
 import com.twix.ui.base.State
 import com.twix.util.RelativeTimeFormatter
 import java.time.LocalDate
@@ -81,16 +80,6 @@ data class TaskCertificationDetailUiState(
     val canReaction: Boolean
         get() =
             currentShow == BetweenUs.PARTNER && isDisplayedGoalCertificated
-
-    fun toNavArgs() =
-        EditorNavArgs(
-            goalId = goalId,
-            nickname = myNickname,
-            goalName = goalName,
-            photologId = myPhotolog?.photologId ?: -1,
-            imageUrl = myPhotolog?.imageUrl ?: "",
-            comment = myPhotolog?.comment,
-        )
 }
 
 fun PhotoLogs.toUiState(

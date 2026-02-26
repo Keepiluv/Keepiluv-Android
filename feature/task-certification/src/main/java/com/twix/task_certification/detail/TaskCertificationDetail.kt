@@ -46,7 +46,7 @@ import java.time.LocalDate
 fun TaskCertificationDetailRoute(
     navigateToBack: () -> Unit,
     navigateToCertification: (Long, LocalDate) -> Unit,
-    navigateToEditor: (TaskCertificationDetailUiState) -> Unit,
+    navigateToEditor: (Long, LocalDate) -> Unit,
     toastManager: ToastManager = koinInject(),
     viewModel: TaskCertificationDetailViewModel = koinViewModel(),
 ) {
@@ -99,7 +99,12 @@ fun TaskCertificationDetailRoute(
     TaskCertificationDetailScreen(
         uiState = uiState,
         onBack = navigateToBack,
-        onClickModify = { navigateToEditor(uiState) },
+        onClickModify = {
+            navigateToEditor(
+                uiState.goalId,
+                uiState.selectedDate,
+            )
+        },
         onClickReaction = { viewModel.dispatch(TaskCertificationDetailIntent.Reaction(it)) },
         onClickUpload = {
             if (currentContext.hasCameraPermission()) {

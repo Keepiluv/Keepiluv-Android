@@ -10,12 +10,14 @@ import com.twix.goal_manage.model.GoalManageUiState
 import com.twix.goal_manage.model.RemovedGoal
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.GoalRefreshBus
+import com.twix.util.bus.StatsRefreshBus
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class GoalManageViewModel(
     private val goalRepository: GoalRepository,
     private val goalRefreshBus: GoalRefreshBus,
+    private val statsRefreshBus: StatsRefreshBus,
 ) : BaseViewModel<GoalManageUiState, GoalManageIntent, GoalManageSideEffect>(GoalManageUiState()) {
     init {
         viewModelScope.launch {
@@ -74,6 +76,7 @@ class GoalManageViewModel(
             block = { goalRepository.completeGoal(id) },
             onSuccess = {
                 goalRefreshBus.notifyGoalListChanged()
+                statsRefreshBus.notifyChanged(StatsRefreshBus.Target.All)
                 markPending(id, false)
             },
             onError = {
@@ -95,6 +98,7 @@ class GoalManageViewModel(
             block = { goalRepository.deleteGoal(id) },
             onSuccess = {
                 goalRefreshBus.notifyGoalListChanged()
+                statsRefreshBus.notifyChanged(StatsRefreshBus.Target.All)
                 markPending(id, false)
             },
             onError = {

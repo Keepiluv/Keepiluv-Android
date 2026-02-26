@@ -35,20 +35,21 @@ class StatsDetailUiStatePreviewProvider : PreviewParameterProvider<StatsDetailUi
             goalId = 1,
             goalName = "아이스크림 먹기",
             goalIcon = GoalIconType.DEFAULT,
-            status = "진행중",
-            monthDate = LocalDate.now(),
+            isCompleted = false,
+            currentDate = LocalDate.now(),
             completedDate = completedDates,
-            statsSummary =
-                StatsSummary(
-                    myNickname = "나",
-                    partnerNickname = "파트너",
-                    totalCount = 10,
-                    myCompletedCount = 6,
-                    partnerCompletedCount = 4,
-                    repeatCycle = RepeatCycle.DAILY,
-                    startDate = LocalDate.now().minusMonths(1),
-                    endDate = null,
-                ),
+        )
+
+    private val summary =
+        StatsSummary(
+            myNickname = "나",
+            partnerNickname = "파트너",
+            totalCount = 10,
+            myCompletedCount = 6,
+            partnerCompletedCount = 4,
+            repeatCycle = RepeatCycle.DAILY,
+            startDate = LocalDate.now().minusMonths(1),
+            endDate = null,
         )
 
     private val baseCalendarUiModel =
@@ -60,13 +61,13 @@ class StatsDetailUiStatePreviewProvider : PreviewParameterProvider<StatsDetailUi
     override val values: Sequence<StatsDetailUiState> =
         sequenceOf(
             StatsDetailUiState(
-                goalId = 1,
                 detail = baseDetail,
+                summary = summary,
                 calendarUiModel = baseCalendarUiModel,
             ),
             StatsDetailUiState(
-                goalId = 1,
-                detail = baseDetail.copy(status = "종료"),
+                detail = baseDetail.copy(isCompleted = true),
+                summary = summary,
                 calendarUiModel = baseCalendarUiModel,
             ),
         )

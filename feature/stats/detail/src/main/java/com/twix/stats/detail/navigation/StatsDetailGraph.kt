@@ -26,13 +26,27 @@ object StatsDetailGraph : NavGraphContributor {
                     },
                     navArgument(NavRoutes.StatsDetailRoute.ARG_DATE) {
                         type = NavType.StringType
-                        nullable = true
-                        defaultValue = null
                     },
                 ),
         ) {
             StatsDetailRoute(
                 onBack = navController::popBackStack,
+                navigateToGoalEditor = { goalId ->
+                    navController.navigate(NavRoutes.GoalEditorRoute.createRoute(goalId)) {
+                        launchSingleTop = true
+                    }
+                },
+                navigateToTaskCertificationDetail = { goalId, date, betweenUs ->
+                    val destination =
+                        NavRoutes.TaskCertificationDetailRoute.createRoute(
+                            goalId = goalId,
+                            date = date,
+                            betweenUs = betweenUs.name,
+                        )
+                    navController.navigate(destination) {
+                        launchSingleTop = true
+                    }
+                },
             )
         }
     }

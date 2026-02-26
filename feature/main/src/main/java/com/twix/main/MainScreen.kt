@@ -34,7 +34,7 @@ fun MainRoute(
     navigateToSettings: () -> Unit,
     navigateToCertification: (Long, LocalDate) -> Unit,
     navigateToCertificationDetail: (Long, LocalDate, BetweenUs) -> Unit,
-    navigateToStatsDetail: (Long, LocalDate?) -> Unit,
+    navigateToStatsDetail: (Long, LocalDate) -> Unit,
     navigateToNotification: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -64,7 +64,7 @@ private fun MainScreen(
     navigateToSettings: () -> Unit,
     navigateToCertification: (Long, LocalDate) -> Unit,
     navigateToCertificationDetail: (Long, LocalDate, BetweenUs) -> Unit,
-    navigateToStatsDetail: (Long, LocalDate?) -> Unit,
+    navigateToStatsDetail: (Long, LocalDate) -> Unit,
     navigateToNotification: () -> Unit,
 ) {
     val calendarState by homeViewModel.calendarState.collectAsStateWithLifecycle()

@@ -137,8 +137,12 @@ class StatsViewModel(
         viewModelScope.launch {
             eventBus.events.collect { publisher ->
                 when (publisher) {
-                    StatsRefreshBus.Publisher.InProgress -> refreshInProgressStats()
-                    StatsRefreshBus.Publisher.End -> fetchCompletedStats()
+                    StatsRefreshBus.Target.InProgress -> refreshInProgressStats()
+                    StatsRefreshBus.Target.End -> fetchCompletedStats()
+                    StatsRefreshBus.Target.All -> {
+                        refreshInProgressStats()
+                        fetchCompletedStats()
+                    }
                 }
             }
         }

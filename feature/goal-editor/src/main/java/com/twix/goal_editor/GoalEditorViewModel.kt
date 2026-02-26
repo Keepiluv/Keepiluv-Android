@@ -145,11 +145,10 @@ class GoalEditorViewModel(
     private fun onGoalSaveSuccess(isUpdate: Boolean) {
         goalRefreshBus.notifyGoalListChanged()
         statsDetailRefreshBus.notifyChanged(StatsDetailRefreshBus.Publisher.GoalUpdated)
-        statsRefreshBus.notifyChanged(StatsRefreshBus.Publisher.InProgress)
+        statsRefreshBus.notifyChanged(StatsRefreshBus.Target.InProgress)
 
         if (isUpdate) {
             goalRefreshBus.notifyGoalSummariesChanged()
-            statsRefreshBus.notifyChanged(StatsRefreshBus.Publisher.End)
         }
 
         tryEmitSideEffect(GoalEditorSideEffect.NavigateToHome)

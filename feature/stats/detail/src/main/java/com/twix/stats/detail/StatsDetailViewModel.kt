@@ -260,8 +260,7 @@ class StatsDetailViewModel(
         launchResult(
             block = { goalRepository.completeGoal(argGoalId) },
             onSuccess = {
-                statsRefreshBus.notifyChanged(StatsRefreshBus.Publisher.InProgress)
-                statsRefreshBus.notifyChanged(StatsRefreshBus.Publisher.End)
+                statsRefreshBus.notifyChanged(StatsRefreshBus.Target.All)
                 goalRefreshBus.notifyGoalListChanged()
                 tryEmitSideEffect(StatsDetailSideEffect.NavigateToBack)
             },
@@ -273,12 +272,7 @@ class StatsDetailViewModel(
         launchResult(
             block = { goalRepository.deleteGoal(argGoalId) },
             onSuccess = {
-                val publisher =
-                    when (currentState.detail.isCompleted) {
-                        true -> StatsRefreshBus.Publisher.End
-                        else -> StatsRefreshBus.Publisher.InProgress
-                    }
-                statsRefreshBus.notifyChanged(publisher)
+                statsRefreshBus.notifyChanged(StatsRefreshBus.Target.All)
                 goalRefreshBus.notifyGoalListChanged()
                 tryEmitSideEffect(StatsDetailSideEffect.NavigateToBack)
             },

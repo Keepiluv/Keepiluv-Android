@@ -208,7 +208,6 @@ class TaskCertificationViewModel(
         goalRefreshBus.notifyGoalListChanged()
         statsDetailRefreshBus.notifyChanged()
         val selectedDate = LocalDate.parse(navArgs.selectedDate)
-        currentState
         tryEmitSideEffect(
             TaskCertificationSideEffect.NavigateToDetail(
                 goalId = navArgs.goalId,

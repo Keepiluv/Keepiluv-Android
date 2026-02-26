@@ -179,7 +179,7 @@ fun StatsDetailScreen(
                     Spacer(Modifier.height(32.dp))
 
                     CalendarNavigator(
-                        currentDate = uiState.detail.yearMonth,
+                        currentDate = uiState.detail.currentDate,
                         onPreviousMonth = onPreviousMonth,
                         onNextMonth = onNextMonth,
                         hasPrevious = uiState.hasPrevious,

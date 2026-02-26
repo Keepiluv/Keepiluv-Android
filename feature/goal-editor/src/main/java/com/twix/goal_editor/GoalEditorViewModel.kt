@@ -144,7 +144,7 @@ class GoalEditorViewModel(
 
     private fun onGoalSaveSuccess(isUpdate: Boolean) {
         goalRefreshBus.notifyGoalListChanged()
-        statsDetailRefreshBus.notifyChanged(StatsDetailRefreshBus.Publisher.GoalUpdated)
+        statsDetailRefreshBus.notifyChanged()
         statsRefreshBus.notifyChanged(StatsRefreshBus.Target.InProgress)
 
         if (isUpdate) {

@@ -182,10 +182,8 @@ class StatsDetailViewModel(
 
     private fun collectEventBus() {
         viewModelScope.launch {
-            statsDetailRefreshBus.events.collect { publisher ->
-                when (publisher) {
-                    StatsDetailRefreshBus.Publisher.GoalUpdated -> refreshCurrentMonthStats()
-                }
+            statsDetailRefreshBus.events.collect {
+                refreshCurrentMonthStats()
             }
         }
     }
@@ -223,7 +221,8 @@ class StatsDetailViewModel(
         cache.remove(yearMonth)
         viewModelScope.launch {
             val summaryDeferred = async { statsRepository.fetchStatsSummary(currentState.goalId) }
-            val detailDeferred = async { statsRepository.fetchStatsDetail(currentState.goalId, yearMonth) }
+            val detailDeferred =
+                async { statsRepository.fetchStatsDetail(currentState.goalId, yearMonth) }
             handleInitialSummary(summaryDeferred.await())
             handleInitialDetail(detailDeferred.await(), yearMonth)
         }

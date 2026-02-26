@@ -69,6 +69,7 @@ dependencies {
     implementation(projects.core.notification)
     implementation(projects.core.navigationContract)
     implementation(projects.feature.notification)
+    implementation(projects.feature.splash)
 
     // Firebase
     implementation(platform(libs.google.firebase.bom))

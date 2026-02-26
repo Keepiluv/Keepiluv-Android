@@ -35,16 +35,18 @@ sealed class NavRoutes(
     object TaskCertificationGraph : NavRoutes("task_certification_graph")
 
     object TaskCertificationDetailRoute :
-        NavRoutes("task_certification_detail/{goalId}/{date}/{betweenUs}") {
+        NavRoutes("task_certification_detail/{goalId}/{date}/{betweenUs}?isCompleted={isCompleted}") {
         const val ARG_GOAL_ID = "goalId"
         const val ARG_DATE = "date"
         const val ARG_BETWEEN_US = "betweenUs"
+        const val ARG_IS_COMPLETED = "isCompleted"
 
         fun createRoute(
             goalId: Long,
             date: LocalDate,
             betweenUs: String,
-        ) = "task_certification_detail/$goalId/$date/$betweenUs"
+            isCompleted: Boolean = false,
+        ) = "task_certification_detail/$goalId/$date/$betweenUs?isCompleted=$isCompleted"
     }
 
     object TaskCertificationRoute : NavRoutes("task_certification/{data}") {

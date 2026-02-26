@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,19 +28,19 @@ import com.twix.ui.extension.noRippleClickable
 
 @Composable
 fun BackgroundCard(
-    isCertificated: Boolean,
     uploadedAt: String,
-    buttonTitle: String,
-    onClick: () -> Unit,
+    actionLabel: String,
     rotation: Float,
+    onClickAction: () -> Unit,
+    showActionButton: Boolean,
 ) {
-    Column {
+    Column(Modifier.wrapContentSize()) {
         PhotologCard(
             background = GrayColor.C200,
             borderColor = GrayColor.C500,
             rotation = rotation,
         )
-        if (isCertificated) {
+        if (!showActionButton) {
             AppText(
                 text = uploadedAt,
                 style = AppTextStyle.B4,
@@ -60,19 +61,19 @@ fun BackgroundCard(
                             Modifier
                                 .width(150.dp)
                                 .height(74.dp)
-                                .noRippleClickable { onClick() },
-                        text = buttonTitle,
+                                .noRippleClickable { onClickAction() },
+                        text = actionLabel,
                         textColor = GrayColor.C500,
                         backgroundColor = CommonColor.White,
                     )
                 }
 
                 Image(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_keepi_sting),
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_photolog_action_poke),
                     contentDescription = null,
                     modifier =
                         Modifier
-                            .padding(end = 24.dp, top = 15.dp)
+                            .padding(end = 16.dp, top = 15.dp)
                             .align(Alignment.TopEnd),
                 )
             }
@@ -85,10 +86,10 @@ fun BackgroundCard(
 fun PreviewBackgroundCard() {
     TwixTheme {
         BackgroundCard(
-            buttonTitle = stringResource(R.string.word_sting),
+            actionLabel = stringResource(R.string.word_sting),
             uploadedAt = "2023.10.31 23:59",
-            onClick = {},
-            isCertificated = true,
+            onClickAction = {},
+            showActionButton = true,
             rotation = -8f,
         )
     }

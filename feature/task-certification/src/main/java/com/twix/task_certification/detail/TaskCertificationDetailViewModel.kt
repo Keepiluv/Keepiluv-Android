@@ -48,6 +48,9 @@ class TaskCertificationDetailViewModel(
         savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_BETWEEN_US]
             ?: error(BETWEEN_US_NOT_FOUND)
 
+    private val argIsCompleted: Boolean =
+        savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_IS_COMPLETED] ?: false
+
     private var lastReaction: GoalReactionType? = null
 
     private val reactionFlow =
@@ -65,7 +68,7 @@ class TaskCertificationDetailViewModel(
     private fun fetchPhotolog() {
         launchResult(
             block = { photologRepository.fetchPhotologs(argTargetDate, argGoalId) },
-            onSuccess = { reduce { it.toUiState(argGoalId, argBetweenUs, argTargetDate) } },
+            onSuccess = { reduce { it.toUiState(argGoalId, argBetweenUs, argTargetDate, argIsCompleted) } },
             onError = {
                 showToast(R.string.task_certification_detail_fetch_photolog_fail, ToastType.ERROR)
             },

@@ -20,6 +20,7 @@ data class TaskCertificationDetailUiState(
     val icon: GoalIconType = GoalIconType.DEFAULT,
     val myPhotolog: PhotologDetail? = null,
     val partnerPhotolog: PhotologDetail? = null,
+    val isCompletedGoal: Boolean = false,
     /**
      * 초기값으로 인해 찌르기/업로드 버튼이 렌더링 되는 것을 막기 위한 변수
      * */
@@ -80,12 +81,16 @@ data class TaskCertificationDetailUiState(
     val canReaction: Boolean
         get() =
             currentShow == BetweenUs.PARTNER && isDisplayedGoalCertificated
+
+    val showActionButton: Boolean
+        get() = !isCompletedGoal && !isDisplayedGoalCertificated
 }
 
 fun PhotoLogs.toUiState(
     goalId: Long,
     betweenUs: String,
     selectedDate: LocalDate,
+    isCompletedGoal: Boolean,
 ): TaskCertificationDetailUiState {
     val currentGoalPhotolog =
         goals.firstOrNull {
@@ -102,5 +107,6 @@ fun PhotoLogs.toUiState(
         icon = currentGoalPhotolog.icon,
         myPhotolog = currentGoalPhotolog.myPhotolog,
         partnerPhotolog = currentGoalPhotolog.partnerPhotolog,
+        isCompletedGoal = isCompletedGoal,
     )
 }

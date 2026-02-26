@@ -21,5 +21,6 @@ sealed interface StatsDetailSideEffect : SideEffect {
         val goalId: Long,
         val date: LocalDate,
         val betweenUs: BetweenUs,
+        val isCompleted: Boolean,
     ) : StatsDetailSideEffect
 }

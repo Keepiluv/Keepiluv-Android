@@ -113,16 +113,17 @@ private fun MarketingCheckItem(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .noRippleClickable(onClick = onClick), ,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .noRippleClickable(onClick = onClick),
     ) {
         Image(
             painter = painterResource(icon),
             contentDescription = null,
             modifier =
                 Modifier
-                    .size(24.dp)
+                    .size(24.dp),
         )
 
         Spacer(Modifier.width(8.dp))

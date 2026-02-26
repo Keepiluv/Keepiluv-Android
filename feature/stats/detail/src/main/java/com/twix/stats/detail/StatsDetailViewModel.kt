@@ -279,8 +279,8 @@ class StatsDetailViewModel(
         )
     }
 
-    private fun navigateToGoalEditor() {
-        tryEmitSideEffect(StatsDetailSideEffect.NavigateToGoalEditor(currentState.goalId))
+    private suspend fun navigateToGoalEditor() {
+        emitSideEffect(StatsDetailSideEffect.NavigateToGoalEditor(currentState.goalId))
     }
 
     private suspend fun showToast(

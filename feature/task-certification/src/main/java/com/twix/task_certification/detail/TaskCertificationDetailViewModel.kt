@@ -7,6 +7,7 @@ import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalReactionType
 import com.twix.domain.repository.PhotoLogRepository
+import com.twix.domain.repository.PokeRepository
 import com.twix.navigation.NavRoutes
 import com.twix.task_certification.detail.contract.TaskCertificationDetailIntent
 import com.twix.task_certification.detail.contract.TaskCertificationDetailSideEffect
@@ -26,6 +27,7 @@ import java.time.LocalDate
 
 class TaskCertificationDetailViewModel(
     private val photologRepository: PhotoLogRepository,
+    private val pokeRepository: PokeRepository,
     private val detailRefreshBus: TaskCertificationRefreshBus,
     private val goalRefreshBus: GoalRefreshBus,
     savedStateHandle: SavedStateHandle,
@@ -119,7 +121,7 @@ class TaskCertificationDetailViewModel(
     override suspend fun handleIntent(intent: TaskCertificationDetailIntent) {
         when (intent) {
             is TaskCertificationDetailIntent.Reaction -> reduceReaction(intent.type)
-            TaskCertificationDetailIntent.Sting -> TODO("찌르기 API 연동")
+            TaskCertificationDetailIntent.Poke -> pokeToPartner()
             TaskCertificationDetailIntent.SwipeCard -> reduceShownCard()
         }
     }
@@ -128,6 +130,14 @@ class TaskCertificationDetailViewModel(
         lastReaction = currentState.partnerPhotolog?.reaction
         reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(reaction)) }
         reactionFlow.tryEmit(reaction)
+    }
+
+    private fun pokeToPartner() {
+        launchResult(
+            block = { pokeRepository.pokeGoal(argGoalId) },
+            onSuccess = { tryEmitSideEffect(TaskCertificationDetailSideEffect.ShowPokeToast(it.message)) },
+            onError = { showToast(R.string.toast_poke_goal_failed, ToastType.ERROR) },
+        )
     }
 
     private fun reduceShownCard() {

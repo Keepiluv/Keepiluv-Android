@@ -8,7 +8,7 @@ sealed interface TaskCertificationDetailIntent : Intent {
         val type: GoalReactionType,
     ) : TaskCertificationDetailIntent
 
-    data object Sting : TaskCertificationDetailIntent
+    data object Poke : TaskCertificationDetailIntent
 
     data object SwipeCard : TaskCertificationDetailIntent
 }

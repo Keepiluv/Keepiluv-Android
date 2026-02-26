@@ -17,7 +17,7 @@ internal fun TaskCertificationCardContent(
     uiState: TaskCertificationDetailUiState,
     onSwipe: () -> Unit,
     onClickUpload: () -> Unit,
-    onClickSting: () -> Unit,
+    onPoke: () -> Unit,
 ) {
     Box(Modifier.fillMaxWidth()) {
         BackgroundCard(
@@ -26,10 +26,10 @@ internal fun TaskCertificationCardContent(
             buttonTitle =
                 when (uiState.currentShow) {
                     BetweenUs.ME -> stringResource(R.string.task_certification_take_picture)
-                    BetweenUs.PARTNER -> stringResource(R.string.action_sting)
+                    BetweenUs.PARTNER -> stringResource(R.string.action_poke)
                 },
             rotation = if (uiState.isDisplayedMyPhotolog) -8f else 0f,
-            onClick = if (uiState.isDisplayedMyPhotolog) onClickUpload else onClickSting,
+            onClick = if (uiState.isDisplayedMyPhotolog) onClickUpload else onPoke,
         )
 
         SwipeableCard(

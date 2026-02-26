@@ -64,6 +64,11 @@ fun TaskCertificationDetailRoute(
                     ToastData(currentContext.getString(sideEffect.message), sideEffect.type),
                 )
             }
+            is TaskCertificationDetailSideEffect.ShowPokeToast -> {
+                toastManager.tryShow(
+                    ToastData(sideEffect.message, ToastType.SUCCESS),
+                )
+            }
         }
     }
 
@@ -110,7 +115,7 @@ fun TaskCertificationDetailRoute(
                 permissionLauncher.launch(Manifest.permission.CAMERA)
             }
         },
-        onClickSting = { viewModel.dispatch(TaskCertificationDetailIntent.Sting) },
+        onPoke = { viewModel.dispatch(TaskCertificationDetailIntent.Poke) },
         onSwipe = { viewModel.dispatch(TaskCertificationDetailIntent.SwipeCard) },
     )
 }
@@ -122,7 +127,7 @@ fun TaskCertificationDetailScreen(
     onClickModify: () -> Unit,
     onClickReaction: (GoalReactionType) -> Unit,
     onClickUpload: () -> Unit,
-    onClickSting: () -> Unit,
+    onPoke: () -> Unit,
     onSwipe: () -> Unit,
 ) {
     Scaffold(
@@ -147,7 +152,7 @@ fun TaskCertificationDetailScreen(
                 uiState = uiState,
                 onSwipe = onSwipe,
                 onClickUpload = onClickUpload,
-                onClickSting = onClickSting,
+                onPoke = onPoke,
             )
 
             if (uiState.canReaction) {
@@ -173,7 +178,7 @@ private fun TaskCertificationDetailScreenPreview(
             onClickModify = {},
             onClickReaction = {},
             onClickUpload = {},
-            onClickSting = {},
+            onPoke = {},
             onSwipe = {},
         )
     }

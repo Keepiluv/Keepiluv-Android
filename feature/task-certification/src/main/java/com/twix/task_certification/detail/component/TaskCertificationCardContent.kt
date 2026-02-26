@@ -34,6 +34,7 @@ internal fun TaskCertificationCardContent(
 
         SwipeableCard(
             onSwipe = onSwipe,
+            isDisplayingMyPhoto = uiState.isDisplayedMyPhotolog,
             modifier = Modifier.fillMaxWidth(),
         ) {
             ForegroundCard(

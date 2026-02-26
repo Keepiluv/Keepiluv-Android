@@ -53,7 +53,7 @@ object TaskCertificationGraph : NavGraphContributor {
                         navController.navigate(destination)
                     },
                     navigateToEditor = { uiState ->
-                        val serializer = uiState.toSerializer()
+                        val serializer = uiState.toNavArgs()
                         navController.navigate(
                             NavRoutes.TaskCertificationEditorRoute.createRoute(
                                 serializer,

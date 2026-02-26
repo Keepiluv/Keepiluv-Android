@@ -21,6 +21,10 @@ data class TaskCertificationDetailUiState(
     val icon: GoalIconType = GoalIconType.DEFAULT,
     val myPhotolog: PhotologDetail? = null,
     val partnerPhotolog: PhotologDetail? = null,
+    /**
+     * 초기값으로 인해 찌르기/업로드 버튼이 렌더링 되는 것을 막기 위한 변수
+     * */
+    val isLoading: Boolean = false,
 ) : State {
     val isDisplayedGoalCertificated: Boolean
         get() =
@@ -78,7 +82,7 @@ data class TaskCertificationDetailUiState(
         get() =
             currentShow == BetweenUs.PARTNER && isDisplayedGoalCertificated
 
-    fun toSerializer() =
+    fun toNavArgs() =
         EditorNavArgs(
             goalId = goalId,
             nickname = myNickname,

@@ -17,6 +17,7 @@
     <string name="word_cancel">취소</string>
     <string name="word_delete">삭제</string>
     <string name="word_modify">수정</string>
+    <string name="word_confirm">확인</string>
     <string name="word_save">저장</string>
     <string name="word_setting">설정</string>
     <string name="word_account">계정</string>
@@ -121,6 +122,12 @@
     <string name="dialog_delete_goal_content">저장된 인증샷은 모두 삭제됩니다.</string>
     <string name="dialog_withdraw_account_title">정말 탈퇴하시겠어요?</string>
     <string name="dialog_withdraw_account_content">커플 연결이 끊어집니다.\n데이터는 전부 삭제되며 복구가 불가능합니다.</string>
+
+    <!-- 마케팅 다이얼로그 -->
+    <string name="marketing_dialog_title">도움이 되는 정보를\n알림으로 받아보시겠어요?</string>
+    <string name="marketing_dialog_marketing">[선택] 마케팅 정보 알림</string>
+    <string name="marketing_dialog_night_marketing">[선택] 야간 마케팅 정보 알림</string>
+    <string name="marketing_dialog_description">* 언제든지 설정 > 알림 설정에서 변경 가능해요</string>
 
     <!-- 인증샷 촬영 화면 !-->
     <string name="task_certification_upload">업로드</string>

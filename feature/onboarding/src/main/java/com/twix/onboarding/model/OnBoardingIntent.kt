@@ -4,6 +4,12 @@ import com.twix.ui.base.Intent
 import java.time.LocalDate
 
 sealed interface OnBoardingIntent : Intent {
+    data class SubmitMarketingConsent(
+        val isPushEnabled: Boolean,
+        val isMarketingEnabled: Boolean,
+        val isNightMarketingEnabled: Boolean,
+    ) : OnBoardingIntent
+
     data class WriteNickName(
         val value: String,
     ) : OnBoardingIntent

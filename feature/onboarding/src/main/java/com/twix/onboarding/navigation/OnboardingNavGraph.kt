@@ -7,11 +7,11 @@ import androidx.navigation.navigation
 import com.twix.navigation.NavRoutes
 import com.twix.navigation.base.NavGraphContributor
 import com.twix.navigation.graphViewModel
+import com.twix.onboarding.OnBoardingViewModel
 import com.twix.onboarding.couple.CoupleConnectRoute
 import com.twix.onboarding.dday.DdayRoute
 import com.twix.onboarding.invite.InviteCodeRoute
 import com.twix.onboarding.profile.ProfileRoute
-import com.twix.onboarding.vm.OnBoardingViewModel
 
 object OnboardingNavGraph : NavGraphContributor {
     override val graphRoute: NavRoutes

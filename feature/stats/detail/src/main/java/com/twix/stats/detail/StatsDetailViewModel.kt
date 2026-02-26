@@ -16,6 +16,7 @@ import com.twix.result.AppResult
 import com.twix.stats.detail.contract.StatsDetailSideEffect
 import com.twix.stats.detail.contract.StatsDetailUiState
 import com.twix.ui.base.BaseViewModel
+import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.StatsRefreshBus
 import com.yapp.stats.detail.contract.StatsDetailIntent
 import kotlinx.coroutines.FlowPreview
@@ -32,6 +33,7 @@ import java.time.YearMonth
 @OptIn(FlowPreview::class)
 class StatsDetailViewModel(
     private val statsRefreshBus: StatsRefreshBus,
+    private val goalRefreshBus: GoalRefreshBus,
     private val goalRepository: GoalRepository,
     private val statsRepository: StatsRepository,
     savedStateHandle: SavedStateHandle,
@@ -182,7 +184,7 @@ class StatsDetailViewModel(
                 when (publisher) {
                     StatsRefreshBus.Publisher.InProgress,
                     StatsRefreshBus.Publisher.End,
-                    -> Unit
+                    -> refreshCurrentMonthStats()
                 }
             }
         }
@@ -191,14 +193,15 @@ class StatsDetailViewModel(
     override suspend fun handleIntent(intent: StatsDetailIntent) {
         when (intent) {
             is StatsDetailIntent.SelectDate -> navigateToTaskCertificationDetail(intent.date)
+            StatsDetailIntent.GoalEdit -> navigateToGoalEditor()
             StatsDetailIntent.PreviousMonth -> fetchPreviousMonth()
             StatsDetailIntent.NextMonth -> fetchNextMonth()
             StatsDetailIntent.GoalEnd -> {
-                // endGoal()
+                endGoal()
             }
 
             StatsDetailIntent.GoalDelete -> {
-                // deleteGoal()
+                deleteGoal()
             }
         }
     }
@@ -213,6 +216,17 @@ class StatsDetailViewModel(
         val nextMonth = currentState.detail.yearMonth.plusMonths(1)
         reduce { copy(detail = detail.copy(yearMonth = nextMonth)) }
         monthChangeFlow.tryEmit(YearMonth.from(nextMonth))
+    }
+
+    private fun refreshCurrentMonthStats() {
+        val yearMonth = YearMonth.from(currentState.detail.yearMonth)
+        cache.remove(yearMonth)
+        viewModelScope.launch {
+            val summaryDeferred = async { statsRepository.fetchStatsSummary(currentState.goalId) }
+            val detailDeferred = async { statsRepository.fetchStatsDetail(currentState.goalId, yearMonth) }
+            handleInitialSummary(summaryDeferred.await())
+            handleInitialDetail(detailDeferred.await(), yearMonth)
+        }
     }
 
     private fun navigateToTaskCertificationDetail(selectedDate: LocalDate) {
@@ -247,6 +261,8 @@ class StatsDetailViewModel(
             block = { goalRepository.completeGoal(argGoalId) },
             onSuccess = {
                 statsRefreshBus.notifyChanged(StatsRefreshBus.Publisher.InProgress)
+                statsRefreshBus.notifyChanged(StatsRefreshBus.Publisher.End)
+                goalRefreshBus.notifyGoalListChanged()
                 tryEmitSideEffect(StatsDetailSideEffect.NavigateToBack)
             },
             onError = { showToast(R.string.toast_complete_goal_failed, ToastType.ERROR) },
@@ -263,10 +279,15 @@ class StatsDetailViewModel(
                         else -> StatsRefreshBus.Publisher.InProgress
                     }
                 statsRefreshBus.notifyChanged(publisher)
+                goalRefreshBus.notifyGoalListChanged()
                 tryEmitSideEffect(StatsDetailSideEffect.NavigateToBack)
             },
             onError = { showToast(R.string.toast_delete_goal_failed, ToastType.ERROR) },
         )
+    }
+
+    private fun navigateToGoalEditor() {
+        tryEmitSideEffect(StatsDetailSideEffect.NavigateToGoalEditor(currentState.goalId))
     }
 
     private suspend fun showToast(

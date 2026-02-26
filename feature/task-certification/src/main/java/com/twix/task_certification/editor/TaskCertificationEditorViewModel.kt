@@ -12,6 +12,7 @@ import com.twix.task_certification.editor.contract.TaskCertificationEditorSideEf
 import com.twix.task_certification.editor.contract.TaskCertificationEditorUiState
 import com.twix.task_certification.editor.contract.toEditorUiState
 import com.twix.ui.base.BaseViewModel
+import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.TaskCertificationRefreshBus
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -19,6 +20,7 @@ import java.time.LocalDate
 class TaskCertificationEditorViewModel(
     private val photologRepository: PhotoLogRepository,
     private val detailRefreshBus: TaskCertificationRefreshBus,
+    private val goalRefreshBus: GoalRefreshBus,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<TaskCertificationEditorUiState, TaskCertificationEditorIntent, TaskCertificationEditorSideEffect>(
         TaskCertificationEditorUiState(),
@@ -61,6 +63,7 @@ class TaskCertificationEditorViewModel(
                 block = { launchModifyComment() },
                 onSuccess = {
                     detailRefreshBus.notifyChanged(TaskCertificationRefreshBus.Publisher.EDITOR)
+                    goalRefreshBus.notifyGoalListChanged()
                     showToast(R.string.task_certification_editor_modify_success, ToastType.SUCCESS)
                 },
                 onError = {

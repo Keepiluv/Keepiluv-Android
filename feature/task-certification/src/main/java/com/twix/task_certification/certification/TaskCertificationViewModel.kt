@@ -195,6 +195,7 @@ class TaskCertificationViewModel(
             },
             onSuccess = {
                 detailRefreshBus.notifyChanged(TaskCertificationRefreshBus.Publisher.PHOTOLOG)
+                goalRefreshBus.notifyGoalListChanged()
                 val selectedDate = runCatching { LocalDate.parse(navArgs.selectedDate) }.getOrDefault(LocalDate.now())
                 tryEmitSideEffect(
                     TaskCertificationSideEffect.NavigateToDetail(

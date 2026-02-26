@@ -11,11 +11,13 @@ import com.twix.domain.repository.GoalRepository
 import com.twix.goal_editor.model.GoalEditorUiState
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.GoalRefreshBus
+import com.twix.util.bus.StatsRefreshBus
 import java.time.LocalDate
 
 class GoalEditorViewModel(
     private val goalRepository: GoalRepository,
     private val goalRefreshBus: GoalRefreshBus,
+    private val statsRefreshBus: StatsRefreshBus,
 ) : BaseViewModel<GoalEditorUiState, GoalEditorIntent, GoalEditorSideEffect>(
         GoalEditorUiState(),
     ) {
@@ -94,6 +96,7 @@ class GoalEditorViewModel(
                 block = { goalRepository.createGoal(currentState.toCreateParam()) },
                 onSuccess = {
                     goalRefreshBus.notifyGoalListChanged()
+                    statsRefreshBus.notifyChanged(StatsRefreshBus.Publisher.InProgress)
                     tryEmitSideEffect(GoalEditorSideEffect.NavigateToHome)
                 },
                 onError = { emitSideEffect(GoalEditorSideEffect.ShowToast(R.string.toast_create_goal_failed, ToastType.ERROR)) },
@@ -104,6 +107,8 @@ class GoalEditorViewModel(
                 onSuccess = {
                     goalRefreshBus.notifyGoalListChanged()
                     goalRefreshBus.notifyGoalSummariesChanged()
+                    statsRefreshBus.notifyChanged(StatsRefreshBus.Publisher.InProgress)
+                    statsRefreshBus.notifyChanged(StatsRefreshBus.Publisher.End)
                     tryEmitSideEffect(GoalEditorSideEffect.NavigateToHome)
                 },
                 onError = { emitSideEffect(GoalEditorSideEffect.ShowToast(R.string.toast_update_goal_failed, ToastType.ERROR)) },

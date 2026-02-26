@@ -13,6 +13,10 @@ sealed interface StatsDetailSideEffect : SideEffect {
 
     data object NavigateToBack : StatsDetailSideEffect
 
+    data class NavigateToGoalEditor(
+        val goalId: Long,
+    ) : StatsDetailSideEffect
+
     data class NavigateToTaskCertificationDetail(
         val goalId: Long,
         val date: LocalDate,

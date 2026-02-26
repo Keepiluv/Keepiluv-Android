@@ -8,6 +8,8 @@ sealed interface StatsDetailIntent : Intent {
         val date: LocalDate,
     ) : StatsDetailIntent
 
+    data object GoalEdit : StatsDetailIntent
+
     data object PreviousMonth : StatsDetailIntent
 
     data object NextMonth : StatsDetailIntent

@@ -60,6 +60,7 @@ import java.time.LocalDate
 @Composable
 fun StatsDetailRoute(
     onBack: () -> Unit,
+    navigateToGoalEditor: (Long) -> Unit,
     navigateToTaskCertificationDetail: (Long, LocalDate, BetweenUs) -> Unit,
     toastManager: ToastManager = koinInject(),
     viewModel: StatsDetailViewModel = koinViewModel(),
@@ -72,6 +73,7 @@ fun StatsDetailRoute(
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
             StatsDetailSideEffect.NavigateToBack -> onBack()
+            is StatsDetailSideEffect.NavigateToGoalEditor -> navigateToGoalEditor(sideEffect.goalId)
             is StatsDetailSideEffect.NavigateToTaskCertificationDetail ->
                 navigateToTaskCertificationDetail(
                     sideEffect.goalId,
@@ -95,9 +97,9 @@ fun StatsDetailRoute(
         onSelectDate = { selectedDate -> viewModel.dispatch(StatsDetailIntent.SelectDate(selectedDate)) },
         onPreviousMonth = { viewModel.dispatch(StatsDetailIntent.PreviousMonth) },
         onNextMonth = { viewModel.dispatch(StatsDetailIntent.NextMonth) },
-        onClickDeleteStats = { },
-        onClickPopupEdit = { },
-        onClickPopupEnd = { },
+        onClickDeleteStats = { viewModel.dispatch(StatsDetailIntent.GoalDelete) },
+        onClickPopupEdit = { viewModel.dispatch(StatsDetailIntent.GoalEdit) },
+        onClickPopupEnd = { viewModel.dispatch(StatsDetailIntent.GoalEnd) },
     )
 }
 
@@ -137,8 +139,14 @@ fun StatsDetailScreen(
                     }
                 },
                 onDismiss = { popupMenuVisibility = false },
-                onClickPopupEdit = onClickPopupEdit,
-                onClickPopupEnd = onClickPopupEnd,
+                onClickPopupEdit = {
+                    popupMenuVisibility = false
+                    onClickPopupEdit()
+                },
+                onClickPopupEnd = {
+                    popupMenuVisibility = false
+                    onClickPopupEnd()
+                },
                 onClickPopupDelete = {
                     popupMenuVisibility = false
                     statsDeleteDialogVisibility = true
@@ -215,7 +223,10 @@ fun StatsDetailScreen(
             confirmText = stringResource(R.string.word_delete),
             dismissText = stringResource(R.string.word_cancel),
             onDismissRequest = { statsDeleteDialogVisibility = false },
-            onConfirm = onClickDeleteStats,
+            onConfirm = {
+                statsDeleteDialogVisibility = false
+                onClickDeleteStats()
+            },
             onDismiss = { statsDeleteDialogVisibility = false },
             content = {
                 StatsDeleteDialogContent(

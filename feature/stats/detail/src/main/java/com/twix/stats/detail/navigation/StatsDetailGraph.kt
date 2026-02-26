@@ -31,6 +31,11 @@ object StatsDetailGraph : NavGraphContributor {
         ) {
             StatsDetailRoute(
                 onBack = navController::popBackStack,
+                navigateToGoalEditor = { goalId ->
+                    navController.navigate(NavRoutes.GoalEditorRoute.createRoute(goalId)) {
+                        launchSingleTop = true
+                    }
+                },
                 navigateToTaskCertificationDetail = { goalId, date, betweenUs ->
                     val destination =
                         NavRoutes.TaskCertificationDetailRoute.createRoute(

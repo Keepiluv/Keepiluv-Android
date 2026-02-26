@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -135,24 +133,20 @@ fun TaskCertificationDetailScreen(
     onPoke: () -> Unit,
     onSwipe: () -> Unit,
 ) {
-    Scaffold(
-        topBar = {
-            TaskCertificationDetailTopBar(
-                title = uiState.goalName,
-                canModify = uiState.canModify,
-                onBack = onBack,
-                onClickModify = onClickModify,
-            )
-        },
-    ) { innerPadding ->
-        Column(
-            Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .background(color = CommonColor.White),
-        ) {
-            Spacer(Modifier.height(103.dp))
+    Column(
+        Modifier
+            .fillMaxSize()
+            .background(color = CommonColor.White),
+    ) {
+        TaskCertificationDetailTopBar(
+            title = uiState.goalName,
+            canModify = uiState.canModify,
+            onBack = onBack,
+            onClickModify = onClickModify,
+        )
+        Spacer(Modifier.height(103.dp))
 
+        if (uiState.isLoading) {
             TaskCertificationCardContent(
                 uiState = uiState,
                 onSwipe = onSwipe,

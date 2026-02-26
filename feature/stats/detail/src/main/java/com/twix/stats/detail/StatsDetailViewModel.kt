@@ -132,13 +132,13 @@ class StatsDetailViewModel(
     }
 
     private fun handleFetchStatsDetailSuccess(result: StatsDetail) {
-        cache[YearMonth.from(result.yearMonth)] = result
+        cache[YearMonth.from(result.currentDate)] = result
         reduce {
             copy(
                 detail = result,
                 calendarUiModel =
                     StatsCalendarUiModel.create(
-                        currentDate = result.yearMonth,
+                        currentDate = result.currentDate,
                         completedDate = result.completedDate,
                     ),
             )
@@ -151,7 +151,7 @@ class StatsDetailViewModel(
             copy(
                 detail =
                     detail.copy(
-                        yearMonth = currentDate,
+                        currentDate = currentDate,
                         completedDate = emptyList(),
                     ),
                 calendarUiModel =
@@ -170,7 +170,7 @@ class StatsDetailViewModel(
                     detail = it,
                     calendarUiModel =
                         StatsCalendarUiModel.create(
-                            currentDate = it.yearMonth,
+                            currentDate = it.currentDate,
                             completedDate = it.completedDate,
                         ),
                 )
@@ -205,19 +205,19 @@ class StatsDetailViewModel(
     }
 
     private fun fetchPreviousMonth() {
-        val previousMonth = currentState.detail.yearMonth.minusMonths(1)
-        reduce { copy(detail = detail.copy(yearMonth = previousMonth)) }
+        val previousMonth = currentState.detail.currentDate.minusMonths(1)
+        reduce { copy(detail = detail.copy(currentDate = previousMonth)) }
         monthChangeFlow.tryEmit(YearMonth.from(previousMonth))
     }
 
     private fun fetchNextMonth() {
-        val nextMonth = currentState.detail.yearMonth.plusMonths(1)
-        reduce { copy(detail = detail.copy(yearMonth = nextMonth)) }
+        val nextMonth = currentState.detail.currentDate.plusMonths(1)
+        reduce { copy(detail = detail.copy(currentDate = nextMonth)) }
         monthChangeFlow.tryEmit(YearMonth.from(nextMonth))
     }
 
     private fun refreshCurrentMonthStats() {
-        val yearMonth = YearMonth.from(currentState.detail.yearMonth)
+        val yearMonth = YearMonth.from(currentState.detail.currentDate)
         cache.remove(yearMonth)
         viewModelScope.launch {
             val summaryDeferred = async { statsRepository.fetchStatsSummary(currentState.goalId) }

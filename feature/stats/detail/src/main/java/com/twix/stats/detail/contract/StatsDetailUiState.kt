@@ -18,7 +18,7 @@ data class StatsDetailUiState(
     val hasNext: Boolean
         get() {
             val limitYm = YearMonth.from(summary.endDate ?: LocalDate.now())
-            val nextYm = YearMonth.from(detail.yearMonth).plusMonths(1)
+            val nextYm = YearMonth.from(detail.currentDate).plusMonths(1)
 
             return nextYm <= limitYm
         }
@@ -26,7 +26,7 @@ data class StatsDetailUiState(
     val hasPrevious: Boolean
         get() {
             val limitYm = YearMonth.from(summary.startDate)
-            val previousYm = YearMonth.from(detail.yearMonth).minusMonths(1)
+            val previousYm = YearMonth.from(detail.currentDate).minusMonths(1)
             return previousYm >= limitYm
         }
 }

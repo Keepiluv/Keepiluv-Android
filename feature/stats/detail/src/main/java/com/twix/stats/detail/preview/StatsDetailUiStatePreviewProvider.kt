@@ -36,7 +36,7 @@ class StatsDetailUiStatePreviewProvider : PreviewParameterProvider<StatsDetailUi
             goalName = "아이스크림 먹기",
             goalIcon = GoalIconType.DEFAULT,
             isCompleted = false,
-            yearMonth = LocalDate.now(),
+            currentDate = LocalDate.now(),
             completedDate = completedDates,
         )
 

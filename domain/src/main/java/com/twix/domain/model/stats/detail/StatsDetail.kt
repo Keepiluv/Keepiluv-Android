@@ -8,7 +8,7 @@ data class StatsDetail(
     val goalName: String,
     val goalIcon: GoalIconType,
     val isCompleted: Boolean,
-    val yearMonth: LocalDate,
+    val currentDate: LocalDate,
     val completedDate: List<CompletedDate>,
 ) {
     companion object {
@@ -18,7 +18,7 @@ data class StatsDetail(
                 goalName = "",
                 goalIcon = GoalIconType.DEFAULT,
                 isCompleted = false,
-                yearMonth = LocalDate.now(),
+                currentDate = LocalDate.now(),
                 completedDate = emptyList(),
             )
     }

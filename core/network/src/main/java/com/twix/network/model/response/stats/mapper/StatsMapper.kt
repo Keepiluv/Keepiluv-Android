@@ -31,7 +31,7 @@ fun StatsCalendarResponse.toDomain(fallbackMonth: YearMonth): StatsDetail =
         goalName = goalName,
         goalIcon = GoalIconType.fromApi(goalIcon),
         isCompleted = isCompleted,
-        yearMonth = runCatching { YearMonth.parse(yearMonth).atDay(1) }.getOrElse { fallbackMonth.atDay(1) },
+        currentDate = runCatching { YearMonth.parse(yearMonth).atDay(1) }.getOrElse { fallbackMonth.atDay(1) },
         completedDate = completedDates.map { it.toDomain() },
     )
 

@@ -18,6 +18,7 @@ import com.twix.task_certification.certification.model.CaptureStatus
 import com.twix.ui.base.BaseViewModel
 import com.twix.ui.image.ImageGenerator
 import com.twix.util.bus.GoalRefreshBus
+import com.twix.util.bus.StatsDetailRefreshBus
 import com.twix.util.bus.TaskCertificationRefreshBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -30,6 +31,7 @@ class TaskCertificationViewModel(
     private val photologRepository: PhotoLogRepository,
     private val detailRefreshBus: TaskCertificationRefreshBus,
     private val goalRefreshBus: GoalRefreshBus,
+    private val statsDetailRefreshBus: StatsDetailRefreshBus,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<TaskCertificationUiState, TaskCertificationIntent, TaskCertificationSideEffect>(
         TaskCertificationUiState(),
@@ -135,20 +137,22 @@ class TaskCertificationViewModel(
                     contentType = "image/jpeg",
                 )
             },
-            onSuccess = { fileName ->
-                when (navArgs.from) {
-                    NavRoutes.TaskCertificationRoute.From.DETAIL,
-                    NavRoutes.TaskCertificationRoute.From.HOME,
-                    -> uploadPhotolog(fileName)
-
-                    NavRoutes.TaskCertificationRoute.From.EDITOR -> modifyPhotolog(fileName)
-                }
-            },
+            onSuccess = { fileName -> handleUploadPhotologSuccess(fileName) },
             onError = {
                 reduce { copy(isLoading = false) }
                 showToast(R.string.task_certification_upload_fail, ToastType.ERROR)
             },
         )
+    }
+
+    private fun handleUploadPhotologSuccess(fileName: String) {
+        when (navArgs.from) {
+            NavRoutes.TaskCertificationRoute.From.DETAIL,
+            NavRoutes.TaskCertificationRoute.From.HOME,
+            -> uploadPhotolog(fileName)
+
+            NavRoutes.TaskCertificationRoute.From.EDITOR -> modifyPhotolog(fileName)
+        }
     }
 
     private fun uploadPhotolog(fileName: String) {
@@ -192,21 +196,25 @@ class TaskCertificationViewModel(
                     comment = currentState.comment.value,
                 )
             },
-            onSuccess = {
-                detailRefreshBus.notifyChanged(TaskCertificationRefreshBus.Publisher.PHOTOLOG)
-                goalRefreshBus.notifyGoalListChanged()
-                val selectedDate = runCatching { LocalDate.parse(navArgs.selectedDate) }.getOrDefault(LocalDate.now())
-                tryEmitSideEffect(
-                    TaskCertificationSideEffect.NavigateToDetail(
-                        goalId = navArgs.goalId,
-                        date = selectedDate,
-                        betweenUs = BetweenUs.ME,
-                    ),
-                )
-            },
+            onSuccess = { handleModifyPhotologSuccess() },
             onError = {
                 showToast(R.string.task_certification_modify_fail, ToastType.ERROR)
             },
+        )
+    }
+
+    private fun handleModifyPhotologSuccess() {
+        detailRefreshBus.notifyChanged(TaskCertificationRefreshBus.Publisher.PHOTOLOG)
+        goalRefreshBus.notifyGoalListChanged()
+        statsDetailRefreshBus.notifyChanged()
+        val selectedDate = LocalDate.parse(navArgs.selectedDate)
+        currentState
+        tryEmitSideEffect(
+            TaskCertificationSideEffect.NavigateToDetail(
+                goalId = navArgs.goalId,
+                date = selectedDate,
+                betweenUs = BetweenUs.ME,
+            ),
         )
     }
 

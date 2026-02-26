@@ -6,6 +6,7 @@ import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.enums.GoalCheckState
 import com.twix.domain.model.enums.WeekNavigation
 import com.twix.domain.repository.GoalRepository
+import com.twix.domain.repository.PokeRepository
 import com.twix.home.model.CalendarState
 import com.twix.home.model.HomeUiState
 import com.twix.ui.base.BaseViewModel
@@ -20,6 +21,7 @@ import java.time.LocalDate
 
 class HomeViewModel(
     private val goalRepository: GoalRepository,
+    private val pokeRepository: PokeRepository,
     private val goalRefreshBus: GoalRefreshBus,
 ) : BaseViewModel<HomeUiState, HomeIntent, HomeSideEffect>(
         HomeUiState(),
@@ -62,6 +64,7 @@ class HomeViewModel(
             HomeIntent.MoveToToday -> shiftWeek(WeekNavigation.TODAY)
             is HomeIntent.UpdateVisibleDate -> updateVisibleDate(intent.date)
             is HomeIntent.Verification -> handleGoalVerification(intent)
+            is HomeIntent.PokeGoal -> pokeGoal(intent.goalId)
         }
     }
 
@@ -119,6 +122,14 @@ class HomeViewModel(
                 }
             }
         }
+    }
+
+    private fun pokeGoal(goalId: Long) {
+        launchResult(
+            block = { pokeRepository.pokeGoal(goalId) },
+            onSuccess = { tryEmitSideEffect(HomeSideEffect.ShowPokeToast(it.message)) },
+            onError = { emitSideEffect(HomeSideEffect.ShowToast(R.string.toast_poke_goal_failed, ToastType.ERROR)) },
+        )
     }
 
     /**

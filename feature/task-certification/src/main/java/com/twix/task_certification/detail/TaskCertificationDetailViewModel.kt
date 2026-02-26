@@ -67,6 +67,7 @@ class TaskCertificationDetailViewModel(
             onError = {
                 showToast(R.string.task_certification_detail_fetch_photolog_fail, ToastType.ERROR)
             },
+            onFinally = { reduce { copy(isLoading = true) } },
         )
     }
 

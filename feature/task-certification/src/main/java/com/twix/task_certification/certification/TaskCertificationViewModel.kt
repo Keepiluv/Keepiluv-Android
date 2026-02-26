@@ -128,7 +128,6 @@ class TaskCertificationViewModel(
     }
 
     private fun upload(image: ByteArray) {
-        reduce { copy(isLoading = true) }
         launchResult(
             onStart = { reduce { copy(isLoading = true) } },
             block = {
@@ -140,9 +139,9 @@ class TaskCertificationViewModel(
             },
             onSuccess = { fileName -> handleUploadPhotologSuccess(fileName) },
             onError = {
+                reduce { copy(isLoading = false) }
                 showToast(R.string.task_certification_upload_fail, ToastType.ERROR)
             },
-            onFinally = { reduce { copy(isLoading = false) } },
         )
     }
 

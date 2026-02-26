@@ -58,7 +58,7 @@ fun AppRoundButton(
                     ).then(
                         if (hasBorder) {
                             Modifier.border(
-                                width = 1.6.dp,
+                                width = 1.dp,
                                 color = borderColor,
                                 shape = RoundedCornerShape(100),
                             )

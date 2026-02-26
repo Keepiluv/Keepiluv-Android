@@ -26,7 +26,8 @@ interface PhotoLogService {
 
     @GET("api/v1/photologs")
     suspend fun fetchPhotoLogs(
-        @Query("targetDate") request: LocalDate,
+        @Query("targetDate") targetDate: LocalDate,
+        @Query("goalId") goalId: Long?,
     ): PhotoLogsResponse
 
     @PUT("api/v1/photologs/{photologId}/reaction")

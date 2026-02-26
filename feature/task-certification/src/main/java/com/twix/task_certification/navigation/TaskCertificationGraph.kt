@@ -52,11 +52,11 @@ object TaskCertificationGraph : NavGraphContributor {
                             )
                         navController.navigate(destination)
                     },
-                    navigateToEditor = { uiState ->
-                        val serializer = uiState.toSerializer()
+                    navigateToEditor = { goalId, date ->
                         navController.navigate(
                             NavRoutes.TaskCertificationEditorRoute.createRoute(
-                                serializer,
+                                goalId = goalId,
+                                date = date,
                             ),
                         )
                     },
@@ -67,20 +67,24 @@ object TaskCertificationGraph : NavGraphContributor {
                 route = NavRoutes.TaskCertificationEditorRoute.route,
                 arguments =
                     listOf(
-                        navArgument(NavRoutes.TaskCertificationEditorRoute.ARG_DATA) {
+                        navArgument(NavRoutes.TaskCertificationEditorRoute.ARG_GOAL_ID) {
+                            type = NavType.LongType
+                        },
+                        navArgument(NavRoutes.TaskCertificationEditorRoute.ARG_DATE) {
                             type = NavType.StringType
                         },
                     ),
             ) {
                 TaskCertificationEditorRoute(
                     navigateToBack = navController::popBackStack,
-                    navigateToCertification = { goalId, photologId, comment ->
+                    navigateToCertification = { goalId, photologId, comment, selectedDate ->
                         val destination =
                             NavRoutes.TaskCertificationRoute.createRoute(
                                 DetailNavArgs(
                                     goalId = goalId,
                                     from = NavRoutes.TaskCertificationRoute.From.EDITOR,
                                     photologId = photologId,
+                                    selectedDate = selectedDate.toString(),
                                     comment = comment,
                                 ),
                             )
@@ -100,11 +104,19 @@ object TaskCertificationGraph : NavGraphContributor {
             ) {
                 TaskCertificationRoute(
                     navigateToBack = navController::popBackStack,
-                    navigateToDetail = {
-                        navController.popBackStack(
-                            route = NavRoutes.TaskCertificationDetailRoute.route,
-                            inclusive = false,
-                        )
+                    navigateToDetail = { goalId, date, betweenUs ->
+                        navController.navigate(
+                            NavRoutes.TaskCertificationDetailRoute.createRoute(
+                                goalId = goalId,
+                                date = date,
+                                betweenUs = betweenUs.name,
+                            ),
+                        ) {
+                            popUpTo(NavRoutes.TaskCertificationDetailRoute.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
                     },
                 )
             }

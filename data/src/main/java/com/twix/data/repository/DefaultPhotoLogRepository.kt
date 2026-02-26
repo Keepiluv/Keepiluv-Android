@@ -51,9 +51,12 @@ class DefaultPhotoLogRepository(
         return AppResult.Success(info.fileName)
     }
 
-    override suspend fun fetchPhotologs(targetDate: LocalDate): AppResult<PhotoLogs> =
+    override suspend fun fetchPhotologs(
+        targetDate: LocalDate,
+        goalId: Long?,
+    ): AppResult<PhotoLogs> =
         safeApiCall {
-            service.fetchPhotoLogs(targetDate).toDomain()
+            service.fetchPhotoLogs(targetDate, goalId).toDomain()
         }
 
     override suspend fun reactToPhotolog(

@@ -44,6 +44,7 @@ import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
+import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalIconType
 import com.twix.stats.detail.component.StatsDetailTopbar
 import com.twix.stats.detail.component.SummaryContent
@@ -59,6 +60,8 @@ import java.time.LocalDate
 @Composable
 fun StatsDetailRoute(
     onBack: () -> Unit,
+    navigateToGoalEditor: (Long) -> Unit,
+    navigateToTaskCertificationDetail: (Long, LocalDate, BetweenUs) -> Unit,
     toastManager: ToastManager = koinInject(),
     viewModel: StatsDetailViewModel = koinViewModel(),
 ) {
@@ -70,6 +73,13 @@ fun StatsDetailRoute(
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
             StatsDetailSideEffect.NavigateToBack -> onBack()
+            is StatsDetailSideEffect.NavigateToGoalEditor -> navigateToGoalEditor(sideEffect.goalId)
+            is StatsDetailSideEffect.NavigateToTaskCertificationDetail ->
+                navigateToTaskCertificationDetail(
+                    sideEffect.goalId,
+                    sideEffect.date,
+                    sideEffect.betweenUs,
+                )
             is StatsDetailSideEffect.ShowToast -> {
                 toastManager.tryShow(
                     ToastData(
@@ -84,12 +94,12 @@ fun StatsDetailRoute(
     StatsDetailScreen(
         uiState = uiState,
         onBack = onBack,
-        onSelectDate = {},
+        onSelectDate = { selectedDate -> viewModel.dispatch(StatsDetailIntent.SelectDate(selectedDate)) },
         onPreviousMonth = { viewModel.dispatch(StatsDetailIntent.PreviousMonth) },
         onNextMonth = { viewModel.dispatch(StatsDetailIntent.NextMonth) },
-        onClickDeleteStats = { },
-        onClickPopupEdit = { },
-        onClickPopupEnd = { },
+        onClickDeleteStats = { viewModel.dispatch(StatsDetailIntent.GoalDelete) },
+        onClickPopupEdit = { viewModel.dispatch(StatsDetailIntent.GoalEdit) },
+        onClickPopupEnd = { viewModel.dispatch(StatsDetailIntent.GoalEnd) },
     )
 }
 
@@ -107,6 +117,7 @@ fun StatsDetailScreen(
     val scrollState = rememberScrollState()
     var popupMenuVisibility by remember { mutableStateOf(false) }
     var statsDeleteDialogVisibility by remember { mutableStateOf(false) }
+    val isInProgressStatsDetail = !uiState.detail.isCompleted
 
     Box {
         Column(
@@ -117,19 +128,25 @@ fun StatsDetailScreen(
         ) {
             StatsDetailTopbar(
                 goalName = uiState.detail.goalName,
-                isInProgressStatsDetail = uiState.isInProgressStatsDetail,
+                isInProgressStatsDetail = isInProgressStatsDetail,
                 popupMenuVisibility = popupMenuVisibility,
                 onBack = onBack,
                 onClickAction = {
-                    if (uiState.isInProgressStatsDetail) {
+                    if (isInProgressStatsDetail) {
                         popupMenuVisibility = true
                     } else {
                         statsDeleteDialogVisibility = true
                     }
                 },
                 onDismiss = { popupMenuVisibility = false },
-                onClickPopupEdit = onClickPopupEdit,
-                onClickPopupEnd = onClickPopupEnd,
+                onClickPopupEdit = {
+                    popupMenuVisibility = false
+                    onClickPopupEdit()
+                },
+                onClickPopupEnd = {
+                    popupMenuVisibility = false
+                    onClickPopupEnd()
+                },
                 onClickPopupDelete = {
                     popupMenuVisibility = false
                     statsDeleteDialogVisibility = true
@@ -161,7 +178,7 @@ fun StatsDetailScreen(
                     Spacer(Modifier.height(32.dp))
 
                     CalendarNavigator(
-                        currentDate = uiState.detail.monthDate,
+                        currentDate = uiState.detail.yearMonth,
                         onPreviousMonth = onPreviousMonth,
                         onNextMonth = onNextMonth,
                         hasPrevious = uiState.hasPrevious,
@@ -198,7 +215,7 @@ fun StatsDetailScreen(
 
             Spacer(Modifier.height(44.dp))
 
-            SummaryContent(uiState.detail.statsSummary)
+            SummaryContent(uiState.summary)
         }
 
         CommonDialog(
@@ -206,7 +223,10 @@ fun StatsDetailScreen(
             confirmText = stringResource(R.string.word_delete),
             dismissText = stringResource(R.string.word_cancel),
             onDismissRequest = { statsDeleteDialogVisibility = false },
-            onConfirm = onClickDeleteStats,
+            onConfirm = {
+                statsDeleteDialogVisibility = false
+                onClickDeleteStats()
+            },
             onDismiss = { statsDeleteDialogVisibility = false },
             content = {
                 StatsDeleteDialogContent(

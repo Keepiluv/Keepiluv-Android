@@ -18,7 +18,10 @@ interface PhotoLogRepository {
         contentType: String,
     ): AppResult<String>
 
-    suspend fun fetchPhotologs(targetDate: LocalDate): AppResult<PhotoLogs>
+    suspend fun fetchPhotologs(
+        targetDate: LocalDate,
+        goalId: Long? = null,
+    ): AppResult<PhotoLogs>
 
     suspend fun reactToPhotolog(
         photologId: Long,

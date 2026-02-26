@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
+import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.photo.PhotologParam
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
@@ -194,7 +195,15 @@ class TaskCertificationViewModel(
             },
             onSuccess = {
                 detailRefreshBus.notifyChanged(TaskCertificationRefreshBus.Publisher.PHOTOLOG)
-                tryEmitSideEffect(TaskCertificationSideEffect.NavigateToDetail)
+                goalRefreshBus.notifyGoalListChanged()
+                val selectedDate = runCatching { LocalDate.parse(navArgs.selectedDate) }.getOrDefault(LocalDate.now())
+                tryEmitSideEffect(
+                    TaskCertificationSideEffect.NavigateToDetail(
+                        goalId = navArgs.goalId,
+                        date = selectedDate,
+                        betweenUs = BetweenUs.ME,
+                    ),
+                )
             },
             onError = {
                 showToast(R.string.task_certification_modify_fail, ToastType.ERROR)

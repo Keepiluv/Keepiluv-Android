@@ -50,11 +50,12 @@ import com.twix.ui.extension.noRippleClickable
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
+import java.time.LocalDate
 
 @Composable
 fun TaskCertificationEditorRoute(
     navigateToBack: () -> Unit,
-    navigateToCertification: (Long, Long, String) -> Unit,
+    navigateToCertification: (Long, Long, String, LocalDate) -> Unit,
     toastManager: ToastManager = koinInject(),
     viewModel: TaskCertificationEditorViewModel = koinViewModel(),
 ) {
@@ -81,7 +82,12 @@ fun TaskCertificationEditorRoute(
         ) { granted ->
 
             if (granted) {
-                navigateToCertification(uiState.goalId, uiState.photologId, uiState.comment.value)
+                navigateToCertification(
+                    uiState.goalId,
+                    uiState.photologId,
+                    uiState.comment.value,
+                    uiState.selectedDate,
+                )
                 return@rememberLauncherForActivityResult
             }
             val activity = currentContext.findActivity() ?: return@rememberLauncherForActivityResult
@@ -114,7 +120,12 @@ fun TaskCertificationEditorRoute(
         onCommentChanged = { viewModel.dispatch(TaskCertificationEditorIntent.ModifyComment(it)) },
         onClickRetake = {
             if (currentContext.hasCameraPermission()) {
-                navigateToCertification(uiState.goalId, uiState.photologId, uiState.comment.value)
+                navigateToCertification(
+                    uiState.goalId,
+                    uiState.photologId,
+                    uiState.comment.value,
+                    uiState.selectedDate,
+                )
             } else {
                 permissionLauncher.launch(Manifest.permission.CAMERA)
             }

@@ -200,14 +200,13 @@ fun HomeScreen(
                 onUpdateVisibleDate = onUpdateVisibleDate,
             )
 
-            Spacer(Modifier.height(12.dp))
-
             if (uiState.goalList.goals.isEmpty()) {
                 EmptyGoalGuide(
                     modifier = Modifier.weight(1f),
                     text = stringResource(R.string.home_empty_goal_guide),
                 )
             } else {
+                Spacer(Modifier.height(12.dp))
                 GoalList(
                     modifier =
                         Modifier

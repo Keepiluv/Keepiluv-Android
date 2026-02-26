@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,7 +33,7 @@ fun BackgroundCard(
     onClickAction: () -> Unit,
     showActionButton: Boolean,
 ) {
-    Column(Modifier.wrapContentSize()) {
+    Column {
         PhotologCard(
             background = GrayColor.C200,
             borderColor = GrayColor.C500,

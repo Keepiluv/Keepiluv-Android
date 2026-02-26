@@ -23,4 +23,8 @@ sealed interface HomeIntent : Intent {
         val goalId: Long,
         val goalCheckState: GoalCheckState,
     ) : HomeIntent
+
+    data class PokeGoal(
+        val goalId: Long,
+    ) : HomeIntent
 }

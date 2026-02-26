@@ -126,6 +126,13 @@ fun HomeRoute(
                 )
 
             HomeSideEffect.ShowMonthPickerBottomSheet -> Unit
+            is HomeSideEffect.ShowPokeToast ->
+                toastManager.show(
+                    ToastData(
+                        sideEffect.message,
+                        ToastType.SUCCESS,
+                    ),
+                )
         }
     }
 
@@ -145,6 +152,7 @@ fun HomeRoute(
         onClickCard = navigateToCertificationDetail,
         onSettingClick = navigateToSettings,
         onNotificationClick = navigateToNotification,
+        onPokeGoal = { viewModel.dispatch(HomeIntent.PokeGoal(it)) },
     )
 }
 
@@ -163,6 +171,7 @@ fun HomeScreen(
     onClickCard: (Long, LocalDate, BetweenUs) -> Unit,
     onSettingClick: () -> Unit,
     onNotificationClick: () -> Unit,
+    onPokeGoal: (Long) -> Unit,
 ) {
     Box(
         modifier =
@@ -209,6 +218,7 @@ fun HomeScreen(
                     onVerificationClick = onVerificationClick,
                     onEditClick = onEditClick,
                     onClickGoalCard = onClickCard,
+                    onPokeGoal = onPokeGoal,
                 )
             }
         }
@@ -231,6 +241,7 @@ fun GoalList(
     onVerificationClick: (Long, GoalCheckState) -> Unit,
     onClickGoalCard: (Long, LocalDate, BetweenUs) -> Unit,
     onEditClick: () -> Unit,
+    onPokeGoal: (Long) -> Unit,
 ) {
     val today = remember { LocalDate.now() }
     val titleRes =
@@ -306,6 +317,7 @@ fun GoalList(
                                     BetweenUs.PARTNER,
                                 )
                             },
+                            onPokeGoal = { onPokeGoal(goal.goalId) },
                         )
                     }
                 },

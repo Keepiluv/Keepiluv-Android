@@ -22,8 +22,8 @@ import com.twix.util.bus.StatsRefreshBus
 import com.yapp.stats.detail.contract.StatsDetailIntent
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -41,8 +41,8 @@ class StatsDetailViewModel(
     private val statsRepository: StatsRepository,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<StatsDetailUiState, StatsDetailIntent, StatsDetailSideEffect>(
-        StatsDetailUiState(),
-    ) {
+    StatsDetailUiState(),
+) {
     private val argGoalId: Long =
         requireNotNull(savedStateHandle[NavRoutes.StatsDetailRoute.ARG_GOAL_ID]) { GOAL_ID_NOT_FOUND }
 
@@ -58,75 +58,44 @@ class StatsDetailViewModel(
         )
 
     init {
-        fetchInitialStatsDetail()
+        fetchInitialStats()
         collectMonthChangeFlow()
         collectEventBus()
     }
 
-    private fun collectMonthChangeFlow() {
-        viewModelScope.launch {
-            monthChangeFlow
-                .distinctUntilChanged()
-                .debounce(DEBOUNCE_INTERVAL)
-                .collectLatest { yearMonth ->
-                    fetchStatsDetail(yearMonth)
-                }
-        }
-    }
-
-    private fun fetchInitialStatsDetail() {
+    private fun fetchInitialStats() {
         val initialDate = LocalDate.parse(argDate).let(YearMonth::from)
 
         viewModelScope.launch {
-            val summaryDeferred =
-                async { statsRepository.fetchStatsSummary(argGoalId) }
-            val detailDeferred =
-                async { statsRepository.fetchStatsDetail(argGoalId, initialDate) }
-
-            awaitAll(summaryDeferred, detailDeferred)
-
-            handleInitialSummary(summaryDeferred.await())
-            handleInitialDetail(detailDeferred.await(), initialDate)
+            val (summary, detail) = fetchStats(initialDate)
+            handleFetchStatsDetailResult(summary, detail, initialDate)
         }
     }
 
-    private suspend fun handleInitialSummary(result: AppResult<StatsSummary>) {
-        when (result) {
-            is AppResult.Success -> reduce { copy(summary = result.data) }
-            is AppResult.Error -> {
-                handleError(result.error)
-                showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
-            }
+    private suspend fun fetchStats(yearMonth: YearMonth): Pair<AppResult<StatsSummary>, AppResult<StatsDetail>> =
+        coroutineScope {
+            val summaryDeferred = async { statsRepository.fetchStatsSummary(argGoalId) }
+            val detailDeferred = async { statsRepository.fetchStatsDetail(argGoalId, yearMonth) }
+            summaryDeferred.await() to detailDeferred.await()
         }
-    }
 
-    private suspend fun handleInitialDetail(
-        result: AppResult<StatsDetail>,
+    private suspend fun handleFetchStatsDetailResult(
+        summary: AppResult<StatsSummary>,
+        detail: AppResult<StatsDetail>,
         initialDate: YearMonth,
     ) {
-        when (result) {
-            is AppResult.Success -> handleFetchStatsDetailSuccess(result.data)
-            is AppResult.Error -> {
-                handleError(result.error)
-                reduceDetailWithEmptyCompletedDate(initialDate)
-                showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
-            }
+        if (summary is AppResult.Success && detail is AppResult.Success) {
+            reduce { copy(summary = summary.data) }
+            reduceStatsDetail(detail.data)
+        } else {
+            if (summary is AppResult.Error) handleError(summary.error)
+            if (detail is AppResult.Error) handleError(detail.error)
+            clearCalendarOnError(initialDate)
+            showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
         }
     }
 
-    private fun fetchStatsDetail(date: YearMonth) {
-        if (checkCache(date)) return
-        launchResult(
-            block = { statsRepository.fetchStatsDetail(argGoalId, date) },
-            onSuccess = { handleFetchStatsDetailSuccess(it) },
-            onError = {
-                reduceDetailWithEmptyCompletedDate(date)
-                showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
-            },
-        )
-    }
-
-    private fun handleFetchStatsDetailSuccess(result: StatsDetail) {
+    private fun reduceStatsDetail(result: StatsDetail) {
         cache[YearMonth.from(result.currentDate)] = result
         reduce {
             copy(
@@ -140,7 +109,7 @@ class StatsDetailViewModel(
         }
     }
 
-    private fun reduceDetailWithEmptyCompletedDate(date: YearMonth) {
+    private fun clearCalendarOnError(date: YearMonth) {
         val currentDate = date.atDay(1)
         reduce {
             copy(
@@ -156,6 +125,29 @@ class StatsDetailViewModel(
                     ),
             )
         }
+    }
+
+    private fun collectMonthChangeFlow() {
+        viewModelScope.launch {
+            monthChangeFlow
+                .distinctUntilChanged()
+                .debounce(DEBOUNCE_INTERVAL)
+                .collectLatest { yearMonth ->
+                    fetchStatsDetail(yearMonth)
+                }
+        }
+    }
+
+    private fun fetchStatsDetail(date: YearMonth) {
+        if (checkCache(date)) return
+        launchResult(
+            block = { statsRepository.fetchStatsDetail(argGoalId, date) },
+            onSuccess = { reduceStatsDetail(it) },
+            onError = {
+                clearCalendarOnError(date)
+                showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
+            },
+        )
     }
 
     private fun checkCache(yearMonth: YearMonth): Boolean {
@@ -183,20 +175,41 @@ class StatsDetailViewModel(
         }
     }
 
+    private fun refreshCurrentMonthStats() {
+        val yearMonth = YearMonth.from(currentState.detail.currentDate)
+        viewModelScope.launch {
+            val (summary, detail) = fetchStats(yearMonth)
+            if (summary is AppResult.Success && detail is AppResult.Success) cache.remove(yearMonth)
+            handleFetchStatsDetailResult(summary, detail, yearMonth)
+        }
+    }
+
     override suspend fun handleIntent(intent: StatsDetailIntent) {
         when (intent) {
             is StatsDetailIntent.SelectDate -> navigateToTaskCertificationDetail(intent.date)
             StatsDetailIntent.GoalEdit -> navigateToGoalEditor()
             StatsDetailIntent.PreviousMonth -> fetchPreviousMonth()
             StatsDetailIntent.NextMonth -> fetchNextMonth()
-            StatsDetailIntent.GoalEnd -> {
-                endGoal()
-            }
-
-            StatsDetailIntent.GoalDelete -> {
-                deleteGoal()
-            }
+            StatsDetailIntent.GoalEnd -> endGoal()
+            StatsDetailIntent.GoalDelete -> deleteGoal()
         }
+    }
+
+    private suspend fun navigateToTaskCertificationDetail(selectedDate: LocalDate) {
+        val completedDate = findCompletedDate(selectedDate) ?: return
+        if (completedDate.myImageUrl == null && completedDate.partnerImageUrl == null) return
+
+        emitSideEffect(
+            StatsDetailSideEffect.NavigateToTaskCertificationDetail(
+                goalId = argGoalId,
+                date = selectedDate,
+                betweenUs = determineDisplayBetweenUs(completedDate.date),
+            ),
+        )
+    }
+
+    private suspend fun navigateToGoalEditor() {
+        emitSideEffect(StatsDetailSideEffect.NavigateToGoalEditor(argGoalId))
     }
 
     private fun fetchPreviousMonth() {
@@ -210,45 +223,6 @@ class StatsDetailViewModel(
         reduce { copy(detail = detail.copy(currentDate = nextMonth)) }
         monthChangeFlow.tryEmit(YearMonth.from(nextMonth))
     }
-
-    private fun refreshCurrentMonthStats() {
-        val yearMonth = YearMonth.from(currentState.detail.currentDate)
-        cache.remove(yearMonth)
-        viewModelScope.launch {
-            val summaryDeferred = async { statsRepository.fetchStatsSummary(argGoalId) }
-            val detailDeferred =
-                async { statsRepository.fetchStatsDetail(argGoalId, yearMonth) }
-            handleInitialSummary(summaryDeferred.await())
-            handleInitialDetail(detailDeferred.await(), yearMonth)
-        }
-    }
-
-    private fun navigateToTaskCertificationDetail(selectedDate: LocalDate) {
-        val completedDate = findCompletedDate(selectedDate) ?: return
-        if (completedDate.myImageUrl == null && completedDate.partnerImageUrl == null) return
-
-        viewModelScope.launch {
-            emitSideEffect(
-                StatsDetailSideEffect.NavigateToTaskCertificationDetail(
-                    goalId = argGoalId,
-                    date = selectedDate,
-                    betweenUs = resolveBetweenUs(completedDate.date),
-                ),
-            )
-        }
-    }
-
-    private fun resolveBetweenUs(selectedDate: LocalDate): BetweenUs {
-        val completedDate = findCompletedDate(selectedDate)
-
-        return when {
-            completedDate?.myImageUrl != null && completedDate.partnerImageUrl == null -> BetweenUs.ME
-            else -> BetweenUs.PARTNER
-        }
-    }
-
-    private fun findCompletedDate(selectedDate: LocalDate): CompletedDate? =
-        currentState.detail.completedDate.firstOrNull { completed -> completed.date == selectedDate }
 
     private fun endGoal() {
         launchResult(
@@ -274,9 +248,17 @@ class StatsDetailViewModel(
         )
     }
 
-    private suspend fun navigateToGoalEditor() {
-        emitSideEffect(StatsDetailSideEffect.NavigateToGoalEditor(argGoalId))
+    private fun determineDisplayBetweenUs(selectedDate: LocalDate): BetweenUs {
+        val completedDate = findCompletedDate(selectedDate)
+
+        return when {
+            completedDate?.myImageUrl != null && completedDate.partnerImageUrl == null -> BetweenUs.ME
+            else -> BetweenUs.PARTNER
+        }
     }
+
+    private fun findCompletedDate(selectedDate: LocalDate): CompletedDate? =
+        currentState.detail.completedDate.firstOrNull { completed -> completed.date == selectedDate }
 
     private suspend fun showToast(
         message: Int,

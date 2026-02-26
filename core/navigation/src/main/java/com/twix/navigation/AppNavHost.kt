@@ -37,7 +37,7 @@ fun AppNavHost(
         }
     val start =
         contributors
-            .firstOrNull { it.graphRoute == NavRoutes.LoginGraph }
+            .firstOrNull { it.graphRoute == NavRoutes.SplashGraph }
             ?.graphRoute
             ?: error("해당 Graph를 찾을 수 없습니다.")
     val pendingDeepLink by notificationLaunchEventSource.pendingDeepLink.collectAsStateWithLifecycle()

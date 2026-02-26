@@ -12,4 +12,6 @@ interface AuthRepository {
     suspend fun logout(): AppResult<Unit>
 
     suspend fun withdrawAccount(): AppResult<Unit>
+
+    suspend fun refreshAccessToken(): AppResult<Unit>
 }

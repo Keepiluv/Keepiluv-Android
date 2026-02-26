@@ -32,15 +32,17 @@ fun EmptyGoalGuide(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+        Spacer(Modifier.height(30.dp))
+
         Image(
             painter = painterResource(R.drawable.ic_empty_goal_home),
             contentDescription = "empty face",
             modifier =
                 Modifier
-                    .size(width = 181.dp, height = 111.dp),
+                    .size(width = 182.dp, height = 116.dp),
         )
 
-        Spacer(Modifier.height(22.dp))
+        Spacer(Modifier.height(16.dp))
 
         AppText(
             text = text,
@@ -57,7 +59,7 @@ fun EmptyGoalGuide(
                 color = GrayColor.C300,
             )
 
-            Spacer(Modifier.height(50.dp))
+            Spacer(Modifier.height(106.dp))
 
             Image(
                 painter = painterResource(R.drawable.ic_empty_goal_arrow),

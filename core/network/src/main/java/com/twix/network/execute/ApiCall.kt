@@ -7,7 +7,7 @@ import io.ktor.client.plugins.ResponseException
 import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import java.io.IOException
+import kotlinx.io.IOException
 import java.net.SocketTimeoutException
 import kotlin.coroutines.cancellation.CancellationException
 

@@ -7,7 +7,7 @@ class StatsRefreshBus {
     enum class Target {
         InProgress,
         End,
-        All
+        All,
     }
 
     private val _events =

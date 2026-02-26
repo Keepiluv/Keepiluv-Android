@@ -4,11 +4,13 @@ import androidx.compose.runtime.Immutable
 import com.twix.designsystem.components.comment.model.CommentUiModel
 import com.twix.domain.model.photolog.PhotoLogs
 import com.twix.ui.base.State
+import java.time.LocalDate
 
 @Immutable
 data class TaskCertificationEditorUiState(
     val goalId: Long = -1,
     val photologId: Long = -1,
+    val selectedDate: LocalDate = LocalDate.now(),
     val nickname: String = "",
     val goalName: String = "",
     val imageUrl: String = "",
@@ -26,13 +28,17 @@ data class TaskCertificationEditorUiState(
     }
 }
 
-internal fun PhotoLogs.toEditorUiState(goalId: Long): TaskCertificationEditorUiState {
+internal fun PhotoLogs.toEditorUiState(
+    goalId: Long,
+    selectedDate: LocalDate,
+): TaskCertificationEditorUiState {
     val goalPhotolog = goals.firstOrNull { it.goalId == goalId }
     val myPhotolog = goalPhotolog?.myPhotolog
 
     return TaskCertificationEditorUiState(
         goalId = goalId,
         photologId = myPhotolog?.photologId ?: -1,
+        selectedDate = selectedDate,
         nickname = myNickname,
         goalName = goalPhotolog?.goalName.orEmpty(),
         imageUrl = myPhotolog?.imageUrl.orEmpty(),

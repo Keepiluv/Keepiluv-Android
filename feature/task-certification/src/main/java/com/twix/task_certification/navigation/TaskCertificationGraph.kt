@@ -77,13 +77,14 @@ object TaskCertificationGraph : NavGraphContributor {
             ) {
                 TaskCertificationEditorRoute(
                     navigateToBack = navController::popBackStack,
-                    navigateToCertification = { goalId, photologId, comment ->
+                    navigateToCertification = { goalId, photologId, comment, selectedDate ->
                         val destination =
                             NavRoutes.TaskCertificationRoute.createRoute(
                                 DetailNavArgs(
                                     goalId = goalId,
                                     from = NavRoutes.TaskCertificationRoute.From.EDITOR,
                                     photologId = photologId,
+                                    selectedDate = selectedDate.toString(),
                                     comment = comment,
                                 ),
                             )
@@ -103,11 +104,19 @@ object TaskCertificationGraph : NavGraphContributor {
             ) {
                 TaskCertificationRoute(
                     navigateToBack = navController::popBackStack,
-                    navigateToDetail = {
-                        navController.popBackStack(
-                            route = NavRoutes.TaskCertificationDetailRoute.route,
-                            inclusive = false,
-                        )
+                    navigateToDetail = { goalId, date, betweenUs ->
+                        navController.navigate(
+                            NavRoutes.TaskCertificationDetailRoute.createRoute(
+                                goalId = goalId,
+                                date = date,
+                                betweenUs = betweenUs.name,
+                            ),
+                        ) {
+                            popUpTo(NavRoutes.TaskCertificationDetailRoute.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
                     },
                 )
             }

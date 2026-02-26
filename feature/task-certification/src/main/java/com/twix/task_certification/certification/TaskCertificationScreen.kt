@@ -36,6 +36,7 @@ import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
+import com.twix.domain.model.enums.BetweenUs
 import com.twix.task_certification.certification.component.CameraControlBar
 import com.twix.task_certification.certification.component.CameraPreviewBox
 import com.twix.task_certification.certification.component.CommentErrorText
@@ -51,6 +52,7 @@ import com.twix.ui.extension.noRippleClickable
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
+import java.time.LocalDate
 
 @Composable
 fun TaskCertificationRoute(
@@ -58,7 +60,7 @@ fun TaskCertificationRoute(
     camera: Camera = koinInject(),
     viewModel: TaskCertificationViewModel = koinViewModel(),
     navigateToBack: () -> Unit,
-    navigateToDetail: () -> Unit,
+    navigateToDetail: (Long, LocalDate, BetweenUs) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val cameraPreview by camera.surfaceRequests.collectAsStateWithLifecycle()
@@ -98,7 +100,12 @@ fun TaskCertificationRoute(
             }
 
             TaskCertificationSideEffect.NavigateToBack -> navigateToBack()
-            TaskCertificationSideEffect.NavigateToDetail -> navigateToDetail()
+            is TaskCertificationSideEffect.NavigateToDetail ->
+                navigateToDetail(
+                    event.goalId,
+                    event.date,
+                    event.betweenUs,
+                )
         }
     }
 

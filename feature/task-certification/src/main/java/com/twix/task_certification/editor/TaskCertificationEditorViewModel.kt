@@ -84,7 +84,7 @@ class TaskCertificationEditorViewModel(
     private fun fetchPhotolog() {
         launchResult(
             block = { photologRepository.fetchPhotologs(argTargetDate, argGoalId) },
-            onSuccess = { reduce { it.toEditorUiState(argGoalId) } },
+            onSuccess = { reduce { it.toEditorUiState(argGoalId, argTargetDate) } },
             onError = {
                 showToast(R.string.task_certification_detail_fetch_photolog_fail, ToastType.ERROR)
             },

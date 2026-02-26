@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.R
 import com.twix.designsystem.components.stats.model.StatsCalendarUiModel
 import com.twix.designsystem.components.toast.model.ToastType
+import com.twix.domain.model.enums.BetweenUs
+import com.twix.domain.model.stats.detail.CompletedDate
 import com.twix.domain.model.stats.detail.StatsDetail
 import com.twix.domain.model.stats.detail.StatsSummary
 import com.twix.domain.repository.GoalRepository
@@ -54,6 +56,7 @@ class StatsDetailViewModel(
         reduceNavArguments()
         fetchInitialStatsDetail()
         collectMonthChangeFlow()
+        collectEventBus()
     }
 
     private fun collectMonthChangeFlow() {
@@ -173,6 +176,18 @@ class StatsDetailViewModel(
         return false
     }
 
+    private fun collectEventBus() {
+        viewModelScope.launch {
+            statsRefreshBus.events.collect { publisher ->
+                when (publisher) {
+                    StatsRefreshBus.Publisher.InProgress,
+                    StatsRefreshBus.Publisher.End,
+                    -> Unit
+                }
+            }
+        }
+    }
+
     override suspend fun handleIntent(intent: StatsDetailIntent) {
         when (intent) {
             is StatsDetailIntent.SelectDate -> navigateToTaskCertificationDetail(intent.date)
@@ -200,17 +215,32 @@ class StatsDetailViewModel(
         monthChangeFlow.tryEmit(YearMonth.from(nextMonth))
     }
 
-    private fun navigateToTaskCertificationDetail(date: LocalDate) {
+    private fun navigateToTaskCertificationDetail(selectedDate: LocalDate) {
+        val completedDate = findCompletedDate(selectedDate) ?: return
+        if (completedDate.myImageUrl == null && completedDate.partnerImageUrl == null) return
+
         viewModelScope.launch {
             emitSideEffect(
                 StatsDetailSideEffect.NavigateToTaskCertificationDetail(
                     goalId = currentState.goalId,
-                    date = date,
-                    betweenUs = currentState.resolveBetweenUs(date),
+                    date = selectedDate,
+                    betweenUs = resolveBetweenUs(completedDate.date),
                 ),
             )
         }
     }
+
+    private fun resolveBetweenUs(selectedDate: LocalDate): BetweenUs {
+        val completedDate = findCompletedDate(selectedDate)
+
+        return when {
+            completedDate?.myImageUrl != null && completedDate.partnerImageUrl == null -> BetweenUs.ME
+            else -> BetweenUs.PARTNER
+        }
+    }
+
+    private fun findCompletedDate(selectedDate: LocalDate): CompletedDate? =
+        currentState.detail.completedDate.firstOrNull { completed -> completed.date == selectedDate }
 
     private fun endGoal() {
         launchResult(

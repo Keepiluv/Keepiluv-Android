@@ -21,14 +21,14 @@ class TaskCertificationEditorViewModel(
     private val detailRefreshBus: TaskCertificationRefreshBus,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<TaskCertificationEditorUiState, TaskCertificationEditorIntent, TaskCertificationEditorSideEffect>(
-    TaskCertificationEditorUiState(),
-) {
+        TaskCertificationEditorUiState(),
+    ) {
     private val argGoalId: Long =
         requireNotNull(savedStateHandle[NavRoutes.TaskCertificationEditorRoute.ARG_GOAL_ID]) { GOAL_ID_NOT_FOUND }
 
     private val argTargetDate: LocalDate =
         LocalDate.parse(
-            requireNotNull(savedStateHandle[NavRoutes.TaskCertificationEditorRoute.ARG_DATE]) { TARGET_DATE_NOT_FOUND }
+            requireNotNull(savedStateHandle[NavRoutes.TaskCertificationEditorRoute.ARG_DATE]) { TARGET_DATE_NOT_FOUND },
         )
 
     init {

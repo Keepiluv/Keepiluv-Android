@@ -61,13 +61,11 @@ class StatsDetailUiStatePreviewProvider : PreviewParameterProvider<StatsDetailUi
     override val values: Sequence<StatsDetailUiState> =
         sequenceOf(
             StatsDetailUiState(
-                goalId = 1,
                 detail = baseDetail,
                 summary = summary,
                 calendarUiModel = baseCalendarUiModel,
             ),
             StatsDetailUiState(
-                goalId = 1,
                 detail = baseDetail.copy(isCompleted = true),
                 summary = summary,
                 calendarUiModel = baseCalendarUiModel,

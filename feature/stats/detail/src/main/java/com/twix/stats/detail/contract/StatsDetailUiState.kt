@@ -10,7 +10,6 @@ import java.time.YearMonth
 
 @Immutable
 data class StatsDetailUiState(
-    val goalId: Long = -1,
     val detail: StatsDetail = StatsDetail.EMPTY,
     val summary: StatsSummary = StatsSummary.EMPTY,
     val calendarUiModel: StatsCalendarUiModel = StatsCalendarUiModel(),

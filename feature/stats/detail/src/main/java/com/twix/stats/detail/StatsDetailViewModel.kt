@@ -22,6 +22,7 @@ import com.twix.util.bus.StatsRefreshBus
 import com.yapp.stats.detail.contract.StatsDetailIntent
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -57,7 +58,6 @@ class StatsDetailViewModel(
         )
 
     init {
-        reduceNavArguments()
         fetchInitialStatsDetail()
         collectMonthChangeFlow()
         collectEventBus()
@@ -74,21 +74,16 @@ class StatsDetailViewModel(
         }
     }
 
-    private fun reduceNavArguments() {
-        reduce {
-            copy(
-                goalId = argGoalId,
-            )
-        }
-    }
-
     private fun fetchInitialStatsDetail() {
         val initialDate = LocalDate.parse(argDate).let(YearMonth::from)
 
         viewModelScope.launch {
-            val summaryDeferred = async { statsRepository.fetchStatsSummary(currentState.goalId) }
+            val summaryDeferred =
+                async { statsRepository.fetchStatsSummary(argGoalId) }
             val detailDeferred =
-                async { statsRepository.fetchStatsDetail(currentState.goalId, initialDate) }
+                async { statsRepository.fetchStatsDetail(argGoalId, initialDate) }
+
+            awaitAll(summaryDeferred, detailDeferred)
 
             handleInitialSummary(summaryDeferred.await())
             handleInitialDetail(detailDeferred.await(), initialDate)
@@ -122,7 +117,7 @@ class StatsDetailViewModel(
     private fun fetchStatsDetail(date: YearMonth) {
         if (checkCache(date)) return
         launchResult(
-            block = { statsRepository.fetchStatsDetail(currentState.goalId, date) },
+            block = { statsRepository.fetchStatsDetail(argGoalId, date) },
             onSuccess = { handleFetchStatsDetailSuccess(it) },
             onError = {
                 reduceDetailWithEmptyCompletedDate(date)
@@ -220,9 +215,9 @@ class StatsDetailViewModel(
         val yearMonth = YearMonth.from(currentState.detail.currentDate)
         cache.remove(yearMonth)
         viewModelScope.launch {
-            val summaryDeferred = async { statsRepository.fetchStatsSummary(currentState.goalId) }
+            val summaryDeferred = async { statsRepository.fetchStatsSummary(argGoalId) }
             val detailDeferred =
-                async { statsRepository.fetchStatsDetail(currentState.goalId, yearMonth) }
+                async { statsRepository.fetchStatsDetail(argGoalId, yearMonth) }
             handleInitialSummary(summaryDeferred.await())
             handleInitialDetail(detailDeferred.await(), yearMonth)
         }
@@ -235,7 +230,7 @@ class StatsDetailViewModel(
         viewModelScope.launch {
             emitSideEffect(
                 StatsDetailSideEffect.NavigateToTaskCertificationDetail(
-                    goalId = currentState.goalId,
+                    goalId = argGoalId,
                     date = selectedDate,
                     betweenUs = resolveBetweenUs(completedDate.date),
                 ),
@@ -280,7 +275,7 @@ class StatsDetailViewModel(
     }
 
     private suspend fun navigateToGoalEditor() {
-        emitSideEffect(StatsDetailSideEffect.NavigateToGoalEditor(currentState.goalId))
+        emitSideEffect(StatsDetailSideEffect.NavigateToGoalEditor(argGoalId))
     }
 
     private suspend fun showToast(

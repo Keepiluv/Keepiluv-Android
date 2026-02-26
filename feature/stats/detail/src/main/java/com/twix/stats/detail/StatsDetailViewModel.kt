@@ -41,8 +41,8 @@ class StatsDetailViewModel(
     private val statsRepository: StatsRepository,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<StatsDetailUiState, StatsDetailIntent, StatsDetailSideEffect>(
-    StatsDetailUiState(),
-) {
+        StatsDetailUiState(),
+    ) {
     private val argGoalId: Long =
         requireNotNull(savedStateHandle[NavRoutes.StatsDetailRoute.ARG_GOAL_ID]) { GOAL_ID_NOT_FOUND }
 

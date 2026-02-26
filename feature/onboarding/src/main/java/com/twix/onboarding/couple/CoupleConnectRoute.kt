@@ -42,12 +42,12 @@ import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
+import com.twix.onboarding.OnBoardingViewModel
 import com.twix.onboarding.R
 import com.twix.onboarding.couple.component.ConnectButton
 import com.twix.onboarding.couple.component.RestoreCoupleBottomSheetContent
 import com.twix.onboarding.model.OnBoardingIntent
 import com.twix.onboarding.model.OnBoardingSideEffect
-import com.twix.onboarding.vm.OnBoardingViewModel
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.noRippleClickable
 import org.koin.compose.koinInject

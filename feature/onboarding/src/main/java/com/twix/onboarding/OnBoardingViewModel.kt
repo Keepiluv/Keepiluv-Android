@@ -1,4 +1,4 @@
-package com.twix.onboarding.vm
+package com.twix.onboarding
 
 import androidx.lifecycle.viewModelScope
 import com.twix.domain.model.OnboardingStatus

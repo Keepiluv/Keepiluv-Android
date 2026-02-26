@@ -157,13 +157,11 @@ class TaskCertificationDetailViewModel(
                 },
         )
 
-    private fun showToast(
+    private suspend fun showToast(
         message: Int,
         type: ToastType,
     ) {
-        viewModelScope.launch {
-            emitSideEffect(TaskCertificationDetailSideEffect.ShowToast(message, type))
-        }
+        emitSideEffect(TaskCertificationDetailSideEffect.ShowToast(message, type))
     }
 
     companion object {

@@ -179,8 +179,15 @@ class StatsDetailViewModel(
         val yearMonth = YearMonth.from(currentState.detail.currentDate)
         viewModelScope.launch {
             val (summary, detail) = fetchStats(yearMonth)
-            if (summary is AppResult.Success && detail is AppResult.Success) cache.remove(yearMonth)
-            handleFetchStatsDetailResult(summary, detail, yearMonth)
+            if (summary is AppResult.Success && detail is AppResult.Success) {
+                cache.remove(yearMonth)
+                reduce { copy(summary = summary.data) }
+                reduceStatsDetail(detail.data)
+            } else {
+                if (summary is AppResult.Error) handleError(summary.error)
+                if (detail is AppResult.Error) handleError(detail.error)
+                showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
+            }
         }
     }
 

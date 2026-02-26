@@ -31,14 +31,22 @@ suspend inline fun <T> safeApiCall(crossinline call: suspend () -> T): AppResult
                 raw?.let { errorJson.decodeFromString<ErrorResponse>(it) }
             }.getOrNull()
 
-        AppResult.Error(
-            AppError.Http(
-                status = status,
-                code = parsed?.code,
-                message = parsed?.message,
-                rawBody = raw,
-            ),
-        )
+        val code = parsed?.code
+        val message = parsed?.message
+
+        val mappedError =
+            when {
+                status == 401 && code == "G4011" ->
+                    AppError.Auth.TokenExpired(status, code, message, raw)
+
+                status == 401 ->
+                    AppError.Auth.Unauthorized(status, code, message, raw)
+
+                else ->
+                    AppError.Http(status, code, message, raw)
+            }
+
+        AppResult.Error(mappedError)
     } catch (e: SocketTimeoutException) {
         AppResult.Error(AppError.Timeout(e))
     } catch (e: IOException) {

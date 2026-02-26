@@ -26,6 +26,25 @@ sealed interface AppError {
         val cause: Throwable? = null,
     ) : AppError
 
+    /** 사용자 인증 */
+    sealed interface Auth : AppError {
+        // 인증되지 않은 사용자
+        data class Unauthorized(
+            val status: Int,
+            val code: String?,
+            val message: String?,
+            val rawBody: String?,
+        ) : Auth
+
+        // 토큰 만료 재로그인 필요
+        data class TokenExpired(
+            val status: Int,
+            val code: String?,
+            val message: String?,
+            val rawBody: String?,
+        ) : Auth
+    }
+
     /** 그 외 */
     data class Unknown(
         val cause: Throwable,

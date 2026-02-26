@@ -143,4 +143,11 @@ sealed class NavRoutes(
     object NotificationGraph : NavRoutes("notification_graph")
 
     object NotificationRoute : NavRoutes("notification")
+
+    /**
+     * SplashGraph
+     * */
+    object SplashGraph : NavRoutes("splash_graph")
+
+    object SplashRoute : NavRoutes("splash")
 }

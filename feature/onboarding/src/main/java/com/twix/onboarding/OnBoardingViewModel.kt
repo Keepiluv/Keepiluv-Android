@@ -1,4 +1,4 @@
-package com.twix.onboarding.vm
+package com.twix.onboarding
 
 import androidx.lifecycle.viewModelScope
 import com.twix.domain.model.OnboardingStatus
@@ -16,10 +16,6 @@ class OnBoardingViewModel(
     private val onBoardingRepository: OnBoardingRepository,
     private val notificationRepository: NotificationRepository,
 ) : BaseViewModel<OnBoardingUiState, OnBoardingIntent, OnBoardingSideEffect>(OnBoardingUiState()) {
-    init {
-        initNotificationSettings()
-    }
-
     fun fetchMyInviteCode() {
         launchResult(
             block = { onBoardingRepository.fetchInviteCode() },
@@ -43,6 +39,9 @@ class OnBoardingViewModel(
             // 디데이 설정 화면
             is OnBoardingIntent.SelectDate -> reduceDday(intent.value)
             OnBoardingIntent.SubmitDday -> anniversarySetup()
+
+            is OnBoardingIntent.SubmitMarketingConsent ->
+                initNotificationSettings(intent.isPushEnabled, intent.isMarketingEnabled, intent.isNightMarketingEnabled)
         }
     }
 
@@ -145,9 +144,19 @@ class OnBoardingViewModel(
         )
     }
 
-    private fun initNotificationSettings() {
+    private fun initNotificationSettings(
+        isPushEnabled: Boolean,
+        isMarketingEnabled: Boolean,
+        isNightMarketingEnabled: Boolean,
+    ) {
         launchResult(
-            block = { notificationRepository.initNotificationSettings(true, true, true) },
+            block = {
+                notificationRepository.initNotificationSettings(
+                    isPushEnabled,
+                    isMarketingEnabled,
+                    isNightMarketingEnabled,
+                )
+            },
             onSuccess = {},
         )
     }

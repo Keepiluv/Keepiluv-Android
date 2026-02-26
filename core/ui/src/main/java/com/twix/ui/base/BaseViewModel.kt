@@ -130,6 +130,14 @@ abstract class BaseViewModel<S : State, I : Intent, SE : SideEffect>(
             is AppError.Timeout -> logger.e(error.cause) { "Timeout error" }
             is AppError.Serialization -> logger.e(error.cause) { "Serialization error" }
             is AppError.Unknown -> logger.e(error.cause) { "Unknown error" }
+            is AppError.Auth.Unauthorized ->
+                logger.e {
+                    "Unauthorized error: status=${error.status}, code=${error.code}, message=${error.message}"
+                }
+            is AppError.Auth.TokenExpired ->
+                logger.e {
+                    "TokenExpired error: status=${error.status}, code=${error.code}, message=${error.message}"
+                }
         }
     }
 

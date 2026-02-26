@@ -23,8 +23,22 @@ object SplashNavGraph : NavGraphContributor {
         ) {
             composable(NavRoutes.SplashRoute.route) {
                 SplashRoute(
-                    navigateToMain = { navController.navigate(NavRoutes.MainGraph.route) },
-                    navigateToLogin = { navController.navigate(NavRoutes.LoginGraph.route) },
+                    navigateToMain = {
+                        navController.navigate(NavRoutes.MainGraph.route) {
+                            popUpTo(NavRoutes.SplashGraph.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    },
+                    navigateToLogin = {
+                        navController.navigate(NavRoutes.LoginGraph.route) {
+                            popUpTo(NavRoutes.SplashGraph.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    },
                 )
             }
         }

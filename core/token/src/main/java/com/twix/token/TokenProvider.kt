@@ -11,4 +11,6 @@ interface TokenProvider {
     )
 
     suspend fun clear()
+
+    suspend fun loadRefreshToken(): String
 }

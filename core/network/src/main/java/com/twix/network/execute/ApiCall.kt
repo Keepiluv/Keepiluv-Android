@@ -5,9 +5,9 @@ import com.twix.result.AppError
 import com.twix.result.AppResult
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.statement.bodyAsText
+import kotlinx.io.IOException
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import kotlinx.io.IOException
 import java.net.SocketTimeoutException
 import kotlin.coroutines.cancellation.CancellationException
 

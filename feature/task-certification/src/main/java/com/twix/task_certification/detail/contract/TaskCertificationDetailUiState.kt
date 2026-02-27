@@ -141,13 +141,12 @@ data class TaskCertificationDetailUiState(
         get() = !isCompletedGoal && !isDisplayedGoalCertificated
 
     /**
-     * 내 인증샷에 달린 리액션 UI를 표시할지 여부를 반환
+     * 내 인증샷에 달린 리액션 뱃지를 표시할지 여부를 반환
      *
      * 내 인증샷을 보고 있고([isDisplayedMyPhotolog]),
-     * 리액션이 존재하며([myPhotolog]의 reaction이 non-null),
-     * 아직 한 번도 표시된 적 없을 때([hasShownMyReaction]이 `false`) `true`
+     * 리액션이 존재하며([myPhotolog]의 reaction이 non-null) 일 때 `true`
      */
-    val showMyPhotologReaction: Boolean
+    val showMyPhotologReactionBadge: Boolean
         get() =
             isDisplayedMyPhotolog &&
                 myPhotolog?.reaction != null

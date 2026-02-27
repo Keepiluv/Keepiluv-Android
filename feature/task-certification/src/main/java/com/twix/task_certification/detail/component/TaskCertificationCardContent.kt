@@ -57,7 +57,7 @@ internal fun TaskCertificationCardContent(
         }
 
         MyReactionBadge(
-            visible = uiState.showMyPhotologReaction,
+            visible = uiState.showMyPhotologReactionBadge,
             reaction = uiState.myReaction,
             modifier =
                 Modifier

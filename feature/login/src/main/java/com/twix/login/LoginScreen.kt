@@ -113,7 +113,7 @@ private fun LoginScreen(onClickLogin: (LoginType) -> Unit) {
 
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_singing),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_keepi_singing),
                 contentDescription = null,
                 modifier =
                     Modifier

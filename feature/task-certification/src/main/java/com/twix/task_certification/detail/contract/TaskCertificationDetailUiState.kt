@@ -89,8 +89,7 @@ data class TaskCertificationDetailUiState(
 
     val showMyPhotologReaction: Boolean
         get() =
-            !hasShownMyReaction &&
-                isDisplayedMyPhotolog &&
+            isDisplayedMyPhotolog &&
                 myPhotolog?.reaction != null
 
     val myReaction: ReactionUiModel?

@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -130,8 +131,7 @@ fun TaskCertificationDetailRoute(
             onPoke = { viewModel.dispatch(TaskCertificationDetailIntent.Poke) },
             onSwipe = { viewModel.dispatch(TaskCertificationDetailIntent.SwipeCard) },
         )
-
-        if (uiState.showMyPhotologReaction) {
+        if (!uiState.hasShownMyReaction) {
             val model = uiState.myReaction
             if (model != null) {
                 ReactionEffect(

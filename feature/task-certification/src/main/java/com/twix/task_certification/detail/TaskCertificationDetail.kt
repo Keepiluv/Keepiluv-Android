@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -139,6 +138,8 @@ fun TaskCertificationDetailRoute(
                     spec =
                         ReactionEffectSpec(
                             particleCount = 10,
+                            durationRange = 500..800,
+                            // 전체 화면 높이까지 퍼짐
                             travelDistanceRange = 500..screenHeightPx.toInt(),
                         ),
                     onFinished = {

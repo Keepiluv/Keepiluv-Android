@@ -68,7 +68,16 @@ class TaskCertificationDetailViewModel(
     private fun fetchPhotolog() {
         launchResult(
             block = { photologRepository.fetchPhotologs(argTargetDate, argGoalId) },
-            onSuccess = { reduce { it.toUiState(argGoalId, argBetweenUs, argTargetDate, argIsCompleted) } },
+            onSuccess = {
+                reduce {
+                    it.toUiState(
+                        argGoalId,
+                        argBetweenUs,
+                        argTargetDate,
+                        argIsCompleted,
+                    )
+                }
+            },
             onError = {
                 showToast(R.string.task_certification_detail_fetch_photolog_fail, ToastType.ERROR)
             },
@@ -127,6 +136,7 @@ class TaskCertificationDetailViewModel(
             is TaskCertificationDetailIntent.Reaction -> reduceReaction(intent.type)
             TaskCertificationDetailIntent.Poke -> pokeToPartner()
             TaskCertificationDetailIntent.SwipeCard -> reduceShownCard()
+            TaskCertificationDetailIntent.MyReactionEffected -> reduceMyReactionShown()
         }
     }
 
@@ -156,6 +166,10 @@ class TaskCertificationDetailViewModel(
                     BetweenUs.PARTNER -> BetweenUs.ME
                 },
         )
+
+    private fun reduceMyReactionShown() {
+        reduce { copy(hasShownMyReaction = true) }
+    }
 
     private suspend fun showToast(
         message: Int,

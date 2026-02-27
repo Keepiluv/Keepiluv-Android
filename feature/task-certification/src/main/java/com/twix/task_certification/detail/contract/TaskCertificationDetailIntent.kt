@@ -11,4 +11,6 @@ sealed interface TaskCertificationDetailIntent : Intent {
     data object Poke : TaskCertificationDetailIntent
 
     data object SwipeCard : TaskCertificationDetailIntent
+
+    data object MyReactionEffected : TaskCertificationDetailIntent
 }

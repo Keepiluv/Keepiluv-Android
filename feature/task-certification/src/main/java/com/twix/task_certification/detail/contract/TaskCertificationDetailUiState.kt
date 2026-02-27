@@ -5,6 +5,7 @@ import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalIconType
 import com.twix.domain.model.photolog.PhotoLogs
 import com.twix.domain.model.photolog.PhotologDetail
+import com.twix.task_certification.detail.component.reaction.ReactionUiModel
 import com.twix.ui.base.State
 import com.twix.util.RelativeTimeFormatter
 import java.time.LocalDate
@@ -21,6 +22,7 @@ data class TaskCertificationDetailUiState(
     val myPhotolog: PhotologDetail? = null,
     val partnerPhotolog: PhotologDetail? = null,
     val isCompletedGoal: Boolean = false,
+    val hasShownMyReaction: Boolean = false,
     /**
      * 초기값으로 인해 찌르기/업로드 버튼이 렌더링 되는 것을 막기 위한 변수
      * */
@@ -84,6 +86,15 @@ data class TaskCertificationDetailUiState(
 
     val showActionButton: Boolean
         get() = !isCompletedGoal && !isDisplayedGoalCertificated
+
+    val showMyPhotologReaction: Boolean
+        get() =
+            !hasShownMyReaction &&
+                isDisplayedMyPhotolog &&
+                myPhotolog?.reaction != null
+
+    val myReaction: ReactionUiModel?
+        get() = myPhotolog?.reaction?.let { ReactionUiModel.find(it) }
 }
 
 fun PhotoLogs.toUiState(

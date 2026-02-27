@@ -93,6 +93,7 @@ class TaskCertificationDetailViewModel(
                 .debounce(DEBOUNCE_INTERVAL)
                 .collectLatest { reaction ->
                     reactToPhotolog(reaction)
+                    goalRefreshBus.notifyGoalListChanged()
                 }
         }
     }

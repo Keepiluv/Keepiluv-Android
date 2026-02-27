@@ -32,7 +32,7 @@ data class TaskCertificationDetailUiState(
     val isLoading: Boolean = false,
 ) : State {
     /**
-     * 현재 [currentShow]에 해당하는 사용자의 포토로그 인증 여부
+     * 현재 [currentShow]에 해당하는 사용자의 인증샷 인증 여부
      *
      * - [BetweenUs.ME]: 내 인증샷이 존재하면 `true`
      * - [BetweenUs.PARTNER]: 파트너 인증샷이 존재하면 `true`
@@ -45,10 +45,10 @@ data class TaskCertificationDetailUiState(
             }
 
     /**
-     * 현재 [currentShow]에 해당하는 포토로그의 업로드 시간을 상대적 시간 문자열
+     * 현재 [currentShow]에 해당하는 인증샷의 업로드 시간을 상대적 시간 문자열
      *
-     * - [BetweenUs.ME]: 내 포토로그의 업로드 시간
-     * - [BetweenUs.PARTNER]: 파트너 포토로그의 업로드 시간
+     * - [BetweenUs.ME]: 내 인증샷 업로드 시간
+     * - [BetweenUs.PARTNER]: 파트너 인증샷 업로드 시간
      */
     val displayedGoalUpdateAt: String
         get() =
@@ -79,7 +79,7 @@ data class TaskCertificationDetailUiState(
             }
 
     /**
-     * 현재 [currentShow]에 해당하는 포토로그의 코멘트
+     * 현재 [currentShow]에 해당하는 인증샷의 코멘트
      *
      * - [BetweenUs.ME]: 내 코멘트
      * - [BetweenUs.PARTNER]: 파트너 코멘트
@@ -114,9 +114,9 @@ data class TaskCertificationDetailUiState(
         get() = currentShow == BetweenUs.ME
 
     /**
-     * 내 포토로그를 수정할 수 있는지 여부 반환
+     * 내 인증샷를 수정할 수 있는지 여부 반환
      *
-     * 현재 내 포토로그를 보고 있고([isDisplayedMyPhotolog]),
+     * 현재 내 인증샷를 보고 있고([isDisplayedMyPhotolog]),
      * 인증이 완료된 상태([isDisplayedGoalCertificated])일 때 `true`
      */
     val canModify: Boolean
@@ -141,11 +141,11 @@ data class TaskCertificationDetailUiState(
         get() = !isCompletedGoal && !isDisplayedGoalCertificated
 
     /**
-     * 내 포토로그에 달린 리액션 UI를 표시할지 여부를 반환
+     * 내 인증샷에 달린 리액션 UI를 표시할지 여부를 반환
      *
-     * 내 포토로그를 보고 있고([isDisplayedMyPhotolog]),
+     * 내 인증샷을 보고 있고([isDisplayedMyPhotolog]),
      * 리액션이 존재하며([myPhotolog]의 reaction이 non-null),
-     * 아직 한 번도 표시된 적 없을 때([hasShownMyReaction]이 `false`) `true`입니다.
+     * 아직 한 번도 표시된 적 없을 때([hasShownMyReaction]이 `false`) `true`
      */
     val showMyPhotologReaction: Boolean
         get() =
@@ -153,7 +153,7 @@ data class TaskCertificationDetailUiState(
                 myPhotolog?.reaction != null
 
     /**
-     * 내 포토로그의 리액션을 [ReactionUiModel]로 변환하여 반환
+     * 내 인증샷의 리액션을 [ReactionUiModel]로 변환하여 반환
      */
     val myReaction: ReactionUiModel?
         get() = myPhotolog?.reaction?.let { ReactionUiModel.find(it) }

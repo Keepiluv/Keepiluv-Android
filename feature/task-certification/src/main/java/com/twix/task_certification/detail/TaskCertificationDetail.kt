@@ -131,7 +131,7 @@ fun TaskCertificationDetailRoute(
             onPoke = { viewModel.dispatch(TaskCertificationDetailIntent.Poke) },
             onSwipe = { viewModel.dispatch(TaskCertificationDetailIntent.SwipeCard) },
         )
-        if (!uiState.hasShownMyReaction) {
+        if (!uiState.hasShownMyReaction && uiState.isDisplayedMyPhotolog) {
             val model = uiState.myReaction
             if (model != null) {
                 ReactionEffect(

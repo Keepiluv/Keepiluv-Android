@@ -61,7 +61,7 @@ import java.time.LocalDate
 fun StatsDetailRoute(
     onBack: () -> Unit,
     navigateToGoalEditor: (Long) -> Unit,
-    navigateToTaskCertificationDetail: (Long, LocalDate, BetweenUs, Boolean) -> Unit,
+    navigateToPhotologDetail: (Long, LocalDate, BetweenUs, Boolean) -> Unit,
     toastManager: ToastManager = koinInject(),
     viewModel: StatsDetailViewModel = koinViewModel(),
 ) {
@@ -74,8 +74,8 @@ fun StatsDetailRoute(
         when (sideEffect) {
             StatsDetailSideEffect.NavigateToBack -> onBack()
             is StatsDetailSideEffect.NavigateToGoalEditor -> navigateToGoalEditor(sideEffect.goalId)
-            is StatsDetailSideEffect.NavigateToTaskCertificationDetail ->
-                navigateToTaskCertificationDetail(
+            is StatsDetailSideEffect.NavigateToPhotologDetail ->
+                navigateToPhotologDetail(
                     sideEffect.goalId,
                     sideEffect.date,
                     sideEffect.betweenUs,
@@ -258,17 +258,15 @@ private fun StatsDeleteDialogContent(
     ) {
         Image(
             painter = painterResource(icon.toRes()),
-            contentDescription = "emoji",
-            modifier =
-                Modifier
-                    .size(60.dp),
+            contentDescription = null,
+            modifier = Modifier.size(94.dp),
         )
 
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(16.dp))
 
         AppText(
             text = title,
-            style = AppTextStyle.T1,
+            style = AppTextStyle.H2,
             color = GrayColor.C500,
             textAlign = TextAlign.Center,
         )
@@ -277,9 +275,8 @@ private fun StatsDeleteDialogContent(
 
         AppText(
             text = content,
-            style = AppTextStyle.B2,
-            color = GrayColor.C500,
-            textAlign = TextAlign.Center,
+            style = AppTextStyle.B3,
+            color = GrayColor.C300,
         )
     }
 }

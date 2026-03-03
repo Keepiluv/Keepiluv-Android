@@ -39,10 +39,10 @@ object MainNavGraph : NavGraphContributor {
                     },
                     navigateToCertification = { goalId, date ->
                         val destination =
-                            NavRoutes.TaskCertificationRoute.createRoute(
+                            NavRoutes.PhotologRoute.createRoute(
                                 DetailNavArgs(
                                     goalId = goalId,
-                                    from = NavRoutes.TaskCertificationRoute.From.HOME,
+                                    from = NavRoutes.PhotologRoute.From.HOME,
                                     selectedDate = date.toString(),
                                 ),
                             )
@@ -52,7 +52,7 @@ object MainNavGraph : NavGraphContributor {
                     },
                     navigateToCertificationDetail = { goalId, date, betweenUs ->
                         val destination =
-                            NavRoutes.TaskCertificationDetailRoute.createRoute(
+                            NavRoutes.PhotologDetailRoute.createRoute(
                                 goalId,
                                 date,
                                 betweenUs.name,

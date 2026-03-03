@@ -7,11 +7,11 @@ import com.twix.login.di.loginModule
 import com.twix.main.di.mainModule
 import com.twix.notification.di.notificationFeatureModule
 import com.twix.onboarding.di.onBoardingModule
+import com.twix.photolog.detail.di.photologDetailModule
 import com.twix.settings.di.settingsModule
 import com.twix.splash.di.splashModule
 import com.twix.stats.detail.di.statsDetailModule
 import com.twix.stats.di.statsModule
-import com.twix.task_certification.di.taskCertificationModule
 import org.koin.core.module.Module
 
 val featureModules: List<Module> =
@@ -19,7 +19,7 @@ val featureModules: List<Module> =
         loginModule,
         mainModule,
         homeModule,
-        taskCertificationModule,
+        photologDetailModule,
         goalEditorModule,
         goalManageModule,
         settingsModule,

@@ -193,7 +193,7 @@ class StatsDetailViewModel(
 
     override suspend fun handleIntent(intent: StatsDetailIntent) {
         when (intent) {
-            is StatsDetailIntent.SelectDate -> navigateToTaskCertificationDetail(intent.date)
+            is StatsDetailIntent.SelectDate -> navigateToPhotologDetail(intent.date)
             StatsDetailIntent.GoalEdit -> navigateToGoalEditor()
             StatsDetailIntent.PreviousMonth -> fetchPreviousMonth()
             StatsDetailIntent.NextMonth -> fetchNextMonth()
@@ -202,12 +202,12 @@ class StatsDetailViewModel(
         }
     }
 
-    private suspend fun navigateToTaskCertificationDetail(selectedDate: LocalDate) {
+    private suspend fun navigateToPhotologDetail(selectedDate: LocalDate) {
         val completedDate = findCompletedDate(selectedDate) ?: return
         if (completedDate.myImageUrl == null && completedDate.partnerImageUrl == null) return
 
         emitSideEffect(
-            StatsDetailSideEffect.NavigateToTaskCertificationDetail(
+            StatsDetailSideEffect.NavigateToPhotologDetail(
                 goalId = argGoalId,
                 date = selectedDate,
                 betweenUs = determineDisplayBetweenUs(completedDate.date),

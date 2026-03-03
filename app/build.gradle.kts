@@ -60,7 +60,7 @@ dependencies {
     implementation(projects.domain)
     implementation(projects.feature.login)
     implementation(projects.feature.main)
-    implementation(projects.feature.taskCertification)
+    implementation(projects.feature.photolog.detail)
     implementation(projects.feature.onboarding)
     implementation(projects.feature.goalEditor)
     implementation(projects.feature.goalManage)

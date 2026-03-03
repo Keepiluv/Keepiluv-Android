@@ -211,6 +211,7 @@ class StatsDetailViewModel(
                 goalId = argGoalId,
                 date = selectedDate,
                 betweenUs = determineDisplayBetweenUs(completedDate.date),
+                isCompleted = currentState.detail.isCompleted,
             ),
         )
     }

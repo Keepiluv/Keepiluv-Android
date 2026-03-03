@@ -4,6 +4,7 @@ import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -30,6 +32,8 @@ import com.twix.domain.model.enums.GoalReactionType
 import com.twix.task_certification.detail.component.TaskCertificationCardContent
 import com.twix.task_certification.detail.component.TaskCertificationDetailTopBar
 import com.twix.task_certification.detail.component.reaction.ReactionContent
+import com.twix.task_certification.detail.component.reaction.ReactionEffect
+import com.twix.task_certification.detail.component.reaction.ReactionEffectSpec
 import com.twix.task_certification.detail.contract.TaskCertificationDetailIntent
 import com.twix.task_certification.detail.contract.TaskCertificationDetailSideEffect
 import com.twix.task_certification.detail.contract.TaskCertificationDetailUiState
@@ -60,6 +64,12 @@ fun TaskCertificationDetailRoute(
             is TaskCertificationDetailSideEffect.ShowToast -> {
                 toastManager.tryShow(
                     ToastData(currentContext.getString(sideEffect.message), sideEffect.type),
+                )
+            }
+
+            is TaskCertificationDetailSideEffect.ShowPokeToast -> {
+                toastManager.tryShow(
+                    ToastData(sideEffect.message, ToastType.SUCCESS),
                 )
             }
         }
@@ -96,26 +106,49 @@ fun TaskCertificationDetailRoute(
             }
         }
 
-    TaskCertificationDetailScreen(
-        uiState = uiState,
-        onBack = navigateToBack,
-        onClickModify = {
-            navigateToEditor(
-                uiState.goalId,
-                uiState.selectedDate,
-            )
-        },
-        onClickReaction = { viewModel.dispatch(TaskCertificationDetailIntent.Reaction(it)) },
-        onClickUpload = {
-            if (currentContext.hasCameraPermission()) {
-                navigateToCertification(uiState.goalId, uiState.selectedDate)
-            } else {
-                permissionLauncher.launch(Manifest.permission.CAMERA)
+    BoxWithConstraints {
+        val density = LocalDensity.current
+        val screenHeightPx = with(density) { maxHeight.toPx() }
+
+        TaskCertificationDetailScreen(
+            uiState = uiState,
+            onBack = navigateToBack,
+            onClickModify = {
+                navigateToEditor(
+                    uiState.goalId,
+                    uiState.selectedDate,
+                )
+            },
+            onClickReaction = { viewModel.dispatch(TaskCertificationDetailIntent.Reaction(it)) },
+            onClickUpload = {
+                if (currentContext.hasCameraPermission()) {
+                    navigateToCertification(uiState.goalId, uiState.selectedDate)
+                } else {
+                    permissionLauncher.launch(Manifest.permission.CAMERA)
+                }
+            },
+            onPoke = { viewModel.dispatch(TaskCertificationDetailIntent.Poke) },
+            onSwipe = { viewModel.dispatch(TaskCertificationDetailIntent.SwipeCard) },
+        )
+        if (!uiState.hasShownMyReaction && uiState.isDisplayedMyPhotolog) {
+            val model = uiState.myReaction
+            if (model != null) {
+                ReactionEffect(
+                    targetReaction = model,
+                    spec =
+                        ReactionEffectSpec(
+                            particleCount = 10,
+                            durationRange = 500..800,
+                            // 전체 화면 높이까지 퍼짐
+                            travelDistanceRange = 500..screenHeightPx.toInt(),
+                        ),
+                    onFinished = {
+                        viewModel.dispatch(TaskCertificationDetailIntent.MyReactionEffected)
+                    },
+                )
             }
-        },
-        onClickSting = { viewModel.dispatch(TaskCertificationDetailIntent.Sting) },
-        onSwipe = { viewModel.dispatch(TaskCertificationDetailIntent.SwipeCard) },
-    )
+        }
+    }
 }
 
 @Composable
@@ -125,7 +158,7 @@ fun TaskCertificationDetailScreen(
     onClickModify: () -> Unit,
     onClickReaction: (GoalReactionType) -> Unit,
     onClickUpload: () -> Unit,
-    onClickSting: () -> Unit,
+    onPoke: () -> Unit,
     onSwipe: () -> Unit,
 ) {
     Column(
@@ -146,7 +179,7 @@ fun TaskCertificationDetailScreen(
                 uiState = uiState,
                 onSwipe = onSwipe,
                 onClickUpload = onClickUpload,
-                onClickSting = onClickSting,
+                onPoke = onPoke,
             )
 
             if (uiState.canReaction) {
@@ -172,7 +205,7 @@ private fun TaskCertificationDetailScreenPreview(
             onClickModify = {},
             onClickReaction = {},
             onClickUpload = {},
-            onClickSting = {},
+            onPoke = {},
             onSwipe = {},
         )
     }

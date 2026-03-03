@@ -33,6 +33,7 @@ fun ReactionEffect(
     targetReaction: ReactionUiModel?,
     modifier: Modifier = Modifier,
     spec: ReactionEffectSpec = ReactionEffectSpec(),
+    onFinished: () -> Unit = {},
 ) {
     if (targetReaction == null) return
 
@@ -58,6 +59,8 @@ fun ReactionEffect(
                 }
 
             particles.addAll(newParticles)
+
+            var remaining = newParticles.size
 
             // 2. 파티클 애니메이션 실행
             newParticles.forEach { particle ->
@@ -145,6 +148,9 @@ fun ReactionEffect(
                     )
 
                     particles.remove(particle)
+
+                    remaining -= 1
+                    if (remaining == 0) onFinished()
                 }
             }
         }

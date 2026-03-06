@@ -16,11 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,7 +33,6 @@ import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.text_field.UnderlineTextField
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
-import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.SystemColor
@@ -53,28 +54,16 @@ fun ProfileRoute(
     toastManager: ToastManager = koinInject(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    val notValidNickNameMessage =
-        stringResource(DesR.string.onboarding_profile_invalid_name_length_toast)
-
-    val profileSetupFailMessage = stringResource(DesR.string.onboarding_profile_setup_fail)
+    val context = LocalContext.current
+    val currentContext by rememberUpdatedState(context)
 
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
-            OnBoardingSideEffect.ProfileSetting.ShowInvalidNickNameToast -> {
+            is OnBoardingSideEffect.ShowToast -> {
                 toastManager.tryShow(
                     ToastData(
-                        message = notValidNickNameMessage,
-                        type = ToastType.ERROR,
-                    ),
-                )
-            }
-
-            OnBoardingSideEffect.ProfileSetting.ShowProfileSetupFailToast -> {
-                toastManager.tryShow(
-                    ToastData(
-                        message = profileSetupFailMessage,
-                        type = ToastType.ERROR,
+                        message = currentContext.getString(sideEffect.message),
+                        type = sideEffect.type,
                     ),
                 )
             }

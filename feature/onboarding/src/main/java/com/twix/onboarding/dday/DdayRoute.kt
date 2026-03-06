@@ -12,8 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,7 +27,6 @@ import com.twix.designsystem.components.calendar.Calendar
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
-import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
@@ -48,17 +49,18 @@ fun DdayRoute(
     toastManager: ToastManager = koinInject(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val currentContext by rememberUpdatedState(context)
     var showCalendarBottomSheet by remember { mutableStateOf(false) }
 
-    val ddaySetUpFailMessage = stringResource(DesR.string.onboarding_dday_setup_fail)
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
             OnBoardingSideEffect.DdaySetting.NavigateToHome -> navigateToHome()
-            OnBoardingSideEffect.DdaySetting.ShowAnniversarySetupFailToast -> {
+            is OnBoardingSideEffect.ShowToast -> {
                 toastManager.tryShow(
                     ToastData(
-                        message = ddaySetUpFailMessage,
-                        type = ToastType.ERROR,
+                        message = currentContext.getString(sideEffect.message),
+                        type = sideEffect.type,
                     ),
                 )
             }

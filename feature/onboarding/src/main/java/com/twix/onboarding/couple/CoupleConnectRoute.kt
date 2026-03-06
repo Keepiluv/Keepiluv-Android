@@ -37,7 +37,6 @@ import com.twix.designsystem.components.dialog.MarketingDialog
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
-import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
@@ -71,7 +70,7 @@ fun CoupleConnectRoute(
                 toastManager.tryShow(
                     ToastData(
                         message = currentContext.getString(sideEffect.message),
-                        type = ToastType.ERROR,
+                        type = sideEffect.type,
                     ),
                 )
             }

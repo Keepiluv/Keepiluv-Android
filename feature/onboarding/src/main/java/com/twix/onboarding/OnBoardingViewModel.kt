@@ -103,7 +103,7 @@ class OnBoardingViewModel(
             profileSetup()
         } else {
             viewModelScope.launch {
-                emitSideEffect(OnBoardingSideEffect.ProfileSetting.ShowInvalidNickNameToast)
+                showToast(R.string.onboarding_profile_invalid_name_length_toast, ToastType.ERROR)
             }
         }
     }
@@ -112,7 +112,7 @@ class OnBoardingViewModel(
         launchResult(
             block = { onBoardingRepository.profileSetup(currentState.profile.nickname) },
             onSuccess = { fetchOnboardingStatus() },
-            onError = { emitSideEffect(OnBoardingSideEffect.ProfileSetting.ShowProfileSetupFailToast) },
+            onError = { showToast(R.string.onboarding_profile_setup_fail, ToastType.ERROR) },
         )
     }
 
@@ -151,7 +151,7 @@ class OnBoardingViewModel(
                 viewModelScope.launch { emitSideEffect(OnBoardingSideEffect.DdaySetting.NavigateToHome) }
             },
             onError = {
-                emitSideEffect(OnBoardingSideEffect.DdaySetting.ShowAnniversarySetupFailToast)
+                showToast(R.string.onboarding_dday_setup_fail, ToastType.ERROR)
             },
         )
     }

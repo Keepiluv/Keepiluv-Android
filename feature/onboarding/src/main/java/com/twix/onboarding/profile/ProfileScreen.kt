@@ -69,7 +69,7 @@ fun ProfileRoute(
             }
 
             OnBoardingSideEffect.ProfileSetting.NavigateToHome -> navigateToHome()
-            OnBoardingSideEffect.ProfileSetting.NavigateToDDaySetting -> navigateToDday()
+            OnBoardingSideEffect.ProfileSetting.NavigateToNext -> navigateToDday()
             else -> Unit
         }
     }

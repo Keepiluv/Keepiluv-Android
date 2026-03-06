@@ -124,7 +124,7 @@ class OnBoardingViewModel(
                     val sideEffect =
                         when (onboardingStatus) {
                             OnboardingStatus.ANNIVERSARY_SETUP ->
-                                OnBoardingSideEffect.ProfileSetting.NavigateToDDaySetting
+                                OnBoardingSideEffect.ProfileSetting.NavigateToNext
 
                             OnboardingStatus.COMPLETED ->
                                 OnBoardingSideEffect.ProfileSetting.NavigateToHome

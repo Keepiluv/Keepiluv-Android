@@ -5,7 +5,7 @@ import com.twix.ui.base.SideEffect
 
 sealed interface OnBoardingSideEffect : SideEffect {
     sealed interface ProfileSetting : OnBoardingSideEffect {
-        data object NavigateToDDaySetting : ProfileSetting
+        data object NavigateToNext : ProfileSetting
 
         data object NavigateToHome : ProfileSetting
     }

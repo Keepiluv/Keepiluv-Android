@@ -18,8 +18,8 @@ import com.twix.photolog.capture.model.CaptureStatus
 import com.twix.ui.base.BaseViewModel
 import com.twix.ui.image.ImageGenerator
 import com.twix.util.bus.GoalRefreshBus
-import com.twix.util.bus.StatsDetailRefreshBus
 import com.twix.util.bus.PhotologRefreshBus
+import com.twix.util.bus.StatsDetailRefreshBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

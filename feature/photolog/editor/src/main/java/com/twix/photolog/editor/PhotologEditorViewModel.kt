@@ -6,11 +6,11 @@ import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.navigation.NavRoutes
-import com.twix.result.AppResult
 import com.twix.photolog.editor.contract.PhotologEditorIntent
 import com.twix.photolog.editor.contract.PhotologEditorSideEffect
 import com.twix.photolog.editor.contract.PhotologEditorUiState
 import com.twix.photolog.editor.contract.toEditorUiState
+import com.twix.result.AppResult
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.PhotologRefreshBus

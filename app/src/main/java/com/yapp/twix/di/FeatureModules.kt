@@ -7,7 +7,9 @@ import com.twix.login.di.loginModule
 import com.twix.main.di.mainModule
 import com.twix.notification.di.notificationFeatureModule
 import com.twix.onboarding.di.onBoardingModule
+import com.twix.photolog.capture.di.photologCaptureModule
 import com.twix.photolog.detail.di.photologDetailModule
+import com.twix.photolog.editor.di.photologEditorModule
 import com.twix.settings.di.settingsModule
 import com.twix.splash.di.splashModule
 import com.twix.stats.detail.di.statsDetailModule
@@ -19,7 +21,9 @@ val featureModules: List<Module> =
         loginModule,
         mainModule,
         homeModule,
+        photologCaptureModule,
         photologDetailModule,
+        photologEditorModule,
         goalEditorModule,
         goalManageModule,
         settingsModule,

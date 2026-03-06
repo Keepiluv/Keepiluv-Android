@@ -37,9 +37,10 @@ fun InviteCodeTextField(
     BasicTextField(
         modifier = modifier,
         value = TextFieldValue(inviteCode, selection = TextRange(inviteCode.length)),
-        onValueChange = {
-            if (it.text.length <= InviteCode.INVITE_CODE_LENGTH) {
-                onValueChange(it.text)
+        onValueChange = { newValue ->
+            val filteredText = newValue.text.filterNot { char -> char.isWhitespace() }
+            if (filteredText.length <= InviteCode.INVITE_CODE_LENGTH) {
+                onValueChange(filteredText)
             }
         },
         decorationBox = {

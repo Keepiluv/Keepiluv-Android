@@ -114,6 +114,9 @@
     <string name="toast_camera_permission_request">인증샷 촬영을 위해서 카메라 권한이 필요해요.</string>
     <string name="toast_fetch_notification_failed">알림 목록 조회에 실패했습니다.</string>
     <string name="toast_poke_goal_failed">찌르기에 실패했습니다.</string>
+    <string name="toast_already_used_invite_code_message">이미 사용된 초대 코드입니다.</string>
+    <string name="toast_invite_code_copy">초대 코드가 복사되었어요</string>
+    <string name="toast_invalid_invite_code">잘못된 초대 코드입니다</string>
 
     <!-- 다이얼로그 -->
     <string name="dialog_end_goal_title">%s\n목표를 이루셨나요?</string>
@@ -186,8 +189,6 @@
     <string name="onboarding_invite_code_plz_write_invite_code">짝꿍에게 받은\n초대 코드를 써주세요</string>
     <string name="onboarding_invite_code_my_invite_code">내 초대 코드</string>
     <string name="onboarding_invite_code_write_invite_code">받은 코드 쓰기</string>
-    <string name="onboarding_invite_code_copy">초대 코드가 복사되었어요</string>
-    <string name="onboarding_invite_invalid_invite_code_fail">잘못된 초대 코드입니다</string>
 
     <string name="onboarding_dday_plz_set_dday">우리의 기념일을 등록해 주세요</string>
     <string name="onboarding_dday_placeholder">YYYY-MM-DD</string>

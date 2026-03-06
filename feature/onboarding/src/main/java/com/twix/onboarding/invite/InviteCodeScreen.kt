@@ -26,12 +26,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -43,7 +45,6 @@ import com.twix.designsystem.components.button.AppButton
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
-import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
@@ -69,35 +70,17 @@ internal fun InviteCodeRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     val keyboardState by keyboardAsState()
+    val context = LocalContext.current
+    val currentContext by rememberUpdatedState(context)
     val clipboard = LocalClipboard.current
-
-    val inviteCodeSuccessMessage = stringResource(R.string.onboarding_invite_code_copy)
-    val invalidInviteCodeMessage = stringResource(R.string.onboarding_invite_invalid_invite_code_fail)
-    val coupleConnectionFailMessage = stringResource(R.string.onboarding_couple_connection_fail)
 
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
-            OnBoardingSideEffect.InviteCode.ShowCopyInviteCodeSuccessToast -> {
+            is OnBoardingSideEffect.ShowToast -> {
                 toastManager.tryShow(
                     ToastData(
-                        message = inviteCodeSuccessMessage,
-                        type = ToastType.SUCCESS,
-                    ),
-                )
-            }
-            OnBoardingSideEffect.InviteCode.ShowInvalidInviteCodeToast -> {
-                toastManager.tryShow(
-                    ToastData(
-                        message = invalidInviteCodeMessage,
-                        type = ToastType.ERROR,
-                    ),
-                )
-            }
-            OnBoardingSideEffect.InviteCode.ShowConnectCoupleConnectFailToast -> {
-                toastManager.tryShow(
-                    ToastData(
-                        message = coupleConnectionFailMessage,
-                        type = ToastType.ERROR,
+                        message = currentContext.getString(sideEffect.message),
+                        type = sideEffect.type,
                     ),
                 )
             }

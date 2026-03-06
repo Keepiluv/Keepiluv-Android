@@ -1,5 +1,6 @@
 package com.twix.onboarding.model
 
+import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.ui.base.SideEffect
 
 sealed interface OnBoardingSideEffect : SideEffect {
@@ -18,12 +19,6 @@ sealed interface OnBoardingSideEffect : SideEffect {
     }
 
     sealed interface InviteCode : OnBoardingSideEffect {
-        data object ShowCopyInviteCodeSuccessToast : InviteCode
-
-        data object ShowInvalidInviteCodeToast : InviteCode
-
-        data object ShowConnectCoupleConnectFailToast : InviteCode
-
         data object NavigateToNext : InviteCode
     }
 
@@ -32,4 +27,9 @@ sealed interface OnBoardingSideEffect : SideEffect {
 
         data object ShowAnniversarySetupFailToast : DdaySetting
     }
+
+    data class ShowToast(
+        val message: Int,
+        val type: ToastType,
+    ) : OnBoardingSideEffect
 }

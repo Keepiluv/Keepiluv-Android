@@ -1,6 +1,8 @@
 package com.twix.onboarding
 
 import androidx.lifecycle.viewModelScope
+import com.twix.designsystem.R
+import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.OnboardingStatus
 import com.twix.domain.repository.NotificationRepository
 import com.twix.domain.repository.OnBoardingRepository
@@ -30,7 +32,7 @@ class OnBoardingViewModel(
             is OnBoardingIntent.WriteInviteCode -> reduceInviteCode(intent.value)
             OnBoardingIntent.ConnectCouple -> connectCouple()
             OnBoardingIntent.CopyInviteCode ->
-                emitSideEffect(OnBoardingSideEffect.InviteCode.ShowCopyInviteCodeSuccessToast)
+                showToast(R.string.toast_invite_code_copy, ToastType.SUCCESS)
 
             // 프로필 설정 화면
             is OnBoardingIntent.WriteNickName -> reduceNickName(intent.value)
@@ -70,14 +72,14 @@ class OnBoardingViewModel(
              * 초대 코드를 잘못 입력한 경우
              * */
             if (error.message == INVALID_INVITE_CODE_MESSAGE) {
-                emitSideEffect(OnBoardingSideEffect.InviteCode.ShowInvalidInviteCodeToast)
+                showToast(R.string.toast_invalid_invite_code, ToastType.ERROR)
             } else if (error.message == ALREADY_USED_INVITE_CODE_MESSAGE) {
                 /**
                  * 상대방이 이미 연결한 경우
                  * */
                 emitSideEffect(OnBoardingSideEffect.InviteCode.NavigateToNext)
             } else {
-                emitSideEffect(OnBoardingSideEffect.InviteCode.ShowConnectCoupleConnectFailToast)
+                showToast(R.string.onboarding_couple_connection_fail, ToastType.ERROR)
             }
         }
     }
@@ -159,6 +161,13 @@ class OnBoardingViewModel(
             },
             onSuccess = {},
         )
+    }
+
+    private suspend fun showToast(
+        message: Int,
+        type: ToastType,
+    ) {
+        emitSideEffect(OnBoardingSideEffect.ShowToast(message, type))
     }
 
     companion object {

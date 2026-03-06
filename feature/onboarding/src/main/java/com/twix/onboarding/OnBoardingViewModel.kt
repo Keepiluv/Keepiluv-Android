@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.OnboardingStatus
+import com.twix.domain.model.invitecode.InviteCode
 import com.twix.domain.repository.NotificationRepository
 import com.twix.domain.repository.OnBoardingRepository
 import com.twix.onboarding.contract.OnBoardingIntent
@@ -25,7 +26,16 @@ class OnBoardingViewModel(
     private fun fetchMyInviteCode() {
         launchResult(
             block = { onBoardingRepository.fetchInviteCode() },
-            onSuccess = { reduce { updateMyInviteCode(it.value) } },
+            onSuccess = { fetchedInviteCode ->
+                reduce {
+                    copy(
+                        inviteCode =
+                            inviteCode.copy(
+                                myInviteCode = fetchedInviteCode.value,
+                            ),
+                    )
+                }
+            },
             onError = {
                 showToast(R.string.onboarding_couple_fetch_my_invite_code_fail, ToastType.ERROR)
             },
@@ -58,7 +68,17 @@ class OnBoardingViewModel(
     }
 
     private fun reduceInviteCode(value: String) {
-        reduce { updatePartnerInviteCode(value) }
+        val isValidInviteCode = InviteCode.create(value).isSuccess
+
+        reduce {
+            copy(
+                inviteCode =
+                    inviteCode.copy(
+                        partnerInviteCode = value,
+                        isValid = isValidInviteCode,
+                    ),
+            )
+        }
     }
 
     private fun connectCouple() {
@@ -95,7 +115,7 @@ class OnBoardingViewModel(
     }
 
     private fun reduceNickName(value: String) {
-        reduce { updateNickName(value) }
+        reduce { copy(profile = profile.updateNickname(value)) }
     }
 
     private fun handleSubmitNickname() {
@@ -141,7 +161,11 @@ class OnBoardingViewModel(
     }
 
     private fun reduceDday(value: LocalDate) {
-        reduce { updateDday(value) }
+        reduce {
+            copy(
+                dDay = dDay.updateAnniversaryDate(value),
+            )
+        }
     }
 
     private fun anniversarySetup() {

@@ -63,7 +63,7 @@ fun AppNavHost(
                 ) {
                     ensureMainStack(navController)
                     navController.navigate(
-                        NavRoutes.TaskCertificationDetailRoute.createRoute(
+                        NavRoutes.PhotologDetailRoute.createRoute(
                             goalId = goalId,
                             date = date,
                             betweenUs = BetweenUs.ME.name,
@@ -79,7 +79,7 @@ fun AppNavHost(
                 ) {
                     ensureMainStack(navController)
                     navController.navigate(
-                        NavRoutes.TaskCertificationDetailRoute.createRoute(
+                        NavRoutes.PhotologDetailRoute.createRoute(
                             goalId = goalId,
                             date = date,
                             betweenUs = BetweenUs.PARTNER.name,

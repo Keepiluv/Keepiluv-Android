@@ -24,13 +24,13 @@ object NotificationNavGraph : NavGraphContributor {
                 NotificationRoute(
                     popBackStack = { navController.popBackStack() },
                     navigateToMyPhotolog = { goalId, date ->
-                        navController.navigate(NavRoutes.TaskCertificationDetailRoute.createRoute(goalId, date, BetweenUs.ME.name)) {
+                        navController.navigate(NavRoutes.PhotologDetailRoute.createRoute(goalId, date, BetweenUs.ME.name)) {
                             launchSingleTop = true
                         }
                     },
                     navigateToPartnerPhotolog = { goalId, date ->
                         navController.navigate(
-                            NavRoutes.TaskCertificationDetailRoute.createRoute(
+                            NavRoutes.PhotologDetailRoute.createRoute(
                                 goalId,
                                 date,
                                 BetweenUs.PARTNER.name,

@@ -6,8 +6,10 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -151,16 +154,26 @@ fun CoupleConnectScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            AppText(
-                text = stringResource(R.string.onboarding_couple_restore),
-                style = AppTextStyle.B1,
-                color = GrayColor.C400,
-                textAlign = TextAlign.Center,
+            Row(
                 modifier =
                     Modifier
                         .fillMaxWidth()
                         .noRippleClickable(onClick = onClickRestore),
-            )
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                AppText(
+                    text = stringResource(R.string.onboarding_couple_restore),
+                    style = AppTextStyle.B1,
+                    color = GrayColor.C400,
+                )
+
+                Image(
+                    painter = painterResource(R.drawable.ic_arrow_m_right),
+                    contentDescription = null
+                )
+            }
+
         }
 
         CommonBottomSheet(

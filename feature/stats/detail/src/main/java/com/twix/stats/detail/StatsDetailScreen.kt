@@ -258,15 +258,17 @@ private fun StatsDeleteDialogContent(
     ) {
         Image(
             painter = painterResource(icon.toRes()),
-            contentDescription = null,
-            modifier = Modifier.size(94.dp),
+            contentDescription = "emoji",
+            modifier =
+                Modifier
+                    .size(60.dp),
         )
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(12.dp))
 
         AppText(
             text = title,
-            style = AppTextStyle.H2,
+            style = AppTextStyle.T1,
             color = GrayColor.C500,
             textAlign = TextAlign.Center,
         )
@@ -275,8 +277,9 @@ private fun StatsDeleteDialogContent(
 
         AppText(
             text = content,
-            style = AppTextStyle.B3,
-            color = GrayColor.C300,
+            style = AppTextStyle.B2,
+            color = GrayColor.C500,
+            textAlign = TextAlign.Center,
         )
     }
 }

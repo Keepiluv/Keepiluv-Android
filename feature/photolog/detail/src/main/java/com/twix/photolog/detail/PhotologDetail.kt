@@ -139,6 +139,7 @@ fun PhotologDetailRoute(
                         ReactionEffectSpec(
                             particleCount = 10,
                             durationRange = 500..800,
+                            // 전체 화면 높이까지 퍼짐
                             travelDistanceRange = 500..screenHeightPx.toInt(),
                         ),
                     onFinished = {

@@ -8,4 +8,8 @@ sealed interface PhotologEditorSideEffect : SideEffect {
         val message: Int,
         val type: ToastType,
     ) : PhotologEditorSideEffect
+
+    data class ShowPokeToast(
+        val message: String,
+    ) : PhotologEditorSideEffect
 }

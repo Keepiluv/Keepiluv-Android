@@ -73,6 +73,11 @@ fun PhotologEditorRoute(
                         sideEffect.type,
                     ),
                 )
+            is PhotologEditorSideEffect.ShowPokeToast -> {
+                toastManager.tryShow(
+                    ToastData(sideEffect.message, ToastType.SUCCESS),
+                )
+            }
         }
     }
 

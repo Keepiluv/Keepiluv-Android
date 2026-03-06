@@ -43,8 +43,9 @@ import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.onboarding.OnBoardingViewModel
-import com.twix.onboarding.R
+import com.twix.designsystem.R
 import com.twix.onboarding.couple.component.ConnectButton
+import com.twix.onboarding.couple.component.InvitationButton
 import com.twix.onboarding.couple.component.RestoreCoupleBottomSheetContent
 import com.twix.onboarding.model.OnBoardingIntent
 import com.twix.onboarding.model.OnBoardingSideEffect
@@ -137,13 +138,13 @@ fun CoupleConnectScreen(
             Spacer(modifier = Modifier.height(11.76.dp))
 
             Image(
-                imageVector = ImageVector.vectorResource(R.drawable.img_couple_connect),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_invite),
                 contentDescription = null,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             )
 
             Spacer(modifier = Modifier.height(47.dp))
-            // InvitationButton(onClick = onClickSend)
+            InvitationButton(onClick = onClickSend)
 
             Spacer(modifier = Modifier.height(20.dp))
 

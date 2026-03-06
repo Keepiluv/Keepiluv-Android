@@ -18,11 +18,17 @@ class OnBoardingViewModel(
     private val onBoardingRepository: OnBoardingRepository,
     private val notificationRepository: NotificationRepository,
 ) : BaseViewModel<OnBoardingUiState, OnBoardingIntent, OnBoardingSideEffect>(OnBoardingUiState()) {
-    fun fetchMyInviteCode() {
+    init {
+        fetchMyInviteCode()
+    }
+
+    private fun fetchMyInviteCode() {
         launchResult(
             block = { onBoardingRepository.fetchInviteCode() },
             onSuccess = { reduce { updateMyInviteCode(it.value) } },
-            onError = { emitSideEffect(OnBoardingSideEffect.CoupleConnection.ShowFetchMyInviteCodeFailToast) },
+            onError = {
+                showToast(R.string.onboarding_couple_fetch_my_invite_code_fail, ToastType.ERROR)
+            },
         )
     }
 
@@ -43,7 +49,11 @@ class OnBoardingViewModel(
             OnBoardingIntent.SubmitDday -> anniversarySetup()
 
             is OnBoardingIntent.SubmitMarketingConsent ->
-                initNotificationSettings(intent.isPushEnabled, intent.isMarketingEnabled, intent.isNightMarketingEnabled)
+                initNotificationSettings(
+                    intent.isPushEnabled,
+                    intent.isMarketingEnabled,
+                    intent.isNightMarketingEnabled,
+                )
         }
     }
 

@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberUpdatedState
@@ -66,18 +65,12 @@ fun CoupleConnectRoute(
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchMyInviteCode()
-    }
-
-    val fetchMyInviteCodeFailMessage =
-        stringResource(R.string.onboarding_couple_fetch_my_invite_code_fail)
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
-            OnBoardingSideEffect.CoupleConnection.ShowFetchMyInviteCodeFailToast -> {
+            is OnBoardingSideEffect.ShowToast -> {
                 toastManager.tryShow(
                     ToastData(
-                        message = fetchMyInviteCodeFailMessage,
+                        message = currentContext.getString(sideEffect.message),
                         type = ToastType.ERROR,
                     ),
                 )

@@ -14,10 +14,6 @@ sealed interface OnBoardingSideEffect : SideEffect {
         data object NavigateToHome : ProfileSetting
     }
 
-    sealed interface CoupleConnection : OnBoardingSideEffect {
-        data object ShowFetchMyInviteCodeFailToast : CoupleConnection
-    }
-
     sealed interface InviteCode : OnBoardingSideEffect {
         data object NavigateToNext : InviteCode
     }

@@ -118,12 +118,6 @@ private fun InviteCodeScreen(
     onComplete: () -> Unit,
     onCopyInviteCode: () -> Unit,
 ) {
-    val focusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
-
     Box(
         modifier =
             Modifier

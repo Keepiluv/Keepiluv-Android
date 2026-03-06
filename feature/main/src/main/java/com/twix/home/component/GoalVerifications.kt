@@ -91,7 +91,7 @@ private fun EmptyContent(
             )
 
             AppRoundButton(
-                text = stringResource(R.string.action_sting_emphasized),
+                text = stringResource(R.string.action_poke_emphasized),
                 textColor = GrayColor.C500,
                 textStyle = AppTextStyle.C2,
                 backgroundColor = CommonColor.White,

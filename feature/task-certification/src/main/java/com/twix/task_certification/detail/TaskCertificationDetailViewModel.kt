@@ -7,6 +7,7 @@ import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalReactionType
 import com.twix.domain.repository.PhotoLogRepository
+import com.twix.domain.repository.PokeRepository
 import com.twix.navigation.NavRoutes
 import com.twix.task_certification.detail.contract.TaskCertificationDetailIntent
 import com.twix.task_certification.detail.contract.TaskCertificationDetailSideEffect
@@ -26,6 +27,7 @@ import java.time.LocalDate
 
 class TaskCertificationDetailViewModel(
     private val photologRepository: PhotoLogRepository,
+    private val pokeRepository: PokeRepository,
     private val detailRefreshBus: TaskCertificationRefreshBus,
     private val goalRefreshBus: GoalRefreshBus,
     savedStateHandle: SavedStateHandle,
@@ -46,6 +48,9 @@ class TaskCertificationDetailViewModel(
         savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_BETWEEN_US]
             ?: error(BETWEEN_US_NOT_FOUND)
 
+    private val argIsCompleted: Boolean =
+        savedStateHandle[NavRoutes.TaskCertificationDetailRoute.ARG_IS_COMPLETED] ?: false
+
     private var lastReaction: GoalReactionType? = null
 
     private val reactionFlow =
@@ -63,7 +68,16 @@ class TaskCertificationDetailViewModel(
     private fun fetchPhotolog() {
         launchResult(
             block = { photologRepository.fetchPhotologs(argTargetDate, argGoalId) },
-            onSuccess = { reduce { it.toUiState(argGoalId, argBetweenUs, argTargetDate) } },
+            onSuccess = {
+                reduce {
+                    it.toUiState(
+                        argGoalId,
+                        argBetweenUs,
+                        argTargetDate,
+                        argIsCompleted,
+                    )
+                }
+            },
             onError = {
                 showToast(R.string.task_certification_detail_fetch_photolog_fail, ToastType.ERROR)
             },
@@ -79,6 +93,7 @@ class TaskCertificationDetailViewModel(
                 .debounce(DEBOUNCE_INTERVAL)
                 .collectLatest { reaction ->
                     reactToPhotolog(reaction)
+                    goalRefreshBus.notifyGoalListChanged()
                 }
         }
     }
@@ -120,8 +135,9 @@ class TaskCertificationDetailViewModel(
     override suspend fun handleIntent(intent: TaskCertificationDetailIntent) {
         when (intent) {
             is TaskCertificationDetailIntent.Reaction -> reduceReaction(intent.type)
-            TaskCertificationDetailIntent.Sting -> TODO("찌르기 API 연동")
+            TaskCertificationDetailIntent.Poke -> pokeToPartner()
             TaskCertificationDetailIntent.SwipeCard -> reduceShownCard()
+            TaskCertificationDetailIntent.MyReactionEffected -> reduceMyReactionShown()
         }
     }
 
@@ -129,6 +145,14 @@ class TaskCertificationDetailViewModel(
         lastReaction = currentState.partnerPhotolog?.reaction
         reduce { currentState.copy(partnerPhotolog = partnerPhotolog?.updateReaction(reaction)) }
         reactionFlow.tryEmit(reaction)
+    }
+
+    private fun pokeToPartner() {
+        launchResult(
+            block = { pokeRepository.pokeGoal(argGoalId) },
+            onSuccess = { tryEmitSideEffect(TaskCertificationDetailSideEffect.ShowPokeToast(it.message)) },
+            onError = { showToast(R.string.toast_poke_goal_failed, ToastType.ERROR) },
+        )
     }
 
     private fun reduceShownCard() {
@@ -144,13 +168,15 @@ class TaskCertificationDetailViewModel(
                 },
         )
 
-    private fun showToast(
+    private fun reduceMyReactionShown() {
+        reduce { copy(hasShownMyReaction = true) }
+    }
+
+    private suspend fun showToast(
         message: Int,
         type: ToastType,
     ) {
-        viewModelScope.launch {
-            emitSideEffect(TaskCertificationDetailSideEffect.ShowToast(message, type))
-        }
+        emitSideEffect(TaskCertificationDetailSideEffect.ShowToast(message, type))
     }
 
     companion object {

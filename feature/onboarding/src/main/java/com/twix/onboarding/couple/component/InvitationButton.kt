@@ -17,8 +17,8 @@ import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
-import com.twix.onboarding.R
 import com.twix.ui.extension.noRippleClickable
+import com.twix.designsystem.R as DesR
 
 @Composable
 internal fun InvitationButton(
@@ -36,7 +36,7 @@ internal fun InvitationButton(
         contentAlignment = Alignment.Center,
     ) {
         AppText(
-            text = stringResource(R.string.onboarding_couple_connect_send_invitation),
+            text = stringResource(DesR.string.onboarding_couple_connect_send_invitation),
             style = AppTextStyle.T2,
             color = CommonColor.White,
         )

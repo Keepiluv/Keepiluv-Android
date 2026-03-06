@@ -38,6 +38,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.twix.designsystem.R
 import com.twix.designsystem.components.button.AppButton
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
@@ -48,7 +49,6 @@ import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.onboarding.OnBoardingViewModel
-import com.twix.onboarding.R
 import com.twix.onboarding.invite.component.InviteCodeTextField
 import com.twix.onboarding.model.OnBoardingIntent
 import com.twix.onboarding.model.OnBoardingSideEffect

@@ -23,13 +23,13 @@ import androidx.compose.ui.text.font.FontWeight.Companion.ExtraBold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.twix.designsystem.R
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.NanumSquareNeoFamily
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
-import com.twix.onboarding.R
 import com.twix.ui.extension.noRippleClickable
 
 @Composable

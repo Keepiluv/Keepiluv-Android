@@ -24,7 +24,7 @@ import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
-import com.twix.onboarding.R
+import com.twix.designsystem.R as DesR
 
 private val RestoreBgColor = Color(0xFFF6F7F7)
 private val BulletColor = Color(0xFF999999)
@@ -39,13 +39,13 @@ internal fun RestoreCoupleBottomSheetContent() {
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         AppText(
-            text = stringResource(R.string.onboarding_couple_restore),
+            text = stringResource(DesR.string.onboarding_couple_restore),
             style = AppTextStyle.T1,
             color = GrayColor.C500,
         )
 
         AppText(
-            text = stringResource(R.string.onboarding_couple_restore_bottom_sheet_content),
+            text = stringResource(DesR.string.onboarding_couple_restore_bottom_sheet_content),
             style = AppTextStyle.B2,
             color = GrayColor.C400,
         )
@@ -58,9 +58,9 @@ internal fun RestoreCoupleBottomSheetContent() {
                     .background(RestoreBgColor, RoundedCornerShape(12.dp)),
             verticalArrangement = Arrangement.Center,
         ) {
-            BulletItem(stringResource(R.string.onboarding_couple_restore_content_my_email))
-            BulletItem(stringResource(R.string.onboarding_couple_restore_content_partner_email))
-            BulletItem(stringResource(R.string.onboarding_couple_restore_content_restore_date))
+            BulletItem(stringResource(DesR.string.onboarding_couple_restore_content_my_email))
+            BulletItem(stringResource(DesR.string.onboarding_couple_restore_content_partner_email))
+            BulletItem(stringResource(DesR.string.onboarding_couple_restore_content_restore_date))
         }
     }
 }

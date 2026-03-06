@@ -31,7 +31,6 @@ import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.onboarding.OnBoardingViewModel
-import com.twix.onboarding.R
 import com.twix.onboarding.dday.component.DDayField
 import com.twix.onboarding.dday.component.DdayTopBar
 import com.twix.onboarding.model.OnBoardingIntent
@@ -39,6 +38,7 @@ import com.twix.onboarding.model.OnBoardingSideEffect
 import com.twix.ui.base.ObserveAsEvents
 import org.koin.compose.koinInject
 import java.time.LocalDate
+import com.twix.designsystem.R as DesR
 
 @Composable
 fun DdayRoute(
@@ -50,7 +50,7 @@ fun DdayRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showCalendarBottomSheet by remember { mutableStateOf(false) }
 
-    val ddaySetUpFailMessage = stringResource(R.string.onboarding_dday_setup_fail)
+    val ddaySetUpFailMessage = stringResource(DesR.string.onboarding_dday_setup_fail)
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
             OnBoardingSideEffect.DdaySetting.NavigateToHome -> navigateToHome()
@@ -103,7 +103,7 @@ fun DdayScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             AppText(
-                text = stringResource(R.string.onboarding_dday_plz_set_dday),
+                text = stringResource(DesR.string.onboarding_dday_plz_set_dday),
                 style = AppTextStyle.H3,
                 color = GrayColor.C500,
                 modifier = Modifier.padding(start = 24.dp),
@@ -119,7 +119,7 @@ fun DdayScreen(
             Spacer(Modifier.weight(1f))
 
             AppButton(
-                text = stringResource(R.string.onboarding_profile_button_title),
+                text = stringResource(DesR.string.onboarding_profile_button_title),
                 onClick = { onCompleted() },
                 backgroundColor = if (uiModel.isSelected) GrayColor.C500 else GrayColor.C100,
                 textColor = if (uiModel.isSelected) CommonColor.White else GrayColor.C300,

@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.twix.designsystem.R
 import com.twix.designsystem.components.bottomsheet.CommonBottomSheet
 import com.twix.designsystem.components.bottomsheet.model.CommonBottomSheetConfig
 import com.twix.designsystem.components.dialog.MarketingDialog
@@ -43,7 +44,6 @@ import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.onboarding.OnBoardingViewModel
-import com.twix.designsystem.R
 import com.twix.onboarding.couple.component.ConnectButton
 import com.twix.onboarding.couple.component.InvitationButton
 import com.twix.onboarding.couple.component.RestoreCoupleBottomSheetContent

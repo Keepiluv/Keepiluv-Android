@@ -38,7 +38,6 @@ import com.twix.designsystem.theme.SystemColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.onboarding.OnBoardingViewModel
-import com.twix.onboarding.R
 import com.twix.onboarding.model.OnBoardingIntent
 import com.twix.onboarding.model.OnBoardingSideEffect
 import com.twix.ui.base.ObserveAsEvents
@@ -56,9 +55,9 @@ fun ProfileRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val notValidNickNameMessage =
-        stringResource(R.string.onboarding_profile_invalid_name_length_toast)
+        stringResource(DesR.string.onboarding_profile_invalid_name_length_toast)
 
-    val profileSetupFailMessage = stringResource(R.string.onboarding_profile_setup_fail)
+    val profileSetupFailMessage = stringResource(DesR.string.onboarding_profile_setup_fail)
 
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
@@ -117,7 +116,7 @@ private fun ProfileScreen(
         Spacer(modifier = Modifier.height(80.dp))
 
         AppText(
-            text = stringResource(R.string.onboarding_profile_title),
+            text = stringResource(DesR.string.onboarding_profile_title),
             style = AppTextStyle.H3,
             color = GrayColor.C500,
             modifier = Modifier.padding(start = 24.dp),
@@ -127,7 +126,7 @@ private fun ProfileScreen(
 
         UnderlineTextField(
             value = uiModel.nickname,
-            placeHolder = stringResource(R.string.onboarding_name_placeholder),
+            placeHolder = stringResource(DesR.string.onboarding_name_placeholder),
             showTrailing = true,
             onValueChange = onChangeNickName,
             trailing = {
@@ -160,14 +159,14 @@ private fun ProfileScreen(
             AppText(
                 style = AppTextStyle.C2,
                 color = if (uiModel.isValid) SystemColor.Success else GrayColor.C300,
-                text = stringResource(id = R.string.onboarding_name_helper),
+                text = stringResource(id = DesR.string.onboarding_name_helper),
             )
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
         AppButton(
-            text = stringResource(R.string.onboarding_profile_button_title),
+            text = stringResource(DesR.string.onboarding_profile_button_title),
             onClick = { onCompleted() },
             backgroundColor = if (uiModel.isValid) GrayColor.C500 else GrayColor.C100,
             textColor = if (uiModel.isValid) CommonColor.White else GrayColor.C300,

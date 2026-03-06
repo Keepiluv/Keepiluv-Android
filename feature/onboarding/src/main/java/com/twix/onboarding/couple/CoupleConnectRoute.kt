@@ -45,6 +45,7 @@ import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.onboarding.OnBoardingViewModel
 import com.twix.onboarding.couple.component.ConnectButton
+import com.twix.onboarding.couple.component.CoupleConnectTopbar
 import com.twix.onboarding.couple.component.InvitationButton
 import com.twix.onboarding.couple.component.RestoreCoupleBottomSheetContent
 import com.twix.onboarding.model.OnBoardingIntent
@@ -58,6 +59,7 @@ fun CoupleConnectRoute(
     viewModel: OnBoardingViewModel,
     toastManager: ToastManager = koinInject(),
     navigateToNext: () -> Unit,
+    navigateToBack: () -> Unit,
 ) {
     var showMarketingDialog by rememberSaveable { mutableStateOf(true) }
     var showRestoreSheet by rememberSaveable { mutableStateOf(false) }
@@ -92,6 +94,7 @@ fun CoupleConnectRoute(
             onClickConnect = navigateToNext,
             onClickRestore = { showRestoreSheet = true },
             onDismissSheet = { showRestoreSheet = false },
+            onClickBack = navigateToBack,
         )
 
         MarketingDialog(
@@ -118,6 +121,7 @@ fun CoupleConnectScreen(
     onClickConnect: () -> Unit,
     onClickRestore: () -> Unit,
     onDismissSheet: () -> Unit,
+    onClickBack: () -> Unit,
 ) {
     Box(
         modifier =
@@ -126,7 +130,9 @@ fun CoupleConnectScreen(
                 .background(color = CommonColor.White),
     ) {
         Column {
-            Spacer(modifier = Modifier.height(80.24.dp))
+            CoupleConnectTopbar(onClickBack = onClickBack)
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             AppText(
                 text = stringResource(R.string.onboarding_couple_connect_description),
@@ -135,7 +141,7 @@ fun CoupleConnectScreen(
                 modifier = Modifier.padding(start = 24.dp),
             )
 
-            Spacer(modifier = Modifier.height(11.76.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             Image(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_invite),
@@ -143,7 +149,8 @@ fun CoupleConnectScreen(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             )
 
-            Spacer(modifier = Modifier.height(47.dp))
+            Spacer(modifier = Modifier.height(2.dp))
+
             InvitationButton(onClick = onClickSend)
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -197,6 +204,7 @@ private fun CoupleConnectScreenPreview() {
             onClickConnect = {},
             onClickRestore = {},
             onDismissSheet = {},
+            onClickBack = {},
         )
     }
 }

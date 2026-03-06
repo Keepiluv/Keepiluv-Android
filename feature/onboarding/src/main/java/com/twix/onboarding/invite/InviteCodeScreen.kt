@@ -1,6 +1,7 @@
 package com.twix.onboarding.invite
 
 import android.content.ClipData
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -22,15 +23,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
@@ -45,6 +45,7 @@ import com.twix.designsystem.components.button.AppButton
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
+import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
@@ -84,7 +85,32 @@ internal fun InviteCodeRoute(
                     ),
                 )
             }
+
             OnBoardingSideEffect.InviteCode.NavigateToNext -> navigateToNext()
+            is OnBoardingSideEffect.InviteCode.CopyInviteCode -> {
+                coroutineScope.launch {
+                    val clipData =
+                        ClipData
+                            .newPlainText(
+                                "inviteCode",
+                                sideEffect.inviteCode,
+                            ).toClipEntry()
+                    clipboard.setClipEntry(clipData)
+                }
+
+                /**
+                 * https://developer.android.com/develop/ui/views/touch-and-input/copy-paste?hl=ko#duplicate-notifications
+                 * */
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                    toastManager.tryShow(
+                        ToastData(
+                            currentContext.getString(R.string.toast_invite_code_copy),
+                            ToastType.SUCCESS,
+                        ),
+                    )
+                }
+            }
+
             else -> Unit
         }
     }
@@ -95,17 +121,7 @@ internal fun InviteCodeRoute(
         navigateToBack = navigateToBack,
         onChangeInviteCode = { viewModel.dispatch(OnBoardingIntent.WriteInviteCode(it)) },
         onComplete = { viewModel.dispatch(OnBoardingIntent.ConnectCouple) },
-        onCopyInviteCode = {
-            val clipData =
-                ClipData.newPlainText(
-                    "inviteCode",
-                    uiState.inviteCode.myInviteCode,
-                )
-            coroutineScope.launch {
-                clipboard.setClipEntry(clipData.toClipEntry())
-            }
-            viewModel.dispatch(OnBoardingIntent.CopyInviteCode)
-        },
+        onCopyInviteCode = { viewModel.dispatch(OnBoardingIntent.CopyInviteCode) },
     )
 }
 
@@ -133,7 +149,7 @@ private fun InviteCodeScreen(
             contentAlignment = Alignment.CenterStart,
         ) {
             Image(
-                imageVector = ImageVector.vectorResource(com.twix.designsystem.R.drawable.ic_arrow_m_left),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_m_left),
                 contentDescription = null,
                 modifier =
                     Modifier
@@ -215,10 +231,7 @@ private fun InviteCodeScreen(
             InviteCodeTextField(
                 inviteCode = uiModel.partnerInviteCode,
                 onValueChange = onChangeInviteCode,
-                modifier =
-                    Modifier
-                        .focusRequester(focusRequester)
-                        .align(Alignment.CenterHorizontally),
+                modifier = Modifier.align(Alignment.CenterHorizontally),
             )
         }
 

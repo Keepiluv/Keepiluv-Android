@@ -12,6 +12,10 @@ sealed interface OnBoardingSideEffect : SideEffect {
 
     sealed interface InviteCode : OnBoardingSideEffect {
         data object NavigateToNext : InviteCode
+
+        data class CopyInviteCode(
+            val inviteCode: String,
+        ) : InviteCode
     }
 
     sealed interface DdaySetting : OnBoardingSideEffect {

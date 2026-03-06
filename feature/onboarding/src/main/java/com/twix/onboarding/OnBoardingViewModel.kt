@@ -48,8 +48,7 @@ class OnBoardingViewModel(
             is OnBoardingIntent.WriteInviteCode -> reduceInviteCode(intent.value)
             OnBoardingIntent.ConnectCouple -> connectCouple()
             OnBoardingIntent.CopyInviteCode ->
-                showToast(R.string.toast_invite_code_copy, ToastType.SUCCESS)
-
+                emitSideEffect(OnBoardingSideEffect.InviteCode.CopyInviteCode(currentState.inviteCode.myInviteCode))
             // 프로필 설정 화면
             is OnBoardingIntent.WriteNickName -> reduceNickName(intent.value)
             OnBoardingIntent.SubmitNickName -> handleSubmitNickname()

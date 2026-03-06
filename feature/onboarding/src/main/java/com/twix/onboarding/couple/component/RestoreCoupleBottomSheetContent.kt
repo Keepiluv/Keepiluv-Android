@@ -16,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,17 +25,14 @@ import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.designsystem.R as DesR
 
-private val RestoreBgColor = Color(0xFFF6F7F7)
-private val BulletColor = Color(0xFF999999)
-
 @Composable
 internal fun RestoreCoupleBottomSheetContent() {
     Column(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(30.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp),
+                .padding(bottom = 16.dp)
+                .padding(horizontal = 30.dp),
     ) {
         AppText(
             text = stringResource(DesR.string.onboarding_couple_restore),
@@ -44,18 +40,22 @@ internal fun RestoreCoupleBottomSheetContent() {
             color = GrayColor.C500,
         )
 
+        Spacer(Modifier.height(3.dp))
+
         AppText(
             text = stringResource(DesR.string.onboarding_couple_restore_bottom_sheet_content),
             style = AppTextStyle.B2,
             color = GrayColor.C400,
         )
 
+        Spacer(Modifier.height(18.dp))
+
         Column(
             modifier =
                 Modifier
                     .fillMaxWidth()
                     .height(78.dp)
-                    .background(RestoreBgColor, RoundedCornerShape(12.dp)),
+                    .background(GrayColor.C050, RoundedCornerShape(12.dp)),
             verticalArrangement = Arrangement.Center,
         ) {
             BulletItem(stringResource(DesR.string.onboarding_couple_restore_content_my_email))
@@ -69,13 +69,15 @@ internal fun RestoreCoupleBottomSheetContent() {
 private fun BulletItem(text: String) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(start = 16.dp),
+        modifier =
+            Modifier
+                .padding(start = 16.dp),
     ) {
         Box(
             modifier =
                 Modifier
                     .size(6.dp)
-                    .background(BulletColor, CircleShape),
+                    .background(GrayColor.C300, CircleShape),
         )
 
         Spacer(Modifier.width(8.dp))
@@ -83,7 +85,7 @@ private fun BulletItem(text: String) {
         AppText(
             text = text,
             style = AppTextStyle.B4,
-            color = BulletColor,
+            color = GrayColor.C300,
         )
     }
 }

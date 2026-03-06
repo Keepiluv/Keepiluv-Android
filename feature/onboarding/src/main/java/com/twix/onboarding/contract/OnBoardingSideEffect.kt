@@ -1,4 +1,4 @@
-package com.twix.onboarding.model
+package com.twix.onboarding.contract
 
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.ui.base.SideEffect

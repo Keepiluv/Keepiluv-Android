@@ -1,4 +1,4 @@
-package com.twix.onboarding.model
+package com.twix.onboarding.contract
 
 import androidx.compose.runtime.Immutable
 import com.twix.onboarding.dday.DdayUiModel

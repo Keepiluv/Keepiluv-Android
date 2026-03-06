@@ -6,9 +6,9 @@ import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.OnboardingStatus
 import com.twix.domain.repository.NotificationRepository
 import com.twix.domain.repository.OnBoardingRepository
-import com.twix.onboarding.model.OnBoardingIntent
-import com.twix.onboarding.model.OnBoardingSideEffect
-import com.twix.onboarding.model.OnBoardingUiState
+import com.twix.onboarding.contract.OnBoardingIntent
+import com.twix.onboarding.contract.OnBoardingSideEffect
+import com.twix.onboarding.contract.OnBoardingUiState
 import com.twix.result.AppError
 import com.twix.ui.base.BaseViewModel
 import kotlinx.coroutines.launch

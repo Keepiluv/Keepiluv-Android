@@ -61,10 +61,19 @@ fun BackgroundCard(
                                 .width(150.dp)
                                 .height(74.dp)
                                 .noRippleClickable { onClickAction() },
-                        text = actionLabel,
-                        textColor = GrayColor.C500,
-                        backgroundColor = CommonColor.White,
-                    )
+                        contentColor = CommonColor.White,
+                        contentHeight = 68.dp,
+                        contentBorderColor = GrayColor.C500,
+                        contentBorderWidth = 1.6.dp,
+                        shadowHeight = 70.dp,
+                        shadowOffset = 4.dp,
+                    ) {
+                        AppText(
+                            style = AppTextStyle.T2,
+                            color = GrayColor.C500,
+                            text = actionLabel,
+                        )
+                    }
                 }
 
                 Image(

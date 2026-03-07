@@ -3,9 +3,7 @@ package com.twix.designsystem.components.button
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
@@ -15,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.theme.CommonColor
@@ -24,42 +23,65 @@ import com.twix.domain.model.enums.AppTextStyle
 
 @Composable
 fun AppRoundButton(
-    text: String,
-    textColor: Color,
-    backgroundColor: Color,
-    modifier: Modifier = Modifier,
-    textStyle: AppTextStyle = AppTextStyle.T2,
-    borderColor: Color = GrayColor.C500,
-    hasBorder: Boolean = true,
+    contentHeight: Dp,
+    contentColor: Color,
+    contentBorderColor: Color,
+    contentBorderWidth: Dp,
+    shadowHeight: Dp,
+    shadowOffset: Dp,
+    modifier: Modifier,
+    content: @Composable () -> Unit,
 ) {
     val shape = RoundedCornerShape(999.dp)
+
     Box(modifier = modifier) {
-        if (hasBorder) {
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .offset(y = 4.dp)
-                        .background(color = borderColor, shape = shape),
-            )
-        }
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(shadowHeight)
+                    .offset(y = shadowOffset)
+                    .background(color = contentBorderColor, shape = shape),
+        )
 
         Box(
             modifier =
                 Modifier
-                    .fillMaxSize()
-                    .background(color = backgroundColor, shape = shape)
+                    .fillMaxWidth()
+                    .height(contentHeight)
+                    .background(color = contentColor, shape = shape)
                     .border(
-                        color = borderColor,
+                        color = contentBorderColor,
                         shape = shape,
-                        width = 1.6.dp,
+                        width = contentBorderWidth,
                     ),
             contentAlignment = Alignment.Center,
         ) {
+            content()
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun WhiteAppRoundButtonPreview() {
+    TwixTheme {
+        AppRoundButton(
+            modifier =
+                Modifier
+                    .width(150.dp)
+                    .height(74.dp),
+            contentColor = CommonColor.White,
+            contentHeight = 68.dp,
+            contentBorderColor = GrayColor.C500,
+            contentBorderWidth = 1.6.dp,
+            shadowHeight = 70.dp,
+            shadowOffset = 4.dp,
+        ) {
             AppText(
-                style = textStyle,
-                color = textColor,
-                text = text,
+                style = AppTextStyle.T2,
+                color = GrayColor.C500,
+                text = "버튼 이름",
             )
         }
     }
@@ -67,30 +89,50 @@ fun AppRoundButton(
 
 @Preview(showBackground = true)
 @Composable
-private fun AppRoundButtonPreview() {
+private fun PokeAppRoundButtonPreview() {
     TwixTheme {
-        Column {
-            AppRoundButton(
-                modifier =
-                    Modifier
-                        .width(150.dp)
-                        .height(74.dp),
-                text = "버튼임니다",
-                textColor = GrayColor.C500,
-                backgroundColor = CommonColor.White,
+        AppRoundButton(
+            modifier =
+                Modifier
+                    .width(64.dp)
+                    .height(32.dp),
+            contentColor = CommonColor.White,
+            contentHeight = 28.dp,
+            contentBorderColor = GrayColor.C500,
+            contentBorderWidth = 1.dp,
+            shadowHeight = 31.dp,
+            shadowOffset = 1.dp,
+        ) {
+            AppText(
+                style = AppTextStyle.C2,
+                color = GrayColor.C500,
+                text = "찌르기!",
             )
-            Spacer(modifier = Modifier.height(10.dp))
-            AppRoundButton(
-                modifier =
-                    Modifier
-                        .width(330.dp)
-                        .height(68.dp),
-                text = "버튼임니다",
-                textColor = CommonColor.White,
-                backgroundColor = GrayColor.C500,
-                hasBorder = false,
+        }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun BlackAppRoundButtonPreview() {
+    TwixTheme {
+        AppRoundButton(
+            modifier =
+                Modifier
+                    .width(150.dp)
+                    .height(74.dp),
+            contentColor = GrayColor.C500,
+            contentHeight = 68.dp,
+            contentBorderColor = CommonColor.White,
+            contentBorderWidth = 1.6.dp,
+            shadowHeight = 70.dp,
+            shadowOffset = 4.dp,
+        ) {
+            AppText(
+                style = AppTextStyle.T2,
+                color = CommonColor.White,
+                text = "버튼 이름",
             )
-            Spacer(modifier = Modifier.height(10.dp))
         }
     }
 }

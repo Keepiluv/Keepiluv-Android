@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -16,12 +17,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
@@ -30,16 +33,19 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.twix.designsystem.R
+import com.twix.designsystem.components.button.AppRoundButton
 import com.twix.designsystem.components.comment.CommentAnchorFrame
 import com.twix.designsystem.components.photolog.PhotologCard
+import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.designsystem.extension.showCameraPermissionToastWithNavigateToSettingAction
 import com.twix.designsystem.theme.CommonColor
+import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
+import com.twix.domain.model.enums.AppTextStyle
 import com.twix.photolog.editor.component.PhotologEditorTopBar
-import com.twix.photolog.editor.component.RetakeButton
 import com.twix.photolog.editor.contract.PhotologEditorIntent
 import com.twix.photolog.editor.contract.PhotologEditorSideEffect
 import com.twix.photolog.editor.contract.PhotologEditorUiState
@@ -157,7 +163,9 @@ fun PhotologEditorScreen(
                 .background(color = CommonColor.White)
                 .noRippleClickable { focusManager.clearFocus() },
     ) {
-        Column {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             PhotologEditorTopBar(
                 title = uiState.goalName,
                 onBack = onBack,
@@ -198,6 +206,29 @@ fun PhotologEditorScreen(
             anchorBottom = photologBottom,
             onCommentChanged = onCommentChanged,
             onFocusChanged = onFocusChanged,
+        )
+    }
+}
+
+@Composable
+private fun RetakeButton(onClickRetake: () -> Unit) {
+    AppRoundButton(
+        modifier =
+            Modifier
+                .width(330.dp)
+                .height(68.dp)
+                .noRippleClickable(onClick = onClickRetake),
+        contentColor = CommonColor.White,
+        contentHeight = 68.dp,
+        contentBorderColor = GrayColor.C500,
+        contentBorderWidth = 1.6.dp,
+        shadowHeight = 70.dp,
+        shadowOffset = 4.dp,
+    ) {
+        AppText(
+            style = AppTextStyle.T2,
+            color = GrayColor.C500,
+            text = stringResource(R.string.photolog_editor_retake),
         )
     }
 }

@@ -32,19 +32,15 @@ fun AppRoundButton(
     borderColor: Color = GrayColor.C500,
     hasBorder: Boolean = true,
 ) {
-    Box(
-        modifier = modifier,
-    ) {
+    val shape = RoundedCornerShape(999.dp)
+    Box(modifier = modifier) {
         if (hasBorder) {
             Box(
                 modifier =
                     Modifier
                         .fillMaxSize()
                         .offset(y = 4.dp)
-                        .background(
-                            color = borderColor,
-                            shape = RoundedCornerShape(100),
-                        ),
+                        .background(color = borderColor, shape = shape),
             )
         }
 
@@ -52,19 +48,11 @@ fun AppRoundButton(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .background(
-                        color = backgroundColor,
-                        shape = RoundedCornerShape(100),
-                    ).then(
-                        if (hasBorder) {
-                            Modifier.border(
-                                width = 1.dp,
-                                color = borderColor,
-                                shape = RoundedCornerShape(100),
-                            )
-                        } else {
-                            Modifier
-                        },
+                    .background(color = backgroundColor, shape = shape)
+                    .border(
+                        color = borderColor,
+                        shape = shape,
+                        width = 1.6.dp,
                     ),
             contentAlignment = Alignment.Center,
         ) {
@@ -79,14 +67,14 @@ fun AppRoundButton(
 
 @Preview(showBackground = true)
 @Composable
-fun AppRoundButtonPreview() {
+private fun AppRoundButtonPreview() {
     TwixTheme {
         Column {
             AppRoundButton(
                 modifier =
                     Modifier
-                        .width(330.dp)
-                        .height(68.dp),
+                        .width(150.dp)
+                        .height(74.dp),
                 text = "버튼임니다",
                 textColor = GrayColor.C500,
                 backgroundColor = CommonColor.White,

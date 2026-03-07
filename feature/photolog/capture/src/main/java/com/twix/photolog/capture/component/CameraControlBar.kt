@@ -2,7 +2,6 @@ package com.twix.photolog.capture.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -119,42 +118,35 @@ private fun ImageCapturedBar(
     onClickUpload: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    Row(
         modifier =
             modifier
                 .fillMaxWidth()
                 .padding(horizontal = 58.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
             imageVector = ImageVector.vectorResource(R.drawable.ic_camera_retake),
             contentDescription = null,
             modifier =
                 Modifier
-                    .size(52.dp)
-                    .align(Alignment.CenterStart)
                     .noRippleClickable(onClick = onClickRefresh),
         )
 
-        Row(
+        Spacer(modifier = Modifier.width(12.dp))
+
+        AppRoundButton(
+            borderColor = CommonColor.White,
+            backgroundColor = GrayColor.C500,
+            text = stringResource(R.string.photolog_upload),
+            textStyle = AppTextStyle.T2,
+            textColor = CommonColor.White,
             modifier =
                 Modifier
-                    .align(Alignment.Center),
-        ) {
-            Spacer(modifier = Modifier.width(12.dp))
-
-            AppRoundButton(
-                borderColor = CommonColor.White,
-                backgroundColor = GrayColor.C500,
-                text = stringResource(R.string.photolog_upload),
-                textStyle = AppTextStyle.T2,
-                textColor = CommonColor.White,
-                modifier =
-                    Modifier
-                        .width(150.dp)
-                        .height(74.dp)
-                        .noRippleClickable(onClick = onClickUpload),
-            )
-        }
+                    .width(150.dp)
+                    .height(74.dp)
+                    .noRippleClickable(onClick = onClickUpload),
+        )
     }
 }
 

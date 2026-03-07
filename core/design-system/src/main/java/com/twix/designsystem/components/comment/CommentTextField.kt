@@ -14,6 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawWithCache
@@ -22,6 +23,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -47,6 +49,7 @@ fun CommentTextField(
     uiModel: CommentUiModel,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    onHeightMeasured: (Float) -> Unit = {},
     onCommitComment: (String) -> Unit = {},
     onFocusChanged: (Boolean) -> Unit = {},
 ) {
@@ -98,9 +101,12 @@ fun CommentTextField(
     }
 
     Box(
+        contentAlignment = Alignment.Center,
         modifier =
             modifier
-                .noRippleClickable {
+                .onSizeChanged { size ->
+                    onHeightMeasured(size.height.toFloat())
+                }.noRippleClickable {
                     focusRequester.requestFocus()
                 },
     ) {
@@ -180,6 +186,7 @@ private fun CommentTextFieldPreview() {
         CommentTextField(
             uiModel = CommentUiModel(text, isFocused),
             onFocusChanged = { isFocused = it },
+            onHeightMeasured = {},
         )
     }
 }

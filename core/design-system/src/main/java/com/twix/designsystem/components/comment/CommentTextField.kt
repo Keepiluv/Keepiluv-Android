@@ -1,8 +1,11 @@
 package com.twix.designsystem.components.comment
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -17,12 +20,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -34,14 +34,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.R
 import com.twix.designsystem.components.comment.model.CommentUiModel
+import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
+import com.twix.domain.model.enums.AppTextStyle
 import com.twix.ui.extension.noRippleClickable
 import com.twix.ui.keyboard.Keyboard
 import com.twix.ui.keyboard.keyboardAsState
 
-val CIRCLE_PADDING_START: Dp = 50.dp
-val CIRCLE_SIZE: Dp = 64.dp
+private val CIRCLE_PADDING_START: Dp = 50.dp
+private val CIRCLE_SIZE: Dp = 64.dp
 private val CIRCLE_GAP: Dp = CIRCLE_PADDING_START - CIRCLE_SIZE
 
 @Composable
@@ -134,47 +136,71 @@ fun CommentTextField(
             singleLine = true,
         )
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(CIRCLE_GAP),
-            modifier =
-                Modifier.drawWithCache {
-                    val radius = size.height / 2
-                    val paddingStart = CIRCLE_PADDING_START.toPx()
-
-                    onDrawBehind {
-                        repeat(CommentUiModel.COMMENT_COUNT) { index ->
-                            val cx = radius + index * paddingStart
-
-                            drawCircle(
-                                color = GrayColor.C500,
-                                radius = radius,
-                                center = Offset(cx, radius),
-                                style = Stroke(2.dp.toPx()),
-                            )
-                        }
-                    }
-                },
+        Box(
+            contentAlignment = Alignment.Center,
         ) {
-            repeat(CommentUiModel.COMMENT_COUNT) { index ->
-                val char =
-                    if (uiModel.isFocused || internalValue.text.isNotEmpty()) {
-                        internalValue.text.getOrNull(index)?.toString()
-                    } else {
-                        stringResource(R.string.comment_text_field_placeholder)[index].toString()
-                    }.orEmpty()
+            CommentFieldBackground(
+                circleCount = CommentUiModel.COMMENT_COUNT,
+                circleSize = CIRCLE_SIZE,
+                circleCenterSpacing = CIRCLE_PADDING_START,
+            )
 
-                CommentCircle(
-                    text = char,
-                    showPlaceholder = !uiModel.isFocused && internalValue.text.isEmpty(),
-                    showCursor = uiModel.isFocused && index == internalValue.text.length,
-                    modifier =
-                        Modifier.noRippleClickable {
-                            focusRequester.requestFocus()
-                        },
-                )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(CIRCLE_GAP),
+            ) {
+                repeat(CommentUiModel.COMMENT_COUNT) { index ->
+                    val char =
+                        if (uiModel.isFocused || internalValue.text.isNotEmpty()) {
+                            internalValue.text.getOrNull(index)?.toString()
+                        } else {
+                            stringResource(R.string.comment_text_field_placeholder)[index].toString()
+                        }.orEmpty()
+
+                    CommentText(
+                        text = char,
+                        showPlaceholder = !uiModel.isFocused && internalValue.text.isEmpty(),
+                        showCursor = uiModel.isFocused && index == internalValue.text.length,
+                        modifier =
+                            Modifier.noRippleClickable {
+                                focusRequester.requestFocus()
+                            },
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+private fun CommentText(
+    text: String,
+    showPlaceholder: Boolean,
+    showCursor: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier.size(CIRCLE_SIZE),
+    ) {
+        AppText(
+            text = text,
+            style = AppTextStyle.H1,
+            color = if (showPlaceholder) GrayColor.C200 else GrayColor.C500,
+        )
+
+        if (showCursor) CursorBar()
+    }
+}
+
+@Composable
+private fun CursorBar() {
+    Box(
+        modifier =
+            Modifier
+                .width(2.dp)
+                .height(28.dp)
+                .background(GrayColor.C500),
+    )
 }
 
 @Preview(showBackground = true)

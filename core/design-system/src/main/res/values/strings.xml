@@ -152,8 +152,6 @@
     <string name="photolog_editor_modify_fail">코멘트 수정에 실패했어요.</string>
     <string name="photolog_detail_reaction_fail">리액션 요청에 실패했어요.</string>
 
-    <string name="photolog_camera_permission_denied_permanently">인증샷 촬영을 위해서 카메라 권한이 필요해요.</string>
-
   <!-- 로그인 화면 -->
     <string name="google_login_button_title">Google로 시작하기</string>
     <string name="kakao_login_button_title">카카오로 시작하기</string>

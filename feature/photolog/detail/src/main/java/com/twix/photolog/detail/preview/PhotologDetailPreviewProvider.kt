@@ -29,7 +29,7 @@ class PhotologDetailPreviewProvider : PreviewParameterProvider<PhotologDetailUiS
                         reaction = null,
                     ),
                 partnerPhotolog = null,
-                isLoading = true
+                isLoading = true,
             ),
             PhotologDetailUiState(
                 goalId = 1,

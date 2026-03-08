@@ -6,6 +6,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -59,8 +60,16 @@ fun ReactionBar(
                     .clip(shape),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            val lastIndex = ReactionUiModel.entries.lastIndex
+
             ReactionUiModel.entries.forEachIndexed { index, reaction ->
                 val isSelected = reaction.type == selectedReaction
+                val paddingModifier =
+                    when (index) {
+                        0 -> Modifier.padding(start = 11.dp, end = 7.dp)
+                        lastIndex -> Modifier.padding(start = 7.dp, end = 11.dp)
+                        else -> Modifier.padding(horizontal = 9.dp)
+                    }
 
                 Box(
                     modifier =
@@ -69,16 +78,24 @@ fun ReactionBar(
                             .fillMaxHeight()
                             .background(
                                 if (isSelected) GrayColor.C300 else GrayColor.C100,
-                            ).noRippleClickable(onClick = { onSelectReaction(reaction.type) }),
+                            ).noRippleClickable(onClick = { onSelectReaction(reaction.type) })
+                            .then(paddingModifier),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Image(
-                        imageVector = ImageVector.vectorResource(reaction.imageResources),
-                        contentDescription = null,
-                    )
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Image(
+                            imageVector = ImageVector.vectorResource(reaction.imageResources),
+                            contentDescription = null,
+                        )
+                    }
                 }
 
-                if (index < 4) {
+                if (index < lastIndex) {
                     VerticalDivider(
                         modifier = Modifier.fillMaxHeight(),
                         color = GrayColor.C500,

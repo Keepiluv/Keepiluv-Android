@@ -115,10 +115,13 @@ fun CommentTextField(
         TextField(
             value = internalValue,
             onValueChange = { newValue ->
-                if (newValue.text.length <= CommentUiModel.COMMENT_COUNT) {
+                val filteredText = newValue.text.filterNot(Char::isWhitespace)
+
+                if (filteredText.length <= CommentUiModel.COMMENT_COUNT) {
                     internalValue =
                         newValue.copy(
-                            selection = TextRange(newValue.text.length),
+                            text = filteredText,
+                            selection = TextRange(filteredText.length),
                         )
                 }
             },

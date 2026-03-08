@@ -43,7 +43,7 @@ fun BackgroundCard(
             AppText(
                 text = uploadedAt,
                 style = AppTextStyle.B4,
-                color = GrayColor.C500,
+                color = GrayColor.C300,
                 modifier =
                     Modifier
                         .padding(end = 36.dp, top = 14.dp)

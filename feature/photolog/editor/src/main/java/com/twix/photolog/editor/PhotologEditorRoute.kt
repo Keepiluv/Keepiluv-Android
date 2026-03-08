@@ -219,9 +219,10 @@ private fun RetakeButton(onClickRetake: () -> Unit) {
     AppRoundButton(
         modifier =
             Modifier
-                .width(330.dp)
+                .fillMaxWidth()
                 .height(70.dp)
-                .noRippleClickable(onClick = onClickRetake),
+                .noRippleClickable(onClick = onClickRetake)
+                .padding(horizontal = 30.dp),
         contentColor = CommonColor.White,
         contentHeight = 68.dp,
         contentBorderColor = GrayColor.C500,

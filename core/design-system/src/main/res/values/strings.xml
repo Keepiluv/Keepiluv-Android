@@ -147,7 +147,7 @@
     <string name="photolog_plz_waiting">잠시만 기다려 주세요.</string>
 
     <!-- 인증샷 상세 화면 !-->
-    <string name="photolog_detail_">다시 찍기</string>
+    <string name="photolog_detail_upload_guide">인증샷을\n올려보세요!</string>
 
     <!-- 인증샷 수정 화면 !-->
     <string name="photolog_editor_retake">다시 찍기</string>

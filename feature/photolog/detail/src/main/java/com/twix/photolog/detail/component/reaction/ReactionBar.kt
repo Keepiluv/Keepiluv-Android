@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.VerticalDivider
@@ -31,21 +32,20 @@ fun ReactionBar(
     selectedReaction: GoalReactionType? = null,
 ) {
     val shape = RoundedCornerShape(999.dp)
-    val height = 68.dp
-    val shadowOffset = 10.dp
-    val shadowStart = 13.dp
 
     Box(
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(height + shadowOffset),
+                .height(77.dp),
     ) {
         Box(
             modifier =
                 Modifier
-                    .matchParentSize()
-                    .padding(start = shadowStart, top = shadowOffset)
+                    .fillMaxWidth()
+                    .height(67.dp)
+                    .padding(start = 1.dp)
+                    .offset(y = 10.dp)
                     .background(GrayColor.C200, shape),
         )
 
@@ -53,7 +53,7 @@ fun ReactionBar(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(height)
+                    .height(68.dp)
                     .border(width = 1.dp, color = GrayColor.C500, shape = shape)
                     .background(GrayColor.C100, shape)
                     .clip(shape),

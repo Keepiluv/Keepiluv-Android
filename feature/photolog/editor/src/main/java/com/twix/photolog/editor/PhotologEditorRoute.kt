@@ -175,7 +175,7 @@ fun PhotologEditorScreen(
                 onClickSave = onClickSave,
             )
 
-            Spacer(Modifier.height(101.dp))
+            Spacer(Modifier.height(103.dp))
 
             PhotologCard(
                 modifier =

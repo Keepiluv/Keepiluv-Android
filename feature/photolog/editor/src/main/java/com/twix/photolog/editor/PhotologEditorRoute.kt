@@ -36,7 +36,6 @@ import coil3.request.crossfade
 import com.twix.designsystem.R
 import com.twix.designsystem.components.button.AppRoundButton
 import com.twix.designsystem.components.comment.CommentAnchorFrame
-import com.twix.designsystem.components.comment.model.CommentUiModel
 import com.twix.designsystem.components.photolog.PhotologCard
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager

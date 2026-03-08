@@ -50,7 +50,7 @@ fun PhotologCard(
 
 @Preview
 @Composable
-fun PhotologCardPreview() {
+private fun PhotologCardPreview() {
     TwixTheme {
         PhotologCard(
             rotation = 0f,

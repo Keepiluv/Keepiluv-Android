@@ -140,7 +140,7 @@ private fun ImageCapturedBar(
             modifier =
                 Modifier
                     .width(150.dp)
-                    .height(68.dp)
+                    .height(74.dp)
                     .noRippleClickable(onClick = onClickUpload),
             contentColor = GrayColor.C500,
             contentHeight = 68.dp,

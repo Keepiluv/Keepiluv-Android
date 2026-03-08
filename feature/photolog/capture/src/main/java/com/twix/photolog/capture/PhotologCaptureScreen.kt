@@ -219,6 +219,7 @@ private fun PhotologCaptureScreen(
         CommentAnchorFrame(
             uiModel = uiState.comment,
             anchorBottom = previewBoxBottom,
+            paddingBottom = 28.dp,
             onCommentChanged = onCommentChanged,
             onFocusChanged = onFocusChanged,
         )

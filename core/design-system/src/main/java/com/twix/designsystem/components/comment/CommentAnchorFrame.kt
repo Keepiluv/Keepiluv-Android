@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.R
@@ -50,6 +51,7 @@ import com.twix.ui.extension.noRippleClickable
 fun CommentAnchorFrame(
     uiModel: CommentUiModel,
     anchorBottom: Float,
+    paddingBottom: Dp,
     onCommentChanged: (String) -> Unit,
     onFocusChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -62,7 +64,7 @@ fun CommentAnchorFrame(
     val imeBottom = WindowInsets.ime.getBottom(density)
     val navBottom = WindowInsets.navigationBars.getBottom(density)
 
-    val commentTextFieldPaddingBottom = with(density) { 28.dp.toPx() }
+    val commentTextFieldPaddingBottom = with(density) { paddingBottom.toPx() }
     val guideTextPaddingBottom = with(density) { 8.dp.toPx() }
 
     var commentTextFieldHeight by remember { mutableFloatStateOf(0f) }

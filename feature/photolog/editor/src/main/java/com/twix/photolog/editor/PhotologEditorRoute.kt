@@ -8,8 +8,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -35,6 +36,7 @@ import coil3.request.crossfade
 import com.twix.designsystem.R
 import com.twix.designsystem.components.button.AppRoundButton
 import com.twix.designsystem.components.comment.CommentAnchorFrame
+import com.twix.designsystem.components.comment.model.CommentUiModel
 import com.twix.designsystem.components.photolog.PhotologCard
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
@@ -79,6 +81,7 @@ fun PhotologEditorRoute(
                         sideEffect.type,
                     ),
                 )
+
             is PhotologEditorSideEffect.ShowPokeToast -> {
                 toastManager.tryShow(
                     ToastData(sideEffect.message, ToastType.SUCCESS),
@@ -172,7 +175,7 @@ fun PhotologEditorScreen(
                 onClickSave = onClickSave,
             )
 
-            Spacer(Modifier.height(103.dp))
+            Spacer(Modifier.height(101.dp))
 
             PhotologCard(
                 modifier =
@@ -204,6 +207,7 @@ fun PhotologEditorScreen(
         CommentAnchorFrame(
             uiModel = uiState.comment,
             anchorBottom = photologBottom,
+            paddingBottom = 24.dp,
             onCommentChanged = onCommentChanged,
             onFocusChanged = onFocusChanged,
         )

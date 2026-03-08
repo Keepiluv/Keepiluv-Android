@@ -216,7 +216,7 @@ private fun RetakeButton(onClickRetake: () -> Unit) {
         modifier =
             Modifier
                 .width(330.dp)
-                .height(68.dp)
+                .height(70.dp)
                 .noRippleClickable(onClick = onClickRetake),
         contentColor = CommonColor.White,
         contentHeight = 68.dp,

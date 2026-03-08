@@ -12,9 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.twix.designsystem.R
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
@@ -132,6 +134,31 @@ private fun BlackAppRoundButtonPreview() {
                 style = AppTextStyle.T2,
                 color = CommonColor.White,
                 text = "버튼 이름",
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LongAppRoundButtonPreview() {
+    TwixTheme {
+        AppRoundButton(
+            modifier =
+                Modifier
+                    .width(330.dp)
+                    .height(70.dp),
+            contentColor = CommonColor.White,
+            contentHeight = 68.dp,
+            contentBorderColor = GrayColor.C500,
+            contentBorderWidth = 1.6.dp,
+            shadowHeight = 70.dp,
+            shadowOffset = 4.dp,
+        ) {
+            AppText(
+                style = AppTextStyle.T2,
+                color = GrayColor.C500,
+                text = stringResource(R.string.photolog_editor_retake),
             )
         }
     }

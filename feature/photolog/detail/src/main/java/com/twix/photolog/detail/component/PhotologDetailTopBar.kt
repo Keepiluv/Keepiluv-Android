@@ -49,7 +49,7 @@ internal fun PhotologDetailTopBar(
                     modifier =
                         Modifier
                             .fillMaxSize()
-                            .background(GrayColor.C100)
+                            .background(GrayColor.C050)
                             .noRippleClickable { onClickModify() },
                     contentAlignment = Alignment.Center,
                 ) {

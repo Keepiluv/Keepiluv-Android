@@ -79,7 +79,7 @@ class PhotologDetailViewModel(
                 }
             },
             onError = {
-                showToast(R.string.photolog_detail_fetch_photolog_fail, ToastType.ERROR)
+                showToast(R.string.toast_photolog_detail_fetch_fail, ToastType.ERROR)
             },
             onFinally = { reduce { copy(isLoading = true) } },
         )
@@ -106,7 +106,7 @@ class PhotologDetailViewModel(
             onSuccess = {},
             onError = {
                 rollbackReaction()
-                showToast(R.string.photolog_detail_reaction_fail, ToastType.ERROR)
+                showToast(R.string.toast_reaction_fail, ToastType.ERROR)
             },
         )
     }

@@ -61,7 +61,7 @@ class PhotologCaptureViewModel(
 
     private fun takePicture(uri: Uri?) {
         uri?.let { reducePicture(it) } ?: showToast(
-            R.string.photolog_image_capture_fail,
+            R.string.toast_image_capture_fail,
             ToastType.ERROR,
         )
     }
@@ -112,7 +112,7 @@ class PhotologCaptureViewModel(
             if (imageBytes != null) {
                 upload(imageBytes)
             } else {
-                showToast(R.string.photolog_image_translate_fail, ToastType.ERROR)
+                showToast(R.string.toast_image_translate_fail, ToastType.ERROR)
             }
         }
     }
@@ -140,7 +140,7 @@ class PhotologCaptureViewModel(
             onSuccess = { fileName -> handleUploadPhotologSuccess(fileName) },
             onError = {
                 reduce { copy(isLoading = false) }
-                showToast(R.string.photolog_upload_fail, ToastType.ERROR)
+                showToast(R.string.toast_photolog_upload_fail, ToastType.ERROR)
             },
         )
     }
@@ -169,7 +169,7 @@ class PhotologCaptureViewModel(
             },
             onSuccess = { handleUploadPhotologSuccess() },
             onError = {
-                showToast(R.string.photolog_upload_fail, ToastType.ERROR)
+                showToast(R.string.toast_photolog_upload_fail, ToastType.ERROR)
             },
         )
     }
@@ -198,7 +198,7 @@ class PhotologCaptureViewModel(
             },
             onSuccess = { handleModifyPhotologSuccess() },
             onError = {
-                showToast(R.string.photolog_modify_fail, ToastType.ERROR)
+                showToast(R.string.toast_photolog_modify_fail, ToastType.ERROR)
             },
         )
     }

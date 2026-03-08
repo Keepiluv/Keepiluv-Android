@@ -30,7 +30,7 @@ fun CommentErrorText(modifier: Modifier = Modifier) {
                 .clip(RoundedCornerShape(12.dp)),
     ) {
         AppText(
-            text = stringResource(R.string.comment_error_message),
+            text = stringResource(R.string.toast_comment_length_guide),
             style = AppTextStyle.B1,
             color = CommonColor.White,
             modifier = Modifier.align(Alignment.Center),

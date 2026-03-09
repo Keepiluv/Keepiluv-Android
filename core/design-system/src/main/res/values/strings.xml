@@ -95,7 +95,7 @@
     <string name="stats_stamp_end_tab_title">종료</string>
 
     <!-- 통계 상세 화면 -->
-    <string name="stats_complete_count">%1$s %2$d/%3$d</string>
+    <string name="stats_complete_count">%1$s - %2$d/%3$d</string>
 
     <!-- 알림 화면 -->
     <string name="notification_recent_14_days">최근 14일</string>

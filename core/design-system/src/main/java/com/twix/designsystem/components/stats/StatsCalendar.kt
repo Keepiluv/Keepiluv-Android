@@ -83,10 +83,11 @@ private fun DayOfWeekHeader() {
     ) {
         days.forEach { day ->
             Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(24.dp),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .height(24.dp),
+                contentAlignment = Alignment.Center,
             ) {
                 AppText(
                     text = day,

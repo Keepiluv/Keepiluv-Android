@@ -104,7 +104,7 @@ fun PictureDayCell(
 
             AppText(
                 text = date.dayOfMonth.toString(),
-                style = AppTextStyle.B1,
+                style = AppTextStyle.B3,
                 color = textColor,
                 textAlign = TextAlign.Center,
             )

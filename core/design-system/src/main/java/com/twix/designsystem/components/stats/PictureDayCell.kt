@@ -68,8 +68,8 @@ fun PictureDayCell(
                     .size(36.dp)
                     .clip(cornerShape)
                     .then(
-                        if (showBackgroundCard) {
-                            Modifier.border(1.dp, borderColor, cornerShape)
+                        if (hasImage) {
+                            Modifier.border((1.2).dp, borderColor, cornerShape)
                         } else {
                             Modifier
                         },

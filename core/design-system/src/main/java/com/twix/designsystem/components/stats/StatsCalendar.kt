@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -81,16 +82,19 @@ private fun DayOfWeekHeader() {
         modifier = Modifier.fillMaxWidth(),
     ) {
         days.forEach { day ->
-            AppText(
-                text = day,
-                style = AppTextStyle.C1,
-                color = GrayColor.C300,
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .height(24.dp),
-                textAlign = TextAlign.Center,
-            )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                AppText(
+                    text = day,
+                    style = AppTextStyle.C1,
+                    color = GrayColor.C300,
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
     }
 }

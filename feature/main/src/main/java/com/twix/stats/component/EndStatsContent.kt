@@ -38,7 +38,7 @@ fun EndStatsContent(
                 )
             }
         } else {
-            item { Spacer(Modifier.height(12.dp)) }
+            item { Spacer(Modifier.height(20.dp)) }
 
             items(
                 items = statsGoals,

@@ -56,7 +56,7 @@ fun PictureDayCell(
                 modifier =
                     Modifier
                         .size(36.dp)
-                        .rotate(-16f)
+                        .rotate(16f)
                         .border(1.dp, GrayColor.C400, cornerShape)
                         .background(CommonColor.White, cornerShape),
             )

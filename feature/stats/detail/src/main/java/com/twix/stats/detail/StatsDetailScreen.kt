@@ -158,6 +158,7 @@ fun StatsDetailScreen(
                 modifier =
                     Modifier
                         .fillMaxWidth()
+                        .padding(top = 32.dp)
                         .verticalScroll(scrollState),
             ) {
                 Image(
@@ -166,18 +167,17 @@ fun StatsDetailScreen(
                     modifier =
                         Modifier
                             .align(Alignment.TopStart)
-                            .padding(start = 20.dp, top = 30.dp),
+                            .padding(start = 20.dp),
                 )
 
                 Column(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
+                            .padding(horizontal = 20.dp)
+                            .padding(top = 4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Spacer(Modifier.height(32.dp))
-
                     CalendarNavigator(
                         currentDate = uiState.detail.currentDate,
                         onPreviousMonth = onPreviousMonth,
@@ -210,7 +210,7 @@ fun StatsDetailScreen(
                     modifier =
                         Modifier
                             .align(Alignment.TopEnd)
-                            .padding(end = 27.dp, top = 30.dp),
+                            .padding(end = 27.dp),
                 )
             }
 

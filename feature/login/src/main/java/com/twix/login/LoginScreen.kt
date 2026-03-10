@@ -3,30 +3,22 @@ package com.twix.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.boundsInParent
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.R
 import com.twix.designsystem.components.button.LoginButton
@@ -82,10 +74,6 @@ fun LoginRoute(
 
 @Composable
 private fun LoginScreen(onClickLogin: (LoginType) -> Unit) {
-    var imageBottomPx by remember { mutableFloatStateOf(0f) }
-    val density = LocalDensity.current
-    val offsetPx = with(density) { 34.dp.toPx() }
-
     Column(
         modifier =
             Modifier
@@ -111,41 +99,23 @@ private fun LoginScreen(onClickLogin: (LoginType) -> Unit) {
 
         Spacer(Modifier.height(27.dp))
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_singing),
-                contentDescription = null,
-                modifier =
-                    Modifier
-                        .onGloballyPositioned { coordinates ->
-                            imageBottomPx = coordinates.boundsInParent().bottom
-                        },
-            )
+        Image(
+            imageVector = ImageVector.vectorResource(R.drawable.ic_singing),
+            contentDescription = null,
+        )
 
-            if (imageBottomPx != 0f) {
-                Column(
-                    modifier =
-                        Modifier
-                            .padding(horizontal = 20.dp)
-                            .offset {
-                                IntOffset(
-                                    x = 0,
-                                    /**
-                                     * singing 이미지 하단 기준으로 로그인 버튼을 배치하고
-                                     * 이미지와 버튼이 겹치는 만큼(34dp) 상단으로 이동
-                                     * */
-                                    y = (imageBottomPx - offsetPx).toInt(),
-                                )
-                            },
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    LoginType.entries.forEach { type ->
-                        LoginButton(
-                            type = type,
-                            onClickLogin = onClickLogin,
-                        )
-                    }
-                }
+        Column(
+            modifier =
+                Modifier
+                    .padding(horizontal = 20.dp)
+                    .padding(top = 29.dp, bottom = 27.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            LoginType.entries.forEach { type ->
+                LoginButton(
+                    type = type,
+                    onClickLogin = onClickLogin,
+                )
             }
         }
     }

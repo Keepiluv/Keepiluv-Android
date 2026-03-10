@@ -1,4 +1,4 @@
-package com.twix.designsystem.components.button
+package com.twix.login.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,7 +27,7 @@ import com.twix.domain.model.enums.LoginType
 import com.twix.ui.extension.noRippleClickable
 
 @Composable
-fun LoginButton(
+internal fun LoginButton(
     type: LoginType,
     onClickLogin: (LoginType) -> Unit,
     modifier: Modifier = Modifier,

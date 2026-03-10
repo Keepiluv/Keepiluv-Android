@@ -125,10 +125,11 @@ fun CoupleConnectScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(color = CommonColor.White)
-                .verticalScroll(scrollState),
+                .background(color = CommonColor.White),
     ) {
-        Column {
+        Column(
+            Modifier.verticalScroll(scrollState),
+        ) {
             CoupleConnectTopbar(onClickBack = onClickBack)
 
             Spacer(modifier = Modifier.height(8.dp))

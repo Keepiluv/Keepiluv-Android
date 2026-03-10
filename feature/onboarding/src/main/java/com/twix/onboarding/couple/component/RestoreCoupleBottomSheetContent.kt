@@ -19,11 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.twix.designsystem.R
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
-import com.twix.designsystem.R as DesR
 
 @Composable
 internal fun RestoreCoupleBottomSheetContent() {
@@ -35,7 +35,7 @@ internal fun RestoreCoupleBottomSheetContent() {
                 .padding(horizontal = 30.dp),
     ) {
         AppText(
-            text = stringResource(DesR.string.onboarding_couple_restore),
+            text = stringResource(R.string.onboarding_couple_restore),
             style = AppTextStyle.T1,
             color = GrayColor.C500,
         )
@@ -43,7 +43,7 @@ internal fun RestoreCoupleBottomSheetContent() {
         Spacer(Modifier.height(3.dp))
 
         AppText(
-            text = stringResource(DesR.string.onboarding_couple_restore_bottom_sheet_content),
+            text = stringResource(R.string.onboarding_couple_restore_bottom_sheet_content),
             style = AppTextStyle.B2,
             color = GrayColor.C400,
         )
@@ -58,9 +58,9 @@ internal fun RestoreCoupleBottomSheetContent() {
                     .background(GrayColor.C050, RoundedCornerShape(12.dp)),
             verticalArrangement = Arrangement.Center,
         ) {
-            BulletItem(stringResource(DesR.string.onboarding_couple_restore_content_my_email))
-            BulletItem(stringResource(DesR.string.onboarding_couple_restore_content_partner_email))
-            BulletItem(stringResource(DesR.string.onboarding_couple_restore_content_restore_date))
+            BulletItem(stringResource(R.string.onboarding_couple_restore_content_my_email))
+            BulletItem(stringResource(R.string.onboarding_couple_restore_content_partner_email))
+            BulletItem(stringResource(R.string.onboarding_couple_restore_content_restore_date))
         }
     }
 }

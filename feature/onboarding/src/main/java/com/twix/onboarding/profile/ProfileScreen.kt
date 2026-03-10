@@ -28,6 +28,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.twix.designsystem.R
 import com.twix.designsystem.components.button.AppButton
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.text_field.UnderlineTextField
@@ -44,7 +45,6 @@ import com.twix.onboarding.contract.OnBoardingSideEffect
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.noRippleClickable
 import org.koin.compose.koinInject
-import com.twix.designsystem.R as DesR
 
 @Composable
 fun ProfileRoute(
@@ -105,7 +105,7 @@ private fun ProfileScreen(
         Spacer(modifier = Modifier.height(80.dp))
 
         AppText(
-            text = stringResource(DesR.string.onboarding_profile_title),
+            text = stringResource(R.string.onboarding_profile_title),
             style = AppTextStyle.H3,
             color = GrayColor.C500,
             modifier = Modifier.padding(start = 24.dp),
@@ -115,12 +115,12 @@ private fun ProfileScreen(
 
         UnderlineTextField(
             value = uiModel.nickname,
-            placeHolder = stringResource(DesR.string.onboarding_name_placeholder),
+            placeHolder = stringResource(R.string.onboarding_name_placeholder),
             showTrailing = true,
             onValueChange = onChangeNickName,
             trailing = {
                 Image(
-                    imageVector = ImageVector.vectorResource(DesR.drawable.ic_clear_text),
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_clear_text),
                     contentDescription = null,
                     modifier = Modifier.noRippleClickable { onChangeNickName("") },
                 )
@@ -138,7 +138,7 @@ private fun ProfileScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(DesR.drawable.ic_check_success),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_check_success),
                 contentDescription = null,
                 tint = if (uiModel.isValid) SystemColor.Success else GrayColor.C300,
             )
@@ -148,14 +148,14 @@ private fun ProfileScreen(
             AppText(
                 style = AppTextStyle.C2,
                 color = if (uiModel.isValid) SystemColor.Success else GrayColor.C300,
-                text = stringResource(id = DesR.string.onboarding_name_helper),
+                text = stringResource(id = R.string.onboarding_name_helper),
             )
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
         AppButton(
-            text = stringResource(DesR.string.onboarding_profile_button_title),
+            text = stringResource(R.string.onboarding_profile_button_title),
             onClick = { onCompleted() },
             backgroundColor = if (uiModel.isValid) GrayColor.C500 else GrayColor.C100,
             textColor = if (uiModel.isValid) CommonColor.White else GrayColor.C300,

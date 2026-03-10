@@ -3,6 +3,7 @@ package com.twix.onboarding.couple.component
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -49,20 +50,32 @@ internal fun ConnectButton(
         Column(
             modifier =
                 Modifier
+                    .padding(vertical = 20.dp)
                     .padding(start = 25.dp),
         ) {
-            AppText(
-                text = stringResource(R.string.onboarding_couple_connect_direct_description),
-                style = AppTextStyle.C1,
-                color = GrayColor.C400,
+            Box(
                 modifier = Modifier.height(18.dp),
-            )
-            AppText(
-                text = stringResource(R.string.onboarding_couple_direct_connect_button_title),
-                style = AppTextStyle.T2,
-                color = GrayColor.C500,
+                contentAlignment = Alignment.Center,
+            ) {
+                AppText(
+                    text = stringResource(R.string.onboarding_couple_connect_direct_description),
+                    style = AppTextStyle.C1,
+                    color = GrayColor.C400,
+                )
+            }
+
+            Spacer(Modifier.weight(1f))
+
+            Box(
                 modifier = Modifier.height(24.dp),
-            )
+                contentAlignment = Alignment.Center,
+            ) {
+                AppText(
+                    text = stringResource(R.string.onboarding_couple_direct_connect_button_title),
+                    style = AppTextStyle.T2,
+                    color = GrayColor.C500,
+                )
+            }
         }
 
         Spacer(modifier = Modifier.weight(1f))

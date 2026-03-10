@@ -153,9 +153,6 @@ class OnBoardingViewModel(
                     emitSideEffect(sideEffect)
                 }
             },
-            onError = {
-                // 에러처리 추가
-            },
         )
     }
 

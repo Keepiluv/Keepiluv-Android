@@ -190,15 +190,28 @@ private fun InviteCodeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                AppText(
-                    text = stringResource(R.string.onboarding_invite_code_my_invite_code),
-                    style = AppTextStyle.B3,
-                    color = GrayColor.C400,
-                )
+                Box(
+                    modifier =
+                        Modifier
+                            .height(18.dp)
+                            .fillMaxWidth(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AppText(
+                        text = stringResource(R.string.onboarding_invite_code_my_invite_code),
+                        style = AppTextStyle.B3,
+                        color = GrayColor.C400,
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Row(
+                    modifier =
+                        Modifier
+                            .height(39.dp)
+                            .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     AppText(
@@ -219,12 +232,19 @@ private fun InviteCodeScreen(
 
             Spacer(modifier = Modifier.height(52.dp))
 
-            AppText(
-                text = stringResource(R.string.onboarding_invite_code_write_invite_code),
-                style = AppTextStyle.B3,
-                color = GrayColor.C500,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-            )
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(18.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                AppText(
+                    text = stringResource(R.string.onboarding_invite_code_write_invite_code),
+                    style = AppTextStyle.B3,
+                    color = GrayColor.C500,
+                )
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -252,16 +272,23 @@ private fun InviteCodeScreen(
     }
 }
 
-@Preview(name = "InviteCodeScreen", showBackground = true)
+@Preview(showBackground = true)
 @Composable
 private fun InviteCodeScreenPreview() {
     TwixTheme {
+        var textState by remember { mutableStateOf("") }
+
         InviteCodeScreen(
-            uiModel = InviteCodeUiModel(),
-            onChangeInviteCode = {},
+            uiModel =
+                InviteCodeUiModel(
+                    partnerInviteCode = textState,
+                    myInviteCode = "ABCDEFG",
+                    isValid = textState.length == 6,
+                ),
+            onChangeInviteCode = { textState = it },
             onComplete = {},
             navigateToBack = {},
-            keyboardState = Keyboard.Opened,
+            keyboardState = Keyboard.Closed,
             onCopyInviteCode = {},
         )
     }

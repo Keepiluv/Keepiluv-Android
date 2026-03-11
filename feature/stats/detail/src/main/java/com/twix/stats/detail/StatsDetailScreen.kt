@@ -61,7 +61,7 @@ import java.time.LocalDate
 fun StatsDetailRoute(
     onBack: () -> Unit,
     navigateToGoalEditor: (Long) -> Unit,
-    navigateToTaskCertificationDetail: (Long, LocalDate, BetweenUs) -> Unit,
+    navigateToPhotologDetail: (Long, LocalDate, BetweenUs, Boolean) -> Unit,
     toastManager: ToastManager = koinInject(),
     viewModel: StatsDetailViewModel = koinViewModel(),
 ) {
@@ -74,11 +74,12 @@ fun StatsDetailRoute(
         when (sideEffect) {
             StatsDetailSideEffect.NavigateToBack -> onBack()
             is StatsDetailSideEffect.NavigateToGoalEditor -> navigateToGoalEditor(sideEffect.goalId)
-            is StatsDetailSideEffect.NavigateToTaskCertificationDetail ->
-                navigateToTaskCertificationDetail(
+            is StatsDetailSideEffect.NavigateToPhotologDetail ->
+                navigateToPhotologDetail(
                     sideEffect.goalId,
                     sideEffect.date,
                     sideEffect.betweenUs,
+                    sideEffect.isCompleted,
                 )
             is StatsDetailSideEffect.ShowToast -> {
                 toastManager.tryShow(

@@ -17,9 +17,10 @@ sealed interface StatsDetailSideEffect : SideEffect {
         val goalId: Long,
     ) : StatsDetailSideEffect
 
-    data class NavigateToTaskCertificationDetail(
+    data class NavigateToPhotologDetail(
         val goalId: Long,
         val date: LocalDate,
         val betweenUs: BetweenUs,
+        val isCompleted: Boolean,
     ) : StatsDetailSideEffect
 }

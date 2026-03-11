@@ -30,24 +30,26 @@ sealed class NavRoutes(
     object MainRoute : NavRoutes("main")
 
     /**
-     * TaskCertificationGraph
+     * PhotologGraph
      * */
-    object TaskCertificationGraph : NavRoutes("task_certification_graph")
+    object PhotologGraph : NavRoutes("photolog_graph")
 
-    object TaskCertificationDetailRoute :
-        NavRoutes("task_certification_detail/{goalId}/{date}/{betweenUs}") {
+    object PhotologDetailRoute :
+        NavRoutes("photolog_detail/{goalId}/{date}/{betweenUs}?isCompleted={isCompleted}") {
         const val ARG_GOAL_ID = "goalId"
         const val ARG_DATE = "date"
         const val ARG_BETWEEN_US = "betweenUs"
+        const val ARG_IS_COMPLETED = "isCompleted"
 
         fun createRoute(
             goalId: Long,
             date: LocalDate,
             betweenUs: String,
-        ) = "task_certification_detail/$goalId/$date/$betweenUs"
+            isCompleted: Boolean = false,
+        ) = "photolog_detail/$goalId/$date/$betweenUs?isCompleted=$isCompleted"
     }
 
-    object TaskCertificationRoute : NavRoutes("task_certification/{data}") {
+    object PhotologRoute : NavRoutes("photolog/{data}") {
         const val ARG_DATA = "data"
 
         enum class From {
@@ -59,19 +61,19 @@ sealed class NavRoutes(
         fun createRoute(data: DetailNavArgs): String {
             val json = Json.encodeToString(data)
             val encoded = Uri.encode(json)
-            return "task_certification/$encoded"
+            return "photolog/$encoded"
         }
     }
 
-    object TaskCertificationEditorRoute :
-        NavRoutes("task_certification_editor/{goalId}/{date}") {
+    object PhotologEditorRoute :
+        NavRoutes("photolog_editor/{goalId}/{date}") {
         const val ARG_GOAL_ID = "goalId"
         const val ARG_DATE = "date"
 
         fun createRoute(
             goalId: Long,
             date: LocalDate,
-        ) = "task_certification_editor/$goalId/$date"
+        ) = "photolog_editor/$goalId/$date"
     }
 
     /**

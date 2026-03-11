@@ -33,7 +33,7 @@ fun ForegroundCard(
                     when (currentShow) {
                         BetweenUs.ME -> stringResource(R.string.keep_it_up)
                         BetweenUs.PARTNER ->
-                            stringResource(R.string.partner_not_task_certification).format(
+                            stringResource(R.string.partner_not_photolog).format(
                                 nickName,
                             )
                     },

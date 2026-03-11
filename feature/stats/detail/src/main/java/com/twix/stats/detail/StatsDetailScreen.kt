@@ -125,6 +125,7 @@ fun StatsDetailScreen(
             modifier =
                 Modifier
                     .fillMaxSize()
+                    .verticalScroll(scrollState)
                     .background(GrayColor.C050),
         ) {
             StatsDetailTopbar(
@@ -159,7 +160,6 @@ fun StatsDetailScreen(
                     Modifier
                         .fillMaxWidth()
                         .padding(top = 32.dp)
-                        .verticalScroll(scrollState),
             ) {
                 Image(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_hug),

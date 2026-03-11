@@ -159,7 +159,7 @@ fun StatsDetailScreen(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(top = 32.dp)
+                        .padding(top = 32.dp),
             ) {
                 Image(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_hug),

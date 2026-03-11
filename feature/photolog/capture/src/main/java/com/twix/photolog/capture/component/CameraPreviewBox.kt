@@ -3,9 +3,10 @@ package com.twix.photolog.capture.component
 import androidx.camera.compose.CameraXViewfinder
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -35,7 +36,8 @@ fun CameraPreviewBox(
     Box(
         modifier =
             modifier
-                .size(375.66.dp)
+                .fillMaxWidth()
+                .aspectRatio(1f)
                 .padding(horizontal = 5.dp)
                 .onGloballyPositioned { coordinates ->
                     onPositioned(coordinates.boundsInParent().bottom)

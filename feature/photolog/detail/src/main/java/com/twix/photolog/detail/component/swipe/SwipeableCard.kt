@@ -1,8 +1,6 @@
 package com.twix.photolog.detail.component.swipe
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
@@ -14,7 +12,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -41,6 +38,7 @@ fun SwipeableCard(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
+    val threshold = with(density) { spec.dismissThreshold.toPx() }
 
     /**
      * 카드 상태 값
@@ -79,9 +77,7 @@ fun SwipeableCard(
                          * 드래그 중
                          * → 위치 즉시 반영 (snap)
                          */
-                        onDrag = { change, dragAmount ->
-                            change.consume()
-
+                        onDrag = { _, dragAmount ->
                             coroutineScope.launch {
                                 offsetX.snapTo(offsetX.value + dragAmount.x)
                             }
@@ -90,34 +86,9 @@ fun SwipeableCard(
                          * 드래그 종료 시 처리
                          */
                         onDragEnd = {
-                            val thresholdPx = with(density) { spec.dismissThresholdDp.toPx() }
-                            val shouldDismiss = abs(offsetX.value) > thresholdPx
-
-                            if (shouldDismiss) {
-                                coroutineScope.launch {
-                                    /**
-                                     * 화면 밖으로 날리기
-                                     */
-                                    val targetX =
-                                        if (offsetX.value > 0) {
-                                            spec.dismissDistancePx
-                                        } else {
-                                            -spec.dismissDistancePx
-                                        }
-
-                                    val targetY = 0f
-
-                                    /**
-                                     * dismiss 애니메이션 완료 대기
-                                     */
-                                    coroutineScope {
-                                        launch { offsetX.animateTo(targetX, tween(spec.dismissDuration)) }
-                                        launch { opacity.animateTo(0f, tween(spec.dismissDuration)) }
-                                    }
-
-                                    /**
-                                     * 데이터 교체
-                                     */
+                            val shouldDismiss = abs(offsetX.value) > threshold
+                            coroutineScope.launch {
+                                if (shouldDismiss) {
                                     onSwipe()
 
                                     /**
@@ -125,32 +96,17 @@ fun SwipeableCard(
                                      */
                                     val reappearStartX =
                                         if (isDisplayingMyPhoto) {
-                                            spec.dismissDistancePx * spec.reappearOffsetRatio
+                                            spec.dismissDistance * spec.reappearOffsetRatio
                                         } else {
-                                            -spec.dismissDistancePx * spec.reappearOffsetRatio
+                                            -spec.dismissDistance * spec.reappearOffsetRatio
                                         }
                                     offsetX.snapTo(reappearStartX)
 
-                                    /**
-                                     * 스프링 복귀
-                                     */
-                                    launch {
-                                        offsetX.animateTo(
-                                            0f,
-                                            spring(
-                                                dampingRatio = spec.springDamping,
-                                                stiffness = spec.springStiffness,
-                                            ),
-                                        )
-                                    }
-                                    launch {
-                                        opacity.animateTo(1f, spring(spec.springDamping))
-                                    }
-                                }
-                            } else {
-                                // threshold 미만 → 제자리 복귀
-                                coroutineScope.launch {
-                                    launch { offsetX.animateTo(0f, spring()) }
+                                    launch { offsetX.animateTo(0f) }
+                                    launch { opacity.animateTo(1f) }
+                                } else {
+                                    // threshold 미만 → 제자리 복귀
+                                    launch { offsetX.animateTo(0f) }
                                 }
                             }
                         },

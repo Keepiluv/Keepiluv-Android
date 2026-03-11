@@ -1,6 +1,7 @@
 package com.twix.photolog.capture
 
 import android.net.Uri
+import androidx.camera.core.CameraSelector
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.R
@@ -15,6 +16,7 @@ import com.twix.photolog.capture.contract.PhotologCaptureIntent
 import com.twix.photolog.capture.contract.PhotologCaptureSideEffect
 import com.twix.photolog.capture.contract.PhotologCaptureUiState
 import com.twix.photolog.capture.model.CaptureStatus
+import com.twix.photolog.capture.model.TorchStatus
 import com.twix.ui.base.BaseViewModel
 import com.twix.ui.image.ImageGenerator
 import com.twix.util.bus.GoalRefreshBus
@@ -71,30 +73,42 @@ class PhotologCaptureViewModel(
     }
 
     private fun reducePicture(uri: Uri) {
-        reduce { updatePicture(uri) }
+        reduce {
+            copy(
+                capture = CaptureStatus.Captured(uri),
+                torch = TorchStatus.Off,
+            )
+        }
         if (uiState.value.hasMaxCommentLength.not()) {
             reduceCommentFocus(true)
         }
     }
 
     private fun reduceLens() {
-        reduce { toggleLens() }
+        val newLens =
+            if (currentState.lens == CameraSelector.DEFAULT_BACK_CAMERA) {
+                CameraSelector.DEFAULT_FRONT_CAMERA
+            } else {
+                CameraSelector.DEFAULT_BACK_CAMERA
+            }
+
+        reduce { copy(lens = newLens, torch = TorchStatus.Off) }
     }
 
     private fun reduceTorch() {
-        reduce { toggleTorch() }
+        reduce { copy(torch = TorchStatus.toggle(torch)) }
     }
 
     private fun setupRetake() {
-        reduce { removePicture() }
+        reduce { copy(capture = CaptureStatus.NotCaptured) }
     }
 
-    private fun reduceComment(comment: String) {
-        reduce { updateComment(comment) }
+    private fun reduceComment(newComment: String) {
+        reduce { copy(comment = comment.copy(value = newComment)) }
     }
 
     private fun reduceCommentFocus(isFocused: Boolean) {
-        reduce { updateCommentFocus(isFocused) }
+        reduce { copy(comment = comment.copy(isFocused = isFocused)) }
     }
 
     private fun handleUploadIntent() {
@@ -120,9 +134,9 @@ class PhotologCaptureViewModel(
     private fun showValidationError() {
         viewModelScope.launch {
             if (!currentState.comment.canUpload) {
-                reduce { showCommentError() }
+                reduce { copy(showCommentError = true) }
                 delay(ERROR_DISPLAY_DURATION_MS)
-                reduce { hideCommentError() }
+                reduce { copy(showCommentError = false) }
             }
         }
     }

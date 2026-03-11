@@ -1,6 +1,5 @@
 package com.twix.photolog.capture.contract
 
-import android.net.Uri
 import androidx.camera.core.CameraSelector
 import androidx.compose.runtime.Immutable
 import com.twix.designsystem.components.comment.model.CommentUiModel
@@ -24,38 +23,4 @@ data class PhotologCaptureUiState(
 
     val showTorch: Boolean
         get() = capture is CaptureStatus.NotCaptured && lens == CameraSelector.DEFAULT_BACK_CAMERA
-
-    fun toggleLens(): PhotologCaptureUiState {
-        val newLens =
-            if (lens == CameraSelector.DEFAULT_BACK_CAMERA) {
-                CameraSelector.DEFAULT_FRONT_CAMERA
-            } else {
-                CameraSelector.DEFAULT_BACK_CAMERA
-            }
-        return copy(
-            lens = newLens,
-            torch = TorchStatus.Off,
-        )
-    }
-
-    fun toggleTorch(): PhotologCaptureUiState {
-        val newFlashMode = TorchStatus.Companion.toggle(torch)
-        return copy(torch = newFlashMode)
-    }
-
-    fun updatePicture(uri: Uri): PhotologCaptureUiState =
-        copy(
-            capture = CaptureStatus.Captured(uri),
-            torch = TorchStatus.Off,
-        )
-
-    fun removePicture(): PhotologCaptureUiState = copy(capture = CaptureStatus.NotCaptured)
-
-    fun updateComment(newComment: String) = copy(comment = comment.updateComment(newComment))
-
-    fun updateCommentFocus(isFocused: Boolean) = copy(comment = comment.updateFocus(isFocused))
-
-    fun showCommentError() = copy(showCommentError = true)
-
-    fun hideCommentError() = copy(showCommentError = false)
 }

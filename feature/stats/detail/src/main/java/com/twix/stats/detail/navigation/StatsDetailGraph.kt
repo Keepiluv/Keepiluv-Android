@@ -36,9 +36,9 @@ object StatsDetailGraph : NavGraphContributor {
                         launchSingleTop = true
                     }
                 },
-                navigateToTaskCertificationDetail = { goalId, date, betweenUs, isCompleted ->
+                navigateToPhotologDetail = { goalId, date, betweenUs, isCompleted ->
                     val destination =
-                        NavRoutes.TaskCertificationDetailRoute.createRoute(
+                        NavRoutes.PhotologDetailRoute.createRoute(
                             goalId = goalId,
                             date = date,
                             betweenUs = betweenUs.name,

@@ -39,6 +39,10 @@
     <string name="word_friday">금</string>
     <string name="word_saturday">토</string>
 
+    <!-- 날짜 포맷 -->
+    <string name="date_year_month_day">%s년 %02d월 %02d일</string>
+    <string name="date_year_month_day_no_padding">%1$d년 %2$d월 %3$d일</string>
+
     <!-- 동작 -->
     <string name="action_edit">수정하기</string>
     <string name="action_delete">삭제하기</string>
@@ -58,7 +62,7 @@
     <string name="comment_condition_guide">5글자로 코멘트를 남길 수 있어요</string>
 
     <!-- 인증샷 화면 -->
-    <string name="partner_not_task_certification">%s님은\n아직…</string>
+    <string name="partner_not_photolog">%s님은\n아직…</string>
 
     <!-- 목표 생성, 편집 화면 -->
     <string name="goal_editor_title">목표 직접 만들기</string>
@@ -73,7 +77,6 @@
     <string name="goal_list_title_previous">지난 우리 목표</string>
     <string name="goal_list_title_today">오늘 우리 목표</string>
     <string name="goal_list_title_next">다음 우리 목표</string>
-    <string name="date_year_month_day">%s년 %02d월 %02d일</string>
     <string name="goal_detail_empty_goal_guide">아직 목표가 없어요!</string>
 
     <!-- 설정 화면 -->
@@ -92,7 +95,7 @@
     <string name="stats_stamp_end_tab_title">종료</string>
 
     <!-- 통계 상세 화면 -->
-    <string name="stats_complete_count">%1$s %2$d/%3$d</string>
+    <string name="stats_complete_count">%1$s - %2$d/%3$d</string>
 
     <!-- 알림 화면 -->
     <string name="notification_recent_14_days">최근 14일</string>
@@ -117,6 +120,16 @@
     <string name="toast_already_used_invite_code_message">이미 사용된 초대 코드입니다.</string>
     <string name="toast_invite_code_copy">초대 코드가 복사되었어요</string>
     <string name="toast_invalid_invite_code">잘못된 초대 코드입니다</string>
+    <string name="toast_reaction_fail">리액션 요청에 실패했어요.</string>
+    <string name="toast_photolog_upload_fail">인증샷 등록에 실패했습니다.</string>
+    <string name="toast_image_translate_fail">이미지 변환에 실패했습니다.</string>
+    <string name="toast_image_capture_fail">인증샷 촬영에 실패했습니다. 다시 시도해 주세요.</string>
+    <string name="toast_photolog_detail_fetch_fail">인증샷 조회에 실패했습니다.</string>
+    <string name="toast_comment_modify_success">코멘트가 수정 되었어요.</string>
+    <string name="toast_comment_not_modified">코멘트가 수정되지 않았어요.</string>
+    <string name="toast_comment_modify_fail">코멘트 수정에 실패했어요.</string>
+    <string name="toast_photolog_modify_fail">인증샷 수정에 실패했어요.</string>
+    <string name="toast_comment_length_guide">코멘트는 5글자로 입력해주세요!</string>
 
     <!-- 다이얼로그 -->
     <string name="dialog_end_goal_title">%s\n목표를 이루셨나요?</string>
@@ -133,28 +146,17 @@
     <string name="marketing_dialog_description">* 언제든지 설정 > 알림 설정에서 변경 가능해요</string>
 
     <!-- 인증샷 촬영 화면 !-->
-    <string name="task_certification_upload">업로드</string>
-    <string name="task_certification_image_capture_fail">이미지 캡처에 실패했습니다. 다시 시도해 주세요.</string>
-    <string name="task_certification_image_pick_fail">이미지를 불러오는 데 실패했습니다. 다시 시도해 주세요.</string>
-    <string name="task_certification_take_picture">인증샷 찍기</string>
-    <string name="task_certification_upload_fail">인증샷 등록에 실패했습니다.</string>
-    <string name="task_certification_image_translate_fail">이미지 변환에 실패했습니다.</string>
-    <string name="task_certification_loading">인증샷 업로드 중...</string>
-    <string name="task_certification_plz_waiting">잠시만 기다려 주세요.</string>
-    <string name="comment_error_message">코멘트는 5글자로 입력해주세요!</string>
+    <string name="photolog_upload">업로드</string>
+    <string name="photolog_picture_upload">업로드하기</string>
+    <string name="photolog_take_picture">인증샷 찍기</string>
+    <string name="photolog_loading">인증샷 업로드 중...</string>
+    <string name="photolog_plz_waiting">잠시만 기다려 주세요.</string>
 
-    <!-- 인증샷 보기 화면 !-->
-    <string name="task_certification_detail_fetch_photolog_fail">인증샷 조회에 실패했습니다.</string>
-    <string name="task_certification_modify_fail">인증샷 수정에 실패했어요.</string>
+    <!-- 인증샷 상세 화면 !-->
+    <string name="photolog_detail_upload_guide">인증샷을\n올려보세요!</string>
 
     <!-- 인증샷 수정 화면 !-->
-    <string name="task_certification_editor_retake">다시 찍기</string>
-    <string name="task_certification_editor_modify_success">코멘트가 수정 되었어요.</string>
-    <string name="task_certification_editor_not_modified">코멘트가 수정되지 않았어요.</string>
-    <string name="task_certification_editor_modify_fail">코멘트 수정에 실패했어요.</string>
-    <string name="task_certification_detail_reaction_fail">리액션 요청에 실패했어요.</string>
-
-    <string name="task_certification_camera_permission_denied_permanently">인증샷 촬영을 위해서 카메라 권한이 필요해요.</string>
+    <string name="photolog_editor_retake">다시 찍기</string>
 
   <!-- 로그인 화면 -->
     <string name="google_login_button_title">Google로 시작하기</string>

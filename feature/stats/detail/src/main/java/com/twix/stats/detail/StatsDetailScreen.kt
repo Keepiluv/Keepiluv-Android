@@ -61,7 +61,7 @@ import java.time.LocalDate
 fun StatsDetailRoute(
     onBack: () -> Unit,
     navigateToGoalEditor: (Long) -> Unit,
-    navigateToTaskCertificationDetail: (Long, LocalDate, BetweenUs, Boolean) -> Unit,
+    navigateToPhotologDetail: (Long, LocalDate, BetweenUs, Boolean) -> Unit,
     toastManager: ToastManager = koinInject(),
     viewModel: StatsDetailViewModel = koinViewModel(),
 ) {
@@ -74,8 +74,8 @@ fun StatsDetailRoute(
         when (sideEffect) {
             StatsDetailSideEffect.NavigateToBack -> onBack()
             is StatsDetailSideEffect.NavigateToGoalEditor -> navigateToGoalEditor(sideEffect.goalId)
-            is StatsDetailSideEffect.NavigateToTaskCertificationDetail ->
-                navigateToTaskCertificationDetail(
+            is StatsDetailSideEffect.NavigateToPhotologDetail ->
+                navigateToPhotologDetail(
                     sideEffect.goalId,
                     sideEffect.date,
                     sideEffect.betweenUs,
@@ -125,6 +125,7 @@ fun StatsDetailScreen(
             modifier =
                 Modifier
                     .fillMaxSize()
+                    .verticalScroll(scrollState)
                     .background(GrayColor.C050),
         ) {
             StatsDetailTopbar(
@@ -158,7 +159,7 @@ fun StatsDetailScreen(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .verticalScroll(scrollState),
+                        .padding(top = 32.dp),
             ) {
                 Image(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_hug),
@@ -166,18 +167,17 @@ fun StatsDetailScreen(
                     modifier =
                         Modifier
                             .align(Alignment.TopStart)
-                            .padding(start = 20.dp, top = 30.dp),
+                            .padding(start = 20.dp),
                 )
 
                 Column(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
+                            .padding(horizontal = 20.dp)
+                            .padding(top = 4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Spacer(Modifier.height(32.dp))
-
                     CalendarNavigator(
                         currentDate = uiState.detail.currentDate,
                         onPreviousMonth = onPreviousMonth,
@@ -210,7 +210,7 @@ fun StatsDetailScreen(
                     modifier =
                         Modifier
                             .align(Alignment.TopEnd)
-                            .padding(end = 27.dp, top = 30.dp),
+                            .padding(end = 27.dp),
                 )
             }
 

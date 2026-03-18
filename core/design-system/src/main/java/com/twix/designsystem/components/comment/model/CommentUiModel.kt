@@ -12,13 +12,9 @@ data class CommentUiModel(
 
     val canUpload: Boolean
         get() =
-            value.isEmpty() ||
-                value.isNotEmpty() &&
+            value.isBlank() ||
+                value.isNotBlank() &&
                 hasMaxCommentLength
-
-    fun updateComment(newComment: String): CommentUiModel = copy(value = newComment)
-
-    fun updateFocus(isFocused: Boolean) = copy(isFocused = isFocused)
 
     companion object {
         const val COMMENT_COUNT = 5

@@ -105,7 +105,7 @@ fun SummaryContent(
                 label = stringResource(R.string.word_start_date),
                 value =
                     stringResource(
-                        R.string.date_year_month_day,
+                        R.string.date_year_month_day_no_padding,
                         statsSummary.startDate.year,
                         statsSummary.startDate.monthValue,
                         statsSummary.startDate.dayOfMonth,
@@ -116,7 +116,7 @@ fun SummaryContent(
                 value =
                     statsSummary.endDate?.let {
                         stringResource(
-                            R.string.date_year_month_day,
+                            R.string.date_year_month_day_no_padding,
                             it.year,
                             it.monthValue,
                             it.dayOfMonth,
@@ -170,7 +170,7 @@ private fun SummaryContentPreview() {
                     partnerCompletedCount = 8,
                     totalCount = 20,
                     repeatCycle = RepeatCycle.DAILY,
-                    startDate = LocalDate.now(),
+                    startDate = LocalDate.of(2025, 11, 12),
                     endDate = LocalDate.now(),
                 ),
         )

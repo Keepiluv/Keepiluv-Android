@@ -44,6 +44,13 @@ class StatsViewModel(
         )
 
     init {
+        collectMonthChange()
+        fetchInProgressStats(YearMonth.from(currentState.currentDate))
+        fetchCompletedStats()
+        collectEventBus()
+    }
+
+    private fun collectMonthChange() {
         viewModelScope.launch {
             monthChangeFlow
                 .distinctUntilChanged()
@@ -52,10 +59,6 @@ class StatsViewModel(
                     fetchInProgressStats(yearMonth)
                 }
         }
-
-        fetchInProgressStats(YearMonth.from(currentState.currentDate))
-        fetchCompletedStats()
-        collectEventBus()
     }
 
     override suspend fun handleIntent(intent: StatsIntent) {

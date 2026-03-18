@@ -9,10 +9,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -28,6 +33,7 @@ import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.designsystem.extension.showCameraPermissionToastWithNavigateToSettingAction
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.TwixTheme
+import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalReactionType
 import com.twix.photolog.detail.component.PhotologCardContent
 import com.twix.photolog.detail.component.PhotologDetailTopBar
@@ -161,9 +167,12 @@ fun PhotologDetailScreen(
     onPoke: () -> Unit,
     onSwipe: () -> Unit,
 ) {
+    val scrollState = rememberScrollState()
+
     Column(
         Modifier
             .fillMaxSize()
+            .verticalScroll(scrollState)
             .background(color = CommonColor.White),
     ) {
         PhotologDetailTopBar(
@@ -199,14 +208,25 @@ private fun PhotologDetailScreenPreview(
     uiState: PhotologDetailUiState,
 ) {
     TwixTheme {
+        var previewState by remember { mutableStateOf(uiState) }
         PhotologDetailScreen(
-            uiState = uiState,
+            uiState = previewState,
             onBack = {},
             onClickModify = {},
             onClickReaction = {},
             onClickUpload = {},
             onPoke = {},
-            onSwipe = {},
+            onSwipe = {
+                previewState =
+                    previewState.copy(
+                        currentShow =
+                            if (previewState.currentShow == BetweenUs.ME) {
+                                BetweenUs.PARTNER
+                            } else {
+                                BetweenUs.ME
+                            },
+                    )
+            },
         )
     }
 }

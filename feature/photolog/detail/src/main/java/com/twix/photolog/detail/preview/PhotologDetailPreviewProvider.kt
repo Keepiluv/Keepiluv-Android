@@ -29,6 +29,7 @@ class PhotologDetailPreviewProvider : PreviewParameterProvider<PhotologDetailUiS
                         reaction = null,
                     ),
                 partnerPhotolog = null,
+                isLoading = true,
             ),
             PhotologDetailUiState(
                 goalId = 1,
@@ -38,6 +39,7 @@ class PhotologDetailPreviewProvider : PreviewParameterProvider<PhotologDetailUiS
                 partnerNickname = "민정",
                 icon = GoalIconType.EXERCISE,
                 myPhotolog = null,
+                isLoading = true,
                 partnerPhotolog =
                     PhotologDetail(
                         photologId = 2,

@@ -34,7 +34,7 @@ internal fun PhotologCardContent(
             uploadedAt = uiState.displayedGoalUpdateAt,
             actionLabel =
                 when (uiState.currentShow) {
-                    BetweenUs.ME -> stringResource(R.string.photolog_take_picture)
+                    BetweenUs.ME -> stringResource(R.string.photolog_picture_upload)
                     BetweenUs.PARTNER -> stringResource(R.string.action_poke)
                 },
             rotation = if (uiState.isDisplayedMyPhotolog) -8f else 0f,

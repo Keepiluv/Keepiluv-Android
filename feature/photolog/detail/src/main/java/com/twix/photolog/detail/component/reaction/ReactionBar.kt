@@ -6,8 +6,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.VerticalDivider
@@ -31,21 +33,20 @@ fun ReactionBar(
     selectedReaction: GoalReactionType? = null,
 ) {
     val shape = RoundedCornerShape(999.dp)
-    val height = 68.dp
-    val shadowOffset = 10.dp
-    val shadowStart = 13.dp
 
     Box(
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(height + shadowOffset),
+                .height(77.dp),
     ) {
         Box(
             modifier =
                 Modifier
-                    .matchParentSize()
-                    .padding(start = shadowStart, top = shadowOffset)
+                    .fillMaxWidth()
+                    .height(67.dp)
+                    .padding(start = 1.dp)
+                    .offset(y = 10.dp)
                     .background(GrayColor.C200, shape),
         )
 
@@ -53,14 +54,22 @@ fun ReactionBar(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .height(height)
+                    .height(68.dp)
                     .border(width = 1.dp, color = GrayColor.C500, shape = shape)
                     .background(GrayColor.C100, shape)
                     .clip(shape),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            val lastIndex = ReactionUiModel.entries.lastIndex
+
             ReactionUiModel.entries.forEachIndexed { index, reaction ->
                 val isSelected = reaction.type == selectedReaction
+                val paddingModifier =
+                    when (index) {
+                        0 -> Modifier.padding(start = 11.dp, end = 7.dp)
+                        lastIndex -> Modifier.padding(start = 7.dp, end = 11.dp)
+                        else -> Modifier.padding(horizontal = 9.dp)
+                    }
 
                 Box(
                     modifier =
@@ -69,16 +78,24 @@ fun ReactionBar(
                             .fillMaxHeight()
                             .background(
                                 if (isSelected) GrayColor.C300 else GrayColor.C100,
-                            ).noRippleClickable(onClick = { onSelectReaction(reaction.type) }),
+                            ).noRippleClickable(onClick = { onSelectReaction(reaction.type) })
+                            .then(paddingModifier),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Image(
-                        imageVector = ImageVector.vectorResource(reaction.imageResources),
-                        contentDescription = null,
-                    )
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Image(
+                            imageVector = ImageVector.vectorResource(reaction.imageResources),
+                            contentDescription = null,
+                        )
+                    }
                 }
 
-                if (index < 4) {
+                if (index < lastIndex) {
                     VerticalDivider(
                         modifier = Modifier.fillMaxHeight(),
                         color = GrayColor.C500,

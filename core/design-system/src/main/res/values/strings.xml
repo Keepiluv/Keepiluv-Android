@@ -114,6 +114,16 @@
     <string name="toast_camera_permission_request">인증샷 촬영을 위해서 카메라 권한이 필요해요.</string>
     <string name="toast_fetch_notification_failed">알림 목록 조회에 실패했습니다.</string>
     <string name="toast_poke_goal_failed">찌르기에 실패했습니다.</string>
+    <string name="toast_reaction_fail">리액션 요청에 실패했어요.</string>
+    <string name="toast_photolog_upload_fail">인증샷 등록에 실패했습니다.</string>
+    <string name="toast_image_translate_fail">이미지 변환에 실패했습니다.</string>
+    <string name="toast_image_capture_fail">인증샷 촬영에 실패했습니다. 다시 시도해 주세요.</string>
+    <string name="toast_photolog_detail_fetch_fail">인증샷 조회에 실패했습니다.</string>
+    <string name="toast_comment_modify_success">코멘트가 수정 되었어요.</string>
+    <string name="toast_comment_not_modified">코멘트가 수정되지 않았어요.</string>
+    <string name="toast_comment_modify_fail">코멘트 수정에 실패했어요.</string>
+    <string name="toast_photolog_modify_fail">인증샷 수정에 실패했어요.</string>
+    <string name="toast_comment_length_guide">코멘트는 5글자로 입력해주세요!</string>
 
     <!-- 다이얼로그 -->
     <string name="dialog_end_goal_title">%s\n목표를 이루셨나요?</string>
@@ -131,27 +141,16 @@
 
     <!-- 인증샷 촬영 화면 !-->
     <string name="photolog_upload">업로드</string>
-    <string name="photolog_image_capture_fail">이미지 캡처에 실패했습니다. 다시 시도해 주세요.</string>
-    <string name="photolog_image_pick_fail">이미지를 불러오는 데 실패했습니다. 다시 시도해 주세요.</string>
+    <string name="photolog_picture_upload">업로드하기</string>
     <string name="photolog_take_picture">인증샷 찍기</string>
-    <string name="photolog_upload_fail">인증샷 등록에 실패했습니다.</string>
-    <string name="photolog_image_translate_fail">이미지 변환에 실패했습니다.</string>
     <string name="photolog_loading">인증샷 업로드 중...</string>
     <string name="photolog_plz_waiting">잠시만 기다려 주세요.</string>
-    <string name="comment_error_message">코멘트는 5글자로 입력해주세요!</string>
 
-    <!-- 인증샷 보기 화면 !-->
-    <string name="photolog_detail_fetch_photolog_fail">인증샷 조회에 실패했습니다.</string>
-    <string name="photolog_modify_fail">인증샷 수정에 실패했어요.</string>
+    <!-- 인증샷 상세 화면 !-->
+    <string name="photolog_detail_upload_guide">인증샷을\n올려보세요!</string>
 
     <!-- 인증샷 수정 화면 !-->
     <string name="photolog_editor_retake">다시 찍기</string>
-    <string name="photolog_editor_modify_success">코멘트가 수정 되었어요.</string>
-    <string name="photolog_editor_not_modified">코멘트가 수정되지 않았어요.</string>
-    <string name="photolog_editor_modify_fail">코멘트 수정에 실패했어요.</string>
-    <string name="photolog_detail_reaction_fail">리액션 요청에 실패했어요.</string>
-
-    <string name="photolog_camera_permission_denied_permanently">인증샷 촬영을 위해서 카메라 권한이 필요해요.</string>
 
   <!-- 로그인 화면 -->
     <string name="google_login_button_title">Google로 시작하기</string>

@@ -28,6 +28,8 @@ fun PhotologCard(
     rotation: Float = 0f,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
+    val shape = RoundedCornerShape(20.dp)
+
     Box(
         modifier =
             modifier
@@ -35,11 +37,11 @@ fun PhotologCard(
                 .fillMaxWidth()
                 .aspectRatio(1f)
                 .rotate(rotation)
-                .clip(shape = RoundedCornerShape(12.dp))
+                .clip(shape = shape)
                 .border(
                     width = 1.6.dp,
                     color = borderColor,
-                    shape = RoundedCornerShape(12.dp),
+                    shape = shape,
                 ).background(background),
         contentAlignment = Alignment.Center,
         content = content,
@@ -48,7 +50,7 @@ fun PhotologCard(
 
 @Preview
 @Composable
-fun PhotologCardPreview() {
+private fun PhotologCardPreview() {
     TwixTheme {
         PhotologCard(
             rotation = 0f,

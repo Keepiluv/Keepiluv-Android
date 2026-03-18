@@ -2,7 +2,6 @@ package com.twix.photolog.capture.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.twix.designsystem.R
 import com.twix.designsystem.components.button.AppRoundButton
+import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
@@ -119,40 +119,40 @@ private fun ImageCapturedBar(
     onClickUpload: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(
+    Row(
         modifier =
             modifier
                 .fillMaxWidth()
                 .padding(horizontal = 58.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
             imageVector = ImageVector.vectorResource(R.drawable.ic_camera_retake),
             contentDescription = null,
             modifier =
                 Modifier
-                    .size(52.dp)
-                    .align(Alignment.CenterStart)
                     .noRippleClickable(onClick = onClickRefresh),
         )
 
-        Row(
+        Spacer(modifier = Modifier.width(12.dp))
+
+        AppRoundButton(
             modifier =
                 Modifier
-                    .align(Alignment.Center),
+                    .width(150.dp)
+                    .height(74.dp)
+                    .noRippleClickable(onClick = onClickUpload),
+            contentColor = GrayColor.C500,
+            contentHeight = 68.dp,
+            contentBorderColor = CommonColor.White,
+            contentBorderWidth = 1.6.dp,
+            shadowHeight = 70.dp,
+            shadowOffset = 4.dp,
         ) {
-            Spacer(modifier = Modifier.width(12.dp))
-
-            AppRoundButton(
-                borderColor = CommonColor.White,
-                backgroundColor = GrayColor.C500,
+            AppText(
+                style = AppTextStyle.T2,
+                color = CommonColor.White,
                 text = stringResource(R.string.photolog_upload),
-                textStyle = AppTextStyle.T2,
-                textColor = CommonColor.White,
-                modifier =
-                    Modifier
-                        .width(150.dp)
-                        .height(74.dp)
-                        .noRippleClickable(onClick = onClickUpload),
             )
         }
     }

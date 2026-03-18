@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -89,17 +90,25 @@ private fun EmptyContent(
                 contentDescription = null,
                 modifier = Modifier.size(width = 85.dp, height = 53.dp),
             )
-
             AppRoundButton(
-                text = stringResource(R.string.action_poke_emphasized),
-                textColor = GrayColor.C500,
-                textStyle = AppTextStyle.C2,
-                backgroundColor = CommonColor.White,
                 modifier =
                     Modifier
-                        .size(width = 64.dp, height = 28.dp)
+                        .width(64.dp)
+                        .height(32.dp)
                         .noRippleClickable { onClick() },
-            )
+                contentColor = CommonColor.White,
+                contentHeight = 28.dp,
+                contentBorderColor = GrayColor.C500,
+                contentBorderWidth = 1.dp,
+                shadowHeight = 31.dp,
+                shadowOffset = 1.dp,
+            ) {
+                AppText(
+                    style = AppTextStyle.C2,
+                    color = GrayColor.C500,
+                    text = stringResource(R.string.action_poke_emphasized),
+                )
+            }
         }
     } else {
         Column(

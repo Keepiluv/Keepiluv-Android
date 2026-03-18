@@ -12,8 +12,8 @@ data class CommentUiModel(
 
     val canUpload: Boolean
         get() =
-            value.isEmpty() ||
-                value.isNotEmpty() &&
+            value.isBlank() ||
+                value.isNotBlank() &&
                 hasMaxCommentLength
 
     companion object {

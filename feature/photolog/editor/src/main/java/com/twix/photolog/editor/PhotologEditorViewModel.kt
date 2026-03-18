@@ -55,19 +55,19 @@ class PhotologEditorViewModel(
 
     private fun modifyComment() {
         if (currentState.comment.canUpload.not()) {
-            showToast(R.string.comment_error_message, ToastType.ERROR)
+            showToast(R.string.toast_comment_length_guide, ToastType.ERROR)
         } else if (currentState.isCommentNotChanged) {
-            showToast(R.string.photolog_editor_not_modified, ToastType.ERROR)
+            showToast(R.string.toast_comment_not_modified, ToastType.ERROR)
         } else {
             launchResult(
                 block = { launchModifyComment() },
                 onSuccess = {
                     detailRefreshBus.notifyChanged(PhotologRefreshBus.Publisher.EDITOR)
                     goalRefreshBus.notifyGoalListChanged()
-                    showToast(R.string.photolog_editor_modify_success, ToastType.SUCCESS)
+                    showToast(R.string.toast_comment_modify_success, ToastType.SUCCESS)
                 },
                 onError = {
-                    showToast(R.string.photolog_editor_modify_fail, ToastType.ERROR)
+                    showToast(R.string.toast_comment_modify_fail, ToastType.ERROR)
                 },
             )
         }
@@ -89,7 +89,7 @@ class PhotologEditorViewModel(
             block = { photologRepository.fetchPhotologs(argTargetDate, argGoalId) },
             onSuccess = { reduce { it.toEditorUiState(argGoalId, argTargetDate) } },
             onError = {
-                showToast(R.string.photolog_detail_fetch_photolog_fail, ToastType.ERROR)
+                showToast(R.string.toast_photolog_detail_fetch_fail, ToastType.ERROR)
             },
         )
     }

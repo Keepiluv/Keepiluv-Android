@@ -1,10 +1,9 @@
 package com.twix.photolog.detail.component.swipe
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -14,7 +13,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -26,10 +24,8 @@ import kotlin.math.roundToInt
  * 1. 사용자가 카드를 드래그
  * 2. threshold 이상 이동 시 → 카드 dismiss
  * 3. 화면 밖으로 날아간 뒤 onSwipe 호출
- * 4. 반대편에서 다시 등장 (spring 복귀)
+ * 4. 반대편에서 다시 등장
  *
- * ## 커스터마이징
- * 모든 애니메이션/거리 값은 [SwipeCardSpec] 으로 조절 가능
  */
 @Composable
 fun SwipeableCard(
@@ -41,6 +37,7 @@ fun SwipeableCard(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
+    val threshold = with(density) { spec.dismissThreshold.toPx() }
 
     /**
      * 카드 상태 값
@@ -55,108 +52,70 @@ fun SwipeableCard(
         (offsetX.value / spec.rotationFactor)
             .coerceIn(-spec.maxRotation, spec.maxRotation)
 
-    Box(
-        modifier =
-            modifier
-                /**
-                 * 카드 위치 이동
-                 */
-                .offset {
-                    IntOffset(
-                        offsetX.value.roundToInt(),
-                        0,
-                    )
-                }
-                /**
-                 * 회전 + 투명도 적용
-                 */
-                .graphicsLayer {
-                    rotationZ = rotation
-                    alpha = opacity.value
-                }.pointerInput(isDisplayingMyPhoto) {
-                    detectDragGestures(
-                        /**
-                         * 드래그 중
-                         * → 위치 즉시 반영 (snap)
-                         */
-                        onDrag = { change, dragAmount ->
-                            change.consume()
+    BoxWithConstraints(modifier = modifier) {
+        val dismissDistance = constraints.maxWidth * 1.3f
 
-                            coroutineScope.launch {
-                                offsetX.snapTo(offsetX.value + dragAmount.x)
-                            }
-                        },
-                        /**
-                         * 드래그 종료 시 처리
-                         */
-                        onDragEnd = {
-                            val thresholdPx = with(density) { spec.dismissThresholdDp.toPx() }
-                            val shouldDismiss = abs(offsetX.value) > thresholdPx
-
-                            if (shouldDismiss) {
+        Box(
+            modifier =
+                modifier
+                    /**
+                     * 카드 위치 이동
+                     */
+                    .offset {
+                        IntOffset(
+                            offsetX.value.roundToInt(),
+                            0,
+                        )
+                    }
+                    /**
+                     * 회전 + 투명도 적용
+                     */
+                    .graphicsLayer {
+                        rotationZ = rotation
+                        alpha = opacity.value
+                    }.pointerInput(isDisplayingMyPhoto) {
+                        detectDragGestures(
+                            /**
+                             * 드래그 중
+                             * → 위치 즉시 반영 (snap)
+                             */
+                            onDrag = { _, dragAmount ->
                                 coroutineScope.launch {
-                                    /**
-                                     * 화면 밖으로 날리기
-                                     */
-                                    val targetX =
-                                        if (offsetX.value > 0) {
-                                            spec.dismissDistancePx
-                                        } else {
-                                            -spec.dismissDistancePx
-                                        }
+                                    offsetX.snapTo(offsetX.value + dragAmount.x)
+                                }
+                            },
+                            /**
+                             * 드래그 종료 시 처리
+                             */
+                            onDragEnd = {
+                                val shouldDismiss = abs(offsetX.value) > threshold
+                                coroutineScope.launch {
+                                    if (shouldDismiss) {
+                                        onSwipe()
 
-                                    val targetY = 0f
+                                        /**
+                                         * 반대편 위치 세팅
+                                         */
+                                        val reappearStartX =
+                                            if (isDisplayingMyPhoto) {
+                                                dismissDistance * spec.reappearOffsetRatio
+                                            } else {
+                                                -dismissDistance * spec.reappearOffsetRatio
+                                            }
+                                        offsetX.snapTo(reappearStartX)
 
-                                    /**
-                                     * dismiss 애니메이션 완료 대기
-                                     */
-                                    coroutineScope {
-                                        launch { offsetX.animateTo(targetX, tween(spec.dismissDuration)) }
-                                        launch { opacity.animateTo(0f, tween(spec.dismissDuration)) }
-                                    }
-
-                                    /**
-                                     * 데이터 교체
-                                     */
-                                    onSwipe()
-
-                                    /**
-                                     * 반대편 위치 세팅
-                                     */
-                                    val reappearStartX =
-                                        if (isDisplayingMyPhoto) {
-                                            spec.dismissDistancePx * spec.reappearOffsetRatio
-                                        } else {
-                                            -spec.dismissDistancePx * spec.reappearOffsetRatio
-                                        }
-                                    offsetX.snapTo(reappearStartX)
-
-                                    /**
-                                     * 스프링 복귀
-                                     */
-                                    launch {
-                                        offsetX.animateTo(
-                                            0f,
-                                            spring(
-                                                dampingRatio = spec.springDamping,
-                                                stiffness = spec.springStiffness,
-                                            ),
-                                        )
-                                    }
-                                    launch {
-                                        opacity.animateTo(1f, spring(spec.springDamping))
+                                        launch { offsetX.animateTo(0f) }
+                                        launch { opacity.animateTo(1f) }
+                                    } else {
+                                        // threshold 미만 → 제자리 복귀
+                                        launch { offsetX.animateTo(0f) }
                                     }
                                 }
-                            } else {
-                                // threshold 미만 → 제자리 복귀
-                                coroutineScope.launch {
-                                    launch { offsetX.animateTo(0f, spring()) }
-                                }
-                            }
-                        },
-                    )
-                },
-    ) {
-        content()
+                            },
+                        )
+                    },
+        ) {
+            content()
+        }
     }
 }

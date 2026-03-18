@@ -2,6 +2,7 @@ package com.twix.designsystem.components.photolog
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.twix.designsystem.R
 import com.twix.designsystem.components.text.AppText
@@ -31,7 +32,7 @@ fun ForegroundCard(
             AppText(
                 text =
                     when (currentShow) {
-                        BetweenUs.ME -> stringResource(R.string.keep_it_up)
+                        BetweenUs.ME -> stringResource(R.string.photolog_detail_upload_guide)
                         BetweenUs.PARTNER ->
                             stringResource(R.string.partner_not_photolog).format(
                                 nickName,
@@ -39,6 +40,7 @@ fun ForegroundCard(
                     },
                 style = AppTextStyle.H2,
                 color = GrayColor.C500,
+                textAlign = TextAlign.Center,
             )
         }
     }
@@ -49,7 +51,7 @@ fun ForegroundCard(
 private fun ForegroundCardPreview() {
     TwixTheme {
         ForegroundCard(
-            isCertificated = true,
+            isCertificated = false,
             nickName = "닉네임",
             imageUrl = "https://picsum.photos/200/300",
             comment = null,

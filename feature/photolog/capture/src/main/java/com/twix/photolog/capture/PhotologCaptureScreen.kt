@@ -130,7 +130,7 @@ fun PhotologCaptureRoute(
             onToggleCameraClick = {
                 viewModel.dispatch(PhotologCaptureIntent.ToggleLens)
             },
-            onClickFlash = {
+            onClickTorch = {
                 viewModel.dispatch(PhotologCaptureIntent.ToggleTorch)
             },
             onClickGallery = {
@@ -159,7 +159,7 @@ private fun PhotologCaptureScreen(
     onClickClose: () -> Unit,
     onCaptureClick: () -> Unit,
     onToggleCameraClick: () -> Unit,
-    onClickFlash: () -> Unit,
+    onClickTorch: () -> Unit,
     onClickGallery: () -> Unit,
     onClickRefresh: () -> Unit,
     onClickUpload: () -> Unit,
@@ -200,7 +200,7 @@ private fun PhotologCaptureScreen(
                 capture = uiState.capture,
                 previewRequest = cameraPreview,
                 torch = uiState.torch,
-                onClickFlash = onClickFlash,
+                onClickTorch = onClickTorch,
                 onPositioned = { previewBoxBottom = it },
             )
 
@@ -219,6 +219,7 @@ private fun PhotologCaptureScreen(
         CommentAnchorFrame(
             uiModel = uiState.comment,
             anchorBottom = previewBoxBottom,
+            paddingBottom = 28.dp,
             onCommentChanged = onCommentChanged,
             onFocusChanged = onFocusChanged,
         )
@@ -235,7 +236,7 @@ fun PhotologCaptureScreenPreview() {
             onClickClose = {},
             onCaptureClick = {},
             onToggleCameraClick = {},
-            onClickFlash = {},
+            onClickTorch = {},
             onClickGallery = {},
             onClickRefresh = {},
             onClickUpload = {},

@@ -16,11 +16,11 @@ import androidx.camera.lifecycle.awaitInstance
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.twix.photolog.capture.model.TorchStatus
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
 class CaptureCamera(
@@ -53,7 +53,7 @@ class CaptureCamera(
         lifecycleOwner: LifecycleOwner,
         lens: CameraSelector,
     ) {
-        val provider = ProcessCameraProvider.awaitInstance(context)
+        val provider = cameraProvider ?: ProcessCameraProvider.awaitInstance(context)
         cameraProvider = provider
 
         provider.unbindAll()
@@ -102,9 +102,10 @@ class CaptureCamera(
                 contentValues,
             ).build()
 
-    private fun capture(continuation: Continuation<Result<Uri>>): ImageCapture.OnImageSavedCallback =
+    private fun capture(continuation: CancellableContinuation<Result<Uri>>): ImageCapture.OnImageSavedCallback =
         object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(result: ImageCapture.OutputFileResults) {
+                if (continuation.isActive.not()) return
                 val uri = result.savedUri
                 if (uri != null) {
                     continuation.resume(Result.success(uri))
@@ -116,12 +117,14 @@ class CaptureCamera(
             }
 
             override fun onError(exception: ImageCaptureException) {
+                if (continuation.isActive.not()) return
                 continuation.resume(Result.failure(exception))
             }
         }
 
     override fun unbind() {
         cameraProvider?.unbindAll()
+        _surfaceRequests.value = null
     }
 
     override fun toggleTorch(torch: TorchStatus) {

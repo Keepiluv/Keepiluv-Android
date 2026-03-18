@@ -39,6 +39,10 @@
     <string name="word_friday">금</string>
     <string name="word_saturday">토</string>
 
+    <!-- 날짜 포맷 -->
+    <string name="date_year_month_day">%s년 %02d월 %02d일</string>
+    <string name="date_year_month_day_no_padding">%1$d년 %2$d월 %3$d일</string>
+
     <!-- 동작 -->
     <string name="action_edit">수정하기</string>
     <string name="action_delete">삭제하기</string>
@@ -73,7 +77,6 @@
     <string name="goal_list_title_previous">지난 우리 목표</string>
     <string name="goal_list_title_today">오늘 우리 목표</string>
     <string name="goal_list_title_next">다음 우리 목표</string>
-    <string name="date_year_month_day">%s년 %02d월 %02d일</string>
     <string name="goal_detail_empty_goal_guide">아직 목표가 없어요!</string>
 
     <!-- 설정 화면 -->
@@ -92,7 +95,7 @@
     <string name="stats_stamp_end_tab_title">종료</string>
 
     <!-- 통계 상세 화면 -->
-    <string name="stats_complete_count">%1$s %2$d/%3$d</string>
+    <string name="stats_complete_count">%1$s - %2$d/%3$d</string>
 
     <!-- 알림 화면 -->
     <string name="notification_recent_14_days">최근 14일</string>

@@ -31,7 +31,7 @@ fun StampCell(
             AppText(
                 text = stats.nickname,
                 style = AppTextStyle.B4,
-                color = GrayColor.C500,
+                color = GrayColor.C400,
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -39,7 +39,7 @@ fun StampCell(
             AppText(
                 text = stringResource(R.string.stats_stamp_end_count).format(stats.completedCount),
                 style = AppTextStyle.B4,
-                color = GrayColor.C500,
+                color = GrayColor.C400,
             )
         }
 

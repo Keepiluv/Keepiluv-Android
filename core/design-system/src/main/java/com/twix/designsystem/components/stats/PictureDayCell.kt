@@ -56,7 +56,7 @@ fun PictureDayCell(
                 modifier =
                     Modifier
                         .size(36.dp)
-                        .rotate(-16f)
+                        .rotate(16f)
                         .border(1.dp, GrayColor.C400, cornerShape)
                         .background(CommonColor.White, cornerShape),
             )
@@ -68,8 +68,8 @@ fun PictureDayCell(
                     .size(36.dp)
                     .clip(cornerShape)
                     .then(
-                        if (showBackgroundCard) {
-                            Modifier.border(1.dp, borderColor, cornerShape)
+                        if (hasImage) {
+                            Modifier.border((1.2).dp, borderColor, cornerShape)
                         } else {
                             Modifier
                         },
@@ -104,7 +104,7 @@ fun PictureDayCell(
 
             AppText(
                 text = date.dayOfMonth.toString(),
-                style = AppTextStyle.B1,
+                style = AppTextStyle.B3,
                 color = textColor,
                 textAlign = TextAlign.Center,
             )

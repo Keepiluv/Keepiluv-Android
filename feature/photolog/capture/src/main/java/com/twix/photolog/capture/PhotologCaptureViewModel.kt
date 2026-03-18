@@ -22,6 +22,7 @@ import com.twix.ui.image.ImageGenerator
 import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.PhotologRefreshBus
 import com.twix.util.bus.StatsDetailRefreshBus
+import com.twix.util.bus.StatsRefreshBus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -34,6 +35,7 @@ class PhotologCaptureViewModel(
     private val detailRefreshBus: PhotologRefreshBus,
     private val goalRefreshBus: GoalRefreshBus,
     private val statsDetailRefreshBus: StatsDetailRefreshBus,
+    private val statsRefreshBus: StatsRefreshBus,
     savedStateHandle: SavedStateHandle,
 ) : BaseViewModel<PhotologCaptureUiState, PhotologCaptureIntent, PhotologCaptureSideEffect>(
         PhotologCaptureUiState(),
@@ -190,11 +192,16 @@ class PhotologCaptureViewModel(
 
     private fun handleUploadPhotologSuccess() {
         when (navArgs.from) {
-            NavRoutes.PhotologRoute.From.HOME ->
+            NavRoutes.PhotologRoute.From.HOME -> {
                 goalRefreshBus.notifyGoalListChanged()
+                statsRefreshBus.notifyChanged(StatsRefreshBus.Target.All)
+            }
 
-            NavRoutes.PhotologRoute.From.DETAIL ->
+            NavRoutes.PhotologRoute.From.DETAIL -> {
                 detailRefreshBus.notifyChanged(PhotologRefreshBus.Publisher.PHOTOLOG)
+                statsDetailRefreshBus.notifyChanged()
+                statsRefreshBus.notifyChanged(StatsRefreshBus.Target.All)
+            }
 
             NavRoutes.PhotologRoute.From.EDITOR -> Unit
         }

@@ -16,35 +16,35 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.twix.designsystem.R
 import com.twix.designsystem.components.button.AppButton
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.text_field.UnderlineTextField
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
-import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.SystemColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.onboarding.OnBoardingViewModel
-import com.twix.onboarding.R
-import com.twix.onboarding.model.OnBoardingIntent
-import com.twix.onboarding.model.OnBoardingSideEffect
+import com.twix.onboarding.contract.OnBoardingIntent
+import com.twix.onboarding.contract.OnBoardingSideEffect
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.noRippleClickable
 import org.koin.compose.koinInject
-import com.twix.designsystem.R as DesR
 
 @Composable
 fun ProfileRoute(
@@ -54,34 +54,22 @@ fun ProfileRoute(
     toastManager: ToastManager = koinInject(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-    val notValidNickNameMessage =
-        stringResource(R.string.onboarding_profile_invalid_name_length_toast)
-
-    val profileSetupFailMessage = stringResource(R.string.onboarding_profile_setup_fail)
+    val context = LocalContext.current
+    val currentContext by rememberUpdatedState(context)
 
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
-            OnBoardingSideEffect.ProfileSetting.ShowInvalidNickNameToast -> {
+            is OnBoardingSideEffect.ShowToast -> {
                 toastManager.tryShow(
                     ToastData(
-                        message = notValidNickNameMessage,
-                        type = ToastType.ERROR,
-                    ),
-                )
-            }
-
-            OnBoardingSideEffect.ProfileSetting.ShowProfileSetupFailToast -> {
-                toastManager.tryShow(
-                    ToastData(
-                        message = profileSetupFailMessage,
-                        type = ToastType.ERROR,
+                        message = currentContext.getString(sideEffect.message),
+                        type = sideEffect.type,
                     ),
                 )
             }
 
             OnBoardingSideEffect.ProfileSetting.NavigateToHome -> navigateToHome()
-            OnBoardingSideEffect.ProfileSetting.NavigateToDDaySetting -> navigateToDday()
+            OnBoardingSideEffect.ProfileSetting.NavigateToNext -> navigateToDday()
             else -> Unit
         }
     }
@@ -132,7 +120,7 @@ private fun ProfileScreen(
             onValueChange = onChangeNickName,
             trailing = {
                 Image(
-                    imageVector = ImageVector.vectorResource(DesR.drawable.ic_clear_text),
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_clear_text),
                     contentDescription = null,
                     modifier = Modifier.noRippleClickable { onChangeNickName("") },
                 )
@@ -150,7 +138,7 @@ private fun ProfileScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = ImageVector.vectorResource(DesR.drawable.ic_check_success),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_check_success),
                 contentDescription = null,
                 tint = if (uiModel.isValid) SystemColor.Success else GrayColor.C300,
             )

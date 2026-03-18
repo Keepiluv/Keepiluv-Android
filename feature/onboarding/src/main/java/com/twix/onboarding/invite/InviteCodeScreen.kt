@@ -1,6 +1,7 @@
 package com.twix.onboarding.invite
 
 import android.content.ClipData
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -20,24 +21,30 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.twix.designsystem.R
 import com.twix.designsystem.components.button.AppButton
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
@@ -48,10 +55,9 @@ import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.onboarding.OnBoardingViewModel
-import com.twix.onboarding.R
+import com.twix.onboarding.contract.OnBoardingIntent
+import com.twix.onboarding.contract.OnBoardingSideEffect
 import com.twix.onboarding.invite.component.InviteCodeTextField
-import com.twix.onboarding.model.OnBoardingIntent
-import com.twix.onboarding.model.OnBoardingSideEffect
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.noRippleClickable
 import com.twix.ui.keyboard.Keyboard
@@ -69,39 +75,46 @@ internal fun InviteCodeRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     val keyboardState by keyboardAsState()
+    val context = LocalContext.current
+    val currentContext by rememberUpdatedState(context)
     val clipboard = LocalClipboard.current
-
-    val inviteCodeSuccessMessage = stringResource(R.string.onboarding_invite_code_copy)
-    val invalidInviteCodeMessage = stringResource(R.string.onboarding_invite_invalid_invite_code_fail)
-    val coupleConnectionFailMessage = stringResource(R.string.onboarding_couple_connection_fail)
 
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
-            OnBoardingSideEffect.InviteCode.ShowCopyInviteCodeSuccessToast -> {
+            is OnBoardingSideEffect.ShowToast -> {
                 toastManager.tryShow(
                     ToastData(
-                        message = inviteCodeSuccessMessage,
-                        type = ToastType.SUCCESS,
+                        message = currentContext.getString(sideEffect.message),
+                        type = sideEffect.type,
                     ),
                 )
             }
-            OnBoardingSideEffect.InviteCode.ShowInvalidInviteCodeToast -> {
-                toastManager.tryShow(
-                    ToastData(
-                        message = invalidInviteCodeMessage,
-                        type = ToastType.ERROR,
-                    ),
-                )
-            }
-            OnBoardingSideEffect.InviteCode.ShowConnectCoupleConnectFailToast -> {
-                toastManager.tryShow(
-                    ToastData(
-                        message = coupleConnectionFailMessage,
-                        type = ToastType.ERROR,
-                    ),
-                )
-            }
+
             OnBoardingSideEffect.InviteCode.NavigateToNext -> navigateToNext()
+            is OnBoardingSideEffect.InviteCode.CopyInviteCode -> {
+                coroutineScope.launch {
+                    val clipData =
+                        ClipData
+                            .newPlainText(
+                                "inviteCode",
+                                sideEffect.inviteCode,
+                            ).toClipEntry()
+                    clipboard.setClipEntry(clipData)
+                }
+
+                /**
+                 * https://developer.android.com/develop/ui/views/touch-and-input/copy-paste?hl=ko#duplicate-notifications
+                 * */
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+                    toastManager.tryShow(
+                        ToastData(
+                            currentContext.getString(R.string.toast_invite_code_copy),
+                            ToastType.SUCCESS,
+                        ),
+                    )
+                }
+            }
+
             else -> Unit
         }
     }
@@ -112,17 +125,7 @@ internal fun InviteCodeRoute(
         navigateToBack = navigateToBack,
         onChangeInviteCode = { viewModel.dispatch(OnBoardingIntent.WriteInviteCode(it)) },
         onComplete = { viewModel.dispatch(OnBoardingIntent.ConnectCouple) },
-        onCopyInviteCode = {
-            val clipData =
-                ClipData.newPlainText(
-                    "inviteCode",
-                    uiState.inviteCode.myInviteCode,
-                )
-            coroutineScope.launch {
-                clipboard.setClipEntry(clipData.toClipEntry())
-            }
-            viewModel.dispatch(OnBoardingIntent.CopyInviteCode)
-        },
+        onCopyInviteCode = { viewModel.dispatch(OnBoardingIntent.CopyInviteCode) },
     )
 }
 
@@ -135,11 +138,7 @@ private fun InviteCodeScreen(
     onComplete: () -> Unit,
     onCopyInviteCode: () -> Unit,
 ) {
-    val focusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
+    val scrollState = rememberScrollState()
 
     Box(
         modifier =
@@ -147,25 +146,12 @@ private fun InviteCodeScreen(
                 .fillMaxSize()
                 .background(CommonColor.White),
     ) {
-        Box(
+        Column(
             modifier =
                 Modifier
-                    .fillMaxWidth()
-                    .height(72.dp)
-                    .padding(horizontal = 10.dp, vertical = 14.dp),
-            contentAlignment = Alignment.CenterStart,
+                    .fillMaxSize()
+                    .verticalScroll(scrollState),
         ) {
-            Image(
-                imageVector = ImageVector.vectorResource(com.twix.designsystem.R.drawable.ic_arrow_m_left),
-                contentDescription = null,
-                modifier =
-                    Modifier
-                        .size(44.dp)
-                        .noRippleClickable(onClick = navigateToBack),
-            )
-        }
-
-        Column {
             Spacer(modifier = Modifier.height(8.dp))
 
             AnimatedVisibility(
@@ -197,15 +183,28 @@ private fun InviteCodeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                AppText(
-                    text = stringResource(R.string.onboarding_invite_code_my_invite_code),
-                    style = AppTextStyle.B3,
-                    color = GrayColor.C400,
-                )
+                Box(
+                    modifier =
+                        Modifier
+                            .height(18.dp)
+                            .fillMaxWidth(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AppText(
+                        text = stringResource(R.string.onboarding_invite_code_my_invite_code),
+                        style = AppTextStyle.B3,
+                        color = GrayColor.C400,
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Row(
+                    modifier =
+                        Modifier
+                            .height(39.dp)
+                            .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     AppText(
@@ -226,24 +225,51 @@ private fun InviteCodeScreen(
 
             Spacer(modifier = Modifier.height(52.dp))
 
-            AppText(
-                text = stringResource(R.string.onboarding_invite_code_write_invite_code),
-                style = AppTextStyle.B3,
-                color = GrayColor.C500,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-            )
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(18.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                AppText(
+                    text = stringResource(R.string.onboarding_invite_code_write_invite_code),
+                    style = AppTextStyle.B3,
+                    color = GrayColor.C500,
+                )
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             InviteCodeTextField(
                 inviteCode = uiModel.partnerInviteCode,
                 onValueChange = onChangeInviteCode,
-                modifier =
-                    Modifier
-                        .focusRequester(focusRequester)
-                        .align(Alignment.CenterHorizontally),
+                modifier = Modifier.align(Alignment.CenterHorizontally),
             )
         }
+
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(72.dp)
+                    .padding(horizontal = 10.dp, vertical = 14.dp),
+            contentAlignment = Alignment.CenterStart,
+        ) {
+            Image(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_arrow_m_left),
+                contentDescription = null,
+                modifier =
+                    Modifier
+                        .size(44.dp)
+                        .noRippleClickable(onClick = navigateToBack),
+            )
+        }
+
+        TopGradientOverlay(
+            visible = scrollState.value > 0,
+            modifier = Modifier.align(Alignment.TopCenter),
+        )
 
         AppButton(
             text = stringResource(R.string.onboarding_profile_button_title),
@@ -262,16 +288,54 @@ private fun InviteCodeScreen(
     }
 }
 
-@Preview(name = "InviteCodeScreen", showBackground = true)
+@Composable
+private fun TopGradientOverlay(
+    visible: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(),
+        exit = fadeOut(),
+        modifier = modifier,
+    ) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .height(96.dp)
+                    .background(
+                        brush =
+                            Brush.verticalGradient(
+                                colors =
+                                    listOf(
+                                        CommonColor.White,
+                                        CommonColor.White.copy(alpha = 0.6f),
+                                        Color.Transparent,
+                                    ),
+                            ),
+                    ),
+        )
+    }
+}
+
+@Preview(showBackground = true)
 @Composable
 private fun InviteCodeScreenPreview() {
     TwixTheme {
+        var textState by remember { mutableStateOf("") }
+
         InviteCodeScreen(
-            uiModel = InviteCodeUiModel(),
-            onChangeInviteCode = {},
+            uiModel =
+                InviteCodeUiModel(
+                    partnerInviteCode = textState,
+                    myInviteCode = "ABCDEFG",
+                    isValid = textState.length == 6,
+                ),
+            onChangeInviteCode = { textState = it },
             onComplete = {},
             navigateToBack = {},
-            keyboardState = Keyboard.Opened,
+            keyboardState = Keyboard.Closed,
             onCopyInviteCode = {},
         )
     }

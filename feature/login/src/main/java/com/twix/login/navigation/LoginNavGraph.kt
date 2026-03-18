@@ -38,11 +38,7 @@ object LoginNavGraph : NavGraphContributor {
                                 OnboardingStatus.COMPLETED -> return@LoginRoute
                             }
 
-                        navController.navigate(destination) {
-                            popUpTo(NavRoutes.LoginGraph.route) {
-                                inclusive = true
-                            }
-                        }
+                        navController.navigate(destination)
                     },
                 )
             }

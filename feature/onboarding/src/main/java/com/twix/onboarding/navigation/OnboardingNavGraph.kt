@@ -34,6 +34,7 @@ object OnboardingNavGraph : NavGraphContributor {
                     navigateToNext = {
                         navController.navigate(NavRoutes.InviteRoute.route)
                     },
+                    navigateToBack = navController::popBackStack,
                     viewModel = vm,
                 )
             }

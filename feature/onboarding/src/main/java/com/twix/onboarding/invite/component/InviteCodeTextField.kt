@@ -1,10 +1,5 @@
 package com.twix.onboarding.invite.component
 
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -14,12 +9,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.components.text.AppText
@@ -36,21 +31,24 @@ fun InviteCodeTextField(
 ) {
     BasicTextField(
         modifier = modifier,
-        value = TextFieldValue(inviteCode, selection = TextRange(inviteCode.length)),
-        onValueChange = {
-            if (it.text.length <= InviteCode.INVITE_CODE_LENGTH) {
-                onValueChange(it.text)
+        value = inviteCode,
+        onValueChange = { newText ->
+            val filtered = newText.filterNot { it.isWhitespace() }
+            if (filtered.length <= InviteCode.INVITE_CODE_LENGTH && filtered != inviteCode) {
+                onValueChange(filtered)
             }
         },
         decorationBox = {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.29.dp),
-            ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 repeat(InviteCode.INVITE_CODE_LENGTH) { index ->
                     CodeBox(index, inviteCode)
                 }
             }
         },
+        keyboardOptions =
+            KeyboardOptions(
+                capitalization = KeyboardCapitalization.Characters,
+            ),
     )
 }
 
@@ -60,12 +58,6 @@ private fun CodeBox(
     code: String,
 ) {
     val isFocused = code.length == index
-    val infiniteTransition = rememberInfiniteTransition()
-    val alpha by infiniteTransition.animateFloat(
-        0f,
-        1f,
-        infiniteRepeatable(tween(500), RepeatMode.Reverse),
-    )
 
     Box(
         modifier =
@@ -91,17 +83,20 @@ private fun CodeBox(
                 )
             }
 
-            isFocused -> {
-                Box(
-                    modifier =
-                        Modifier
-                            .width(2.dp)
-                            .height(24.dp)
-                            .background(GrayColor.C500.copy(alpha = alpha)),
-                )
-            }
+            isFocused -> Cursor()
         }
     }
+}
+
+@Composable
+private fun Cursor() {
+    Box(
+        modifier =
+            Modifier
+                .width(2.dp)
+                .height(24.dp)
+                .background(GrayColor.C500),
+    )
 }
 
 @Preview(showBackground = true)

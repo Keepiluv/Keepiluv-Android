@@ -16,15 +16,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.twix.designsystem.R
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
-import com.twix.onboarding.R
 import com.twix.onboarding.dday.DdayUiModel
 import com.twix.ui.extension.noRippleClickable
 import java.time.LocalDate
-import com.twix.designsystem.R as DesR
 
 @Composable
 internal fun DDayField(
@@ -59,7 +58,7 @@ internal fun DDayField(
             )
 
             Image(
-                imageVector = ImageVector.vectorResource(DesR.drawable.ic_calendar),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_calendar),
                 contentDescription = null,
                 modifier =
                     Modifier

@@ -6,15 +6,18 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberUpdatedState
@@ -24,30 +27,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.twix.designsystem.R
 import com.twix.designsystem.components.bottomsheet.CommonBottomSheet
 import com.twix.designsystem.components.bottomsheet.model.CommonBottomSheetConfig
 import com.twix.designsystem.components.dialog.MarketingDialog
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
-import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.onboarding.OnBoardingViewModel
-import com.twix.onboarding.R
+import com.twix.onboarding.contract.OnBoardingIntent
+import com.twix.onboarding.contract.OnBoardingSideEffect
 import com.twix.onboarding.couple.component.ConnectButton
+import com.twix.onboarding.couple.component.CoupleConnectTopbar
+import com.twix.onboarding.couple.component.InvitationButton
 import com.twix.onboarding.couple.component.RestoreCoupleBottomSheetContent
-import com.twix.onboarding.model.OnBoardingIntent
-import com.twix.onboarding.model.OnBoardingSideEffect
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.noRippleClickable
 import org.koin.compose.koinInject
@@ -57,25 +61,20 @@ fun CoupleConnectRoute(
     viewModel: OnBoardingViewModel,
     toastManager: ToastManager = koinInject(),
     navigateToNext: () -> Unit,
+    navigateToBack: () -> Unit,
 ) {
     var showMarketingDialog by rememberSaveable { mutableStateOf(true) }
     var showRestoreSheet by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchMyInviteCode()
-    }
-
-    val fetchMyInviteCodeFailMessage =
-        stringResource(R.string.onboarding_couple_fetch_my_invite_code_fail)
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
-            OnBoardingSideEffect.CoupleConnection.ShowFetchMyInviteCodeFailToast -> {
+            is OnBoardingSideEffect.ShowToast -> {
                 toastManager.tryShow(
                     ToastData(
-                        message = fetchMyInviteCodeFailMessage,
-                        type = ToastType.ERROR,
+                        message = currentContext.getString(sideEffect.message),
+                        type = sideEffect.type,
                     ),
                 )
             }
@@ -91,6 +90,7 @@ fun CoupleConnectRoute(
             onClickConnect = navigateToNext,
             onClickRestore = { showRestoreSheet = true },
             onDismissSheet = { showRestoreSheet = false },
+            onClickBack = navigateToBack,
         )
 
         MarketingDialog(
@@ -117,15 +117,22 @@ fun CoupleConnectScreen(
     onClickConnect: () -> Unit,
     onClickRestore: () -> Unit,
     onDismissSheet: () -> Unit,
+    onClickBack: () -> Unit,
 ) {
+    val scrollState = rememberScrollState()
+
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
                 .background(color = CommonColor.White),
     ) {
-        Column {
-            Spacer(modifier = Modifier.height(80.24.dp))
+        Column(
+            Modifier.verticalScroll(scrollState),
+        ) {
+            CoupleConnectTopbar(onClickBack = onClickBack)
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             AppText(
                 text = stringResource(R.string.onboarding_couple_connect_description),
@@ -134,16 +141,17 @@ fun CoupleConnectScreen(
                 modifier = Modifier.padding(start = 24.dp),
             )
 
-            Spacer(modifier = Modifier.height(11.76.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             Image(
-                imageVector = ImageVector.vectorResource(R.drawable.img_couple_connect),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_invite),
                 contentDescription = null,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             )
 
-            Spacer(modifier = Modifier.height(47.dp))
-            // InvitationButton(onClick = onClickSend)
+            Spacer(modifier = Modifier.height(2.dp))
+
+            InvitationButton(onClick = onClickSend)
 
             Spacer(modifier = Modifier.height(20.dp))
 
@@ -151,16 +159,25 @@ fun CoupleConnectScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            AppText(
-                text = stringResource(R.string.onboarding_couple_restore),
-                style = AppTextStyle.B1,
-                color = GrayColor.C400,
-                textAlign = TextAlign.Center,
+            Row(
                 modifier =
                     Modifier
                         .fillMaxWidth()
                         .noRippleClickable(onClick = onClickRestore),
-            )
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                AppText(
+                    text = stringResource(R.string.onboarding_couple_restore),
+                    style = AppTextStyle.B1,
+                    color = GrayColor.C400,
+                )
+
+                Image(
+                    painter = painterResource(R.drawable.ic_arrow_m_right),
+                    contentDescription = null,
+                )
+            }
         }
 
         CommonBottomSheet(
@@ -196,6 +213,7 @@ private fun CoupleConnectScreenPreview() {
             onClickConnect = {},
             onClickRestore = {},
             onDismissSheet = {},
+            onClickBack = {},
         )
     }
 }

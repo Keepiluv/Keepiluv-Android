@@ -98,20 +98,25 @@ class OnBoardingViewModel(
     }
 
     private suspend fun handleCoupleConnectException(error: AppError) {
-        if (error is AppError.Http && error.status == 404) {
-            /**
-             * 초대 코드를 잘못 입력한 경우
-             * */
-            if (error.message == INVALID_INVITE_CODE_MESSAGE) {
-                showToast(R.string.toast_invalid_invite_code, ToastType.ERROR)
-            } else if (error.message == ALREADY_USED_INVITE_CODE_MESSAGE) {
-                /**
-                 * 상대방이 이미 연결한 경우
-                 * */
-                emitSideEffect(OnBoardingSideEffect.InviteCode.NavigateToNext)
-            } else {
-                showToast(R.string.onboarding_couple_connection_fail, ToastType.ERROR)
+        when {
+            error is AppError.Http && error.status == 400 && error.code == SELF_INVITE_CODE_ERROR_CODE -> {
+                /** 자신의 초대 코드를 입력한 경우 */
+                showToast(R.string.toast_self_invite_code, ToastType.ERROR)
             }
+            error is AppError.Http && error.status == 404 -> {
+                when (error.message) {
+                    INVALID_INVITE_CODE_MESSAGE -> {
+                        /** 초대 코드를 잘못 입력한 경우 */
+                        showToast(R.string.toast_invalid_invite_code, ToastType.ERROR)
+                    }
+                    ALREADY_USED_INVITE_CODE_MESSAGE -> {
+                        /** 상대방이 이미 연결한 경우 */
+                        emitSideEffect(OnBoardingSideEffect.InviteCode.NavigateToNext)
+                    }
+                    else -> showToast(R.string.onboarding_couple_connection_fail, ToastType.ERROR)
+                }
+            }
+            else -> showToast(R.string.onboarding_couple_connection_fail, ToastType.ERROR)
         }
     }
 
@@ -205,5 +210,6 @@ class OnBoardingViewModel(
     companion object {
         private const val ALREADY_USED_INVITE_CODE_MESSAGE = "이미 사용된 초대 코드입니다."
         private const val INVALID_INVITE_CODE_MESSAGE = "유효하지 않은 초대 코드입니다."
+        private const val SELF_INVITE_CODE_ERROR_CODE = "G4000"
     }
 }

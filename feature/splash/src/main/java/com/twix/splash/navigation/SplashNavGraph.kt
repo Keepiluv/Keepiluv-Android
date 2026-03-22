@@ -57,11 +57,10 @@ object SplashNavGraph : NavGraphContributor {
                                 OnboardingStatus.COMPLETED -> return@SplashRoute
                             }
 
-                        navController.navigate(NavRoutes.OnboardingGraph.route) {
+                        navController.navigate(destination) {
                             popUpTo(NavRoutes.SplashGraph.route) { inclusive = true }
                             launchSingleTop = true
                         }
-                        navController.navigate(destination)
                     },
                 )
             }

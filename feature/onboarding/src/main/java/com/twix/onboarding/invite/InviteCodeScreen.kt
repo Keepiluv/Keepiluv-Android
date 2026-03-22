@@ -25,6 +25,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -70,9 +71,16 @@ internal fun InviteCodeRoute(
     viewModel: OnBoardingViewModel,
     navigateToNext: () -> Unit,
     navigateToBack: () -> Unit,
+    initialInviteCode: String? = null,
     toastManager: ToastManager = koinInject(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(initialInviteCode) {
+        if (!initialInviteCode.isNullOrBlank()) {
+            viewModel.dispatch(OnBoardingIntent.WriteInviteCode(initialInviteCode))
+        }
+    }
     val coroutineScope = rememberCoroutineScope()
     val keyboardState by keyboardAsState()
     val context = LocalContext.current

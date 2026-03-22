@@ -2,16 +2,23 @@ package com.twix.onboarding.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.navigation.NavRoutes
 import com.twix.navigation.base.NavGraphContributor
 import com.twix.navigation.graphViewModel
+import com.twix.navigation_contract.InviteLaunchEventSource
 import com.twix.onboarding.OnBoardingViewModel
 import com.twix.onboarding.couple.CoupleConnectRoute
 import com.twix.onboarding.dday.DdayRoute
 import com.twix.onboarding.invite.InviteCodeRoute
 import com.twix.onboarding.profile.ProfileRoute
+import org.koin.compose.koinInject
 
 object OnboardingNavGraph : NavGraphContributor {
     override val graphRoute: NavRoutes
@@ -29,17 +36,35 @@ object OnboardingNavGraph : NavGraphContributor {
         ) {
             composable(NavRoutes.CoupleConnectionRoute.route) { backStackEntry ->
                 val vm: OnBoardingViewModel = backStackEntry.graphViewModel(navController, graphRoute.route)
+                val inviteLaunchEventSource: InviteLaunchEventSource = koinInject()
+                val pendingInviteCode by inviteLaunchEventSource.pendingInviteCode.collectAsStateWithLifecycle()
+
+                LaunchedEffect(pendingInviteCode) {
+                    val code = pendingInviteCode ?: return@LaunchedEffect
+                    inviteLaunchEventSource.consumePendingInviteCode()
+                    navController.navigate(NavRoutes.InviteRoute.createRoute(code))
+                }
 
                 CoupleConnectRoute(
                     navigateToNext = {
-                        navController.navigate(NavRoutes.InviteRoute.route)
+                        navController.navigate(NavRoutes.InviteRoute.createRoute())
                     },
                     navigateToBack = navController::popBackStack,
                     viewModel = vm,
                 )
             }
-            composable(NavRoutes.InviteRoute.route) { backStackEntry ->
+            composable(
+                route = NavRoutes.InviteRoute.route,
+                arguments = listOf(
+                    navArgument(NavRoutes.InviteRoute.ARG_CODE) {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    },
+                ),
+            ) { backStackEntry ->
                 val vm: OnBoardingViewModel = backStackEntry.graphViewModel(navController, graphRoute.route)
+                val inviteCode = backStackEntry.arguments?.getString(NavRoutes.InviteRoute.ARG_CODE)
 
                 InviteCodeRoute(
                     navigateToNext = {
@@ -47,6 +72,7 @@ object OnboardingNavGraph : NavGraphContributor {
                     },
                     navigateToBack = navController::popBackStack,
                     viewModel = vm,
+                    initialInviteCode = inviteCode,
                 )
             }
             composable(NavRoutes.ProfileRoute.route) { backStackEntry ->

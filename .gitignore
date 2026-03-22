@@ -89,3 +89,4 @@ lint/tmp/
 /scripts/install-hooks.sh
 /scripts/pre-push
 /scripts/uninstall-hooks.sh
+public/.well-known/assetlinks.json

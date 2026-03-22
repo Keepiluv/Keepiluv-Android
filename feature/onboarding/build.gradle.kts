@@ -5,3 +5,7 @@ plugins {
 android {
     namespace = "com.twix.onboarding"
 }
+
+dependencies {
+    implementation(project(":core:navigation-contract"))
+}

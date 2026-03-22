@@ -49,6 +49,8 @@ class OnBoardingViewModel(
             OnBoardingIntent.ConnectCouple -> connectCouple()
             OnBoardingIntent.CopyInviteCode ->
                 emitSideEffect(OnBoardingSideEffect.InviteCode.CopyInviteCode(currentState.inviteCode.myInviteCode))
+            OnBoardingIntent.ShareInviteLink ->
+                emitSideEffect(OnBoardingSideEffect.InviteCode.ShareInviteLink(currentState.inviteCode.myInviteCode))
             // 프로필 설정 화면
             is OnBoardingIntent.WriteNickName -> reduceNickName(intent.value)
             OnBoardingIntent.SubmitNickName -> handleSubmitNickname()

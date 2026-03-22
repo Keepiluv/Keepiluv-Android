@@ -90,3 +90,4 @@ lint/tmp/
 /scripts/pre-push
 /scripts/uninstall-hooks.sh
 public/.well-known/assetlinks.json
+.firebase/

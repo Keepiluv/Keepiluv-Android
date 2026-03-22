@@ -26,6 +26,7 @@ import com.twix.designsystem.components.toast.ToastHost
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.navigation.AppNavHost
+import com.twix.navigation_contract.InviteLaunchEventSource
 import com.twix.navigation_contract.NotificationLaunchEventSource
 import org.koin.android.ext.android.inject
 import org.koin.compose.koinInject
@@ -33,11 +34,13 @@ import kotlin.getValue
 
 class MainActivity : ComponentActivity() {
     private val notificationLaunchEventSource: NotificationLaunchEventSource by inject()
+    private val inviteLaunchEventSource: InviteLaunchEventSource by inject()
     private val requestNotificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         handleNotificationIntent(intent)
+        inviteLaunchEventSource.dispatchFromIntent(intent)
         enableEdgeToEdge()
         setContent {
             val toastManager: ToastManager = koinInject()
@@ -57,7 +60,9 @@ class MainActivity : ComponentActivity() {
                                 WindowInsets.systemBars.only(WindowInsetsSides.Vertical),
                             ),
                 ) {
-                    AppNavHost(notificationLaunchEventSource = notificationLaunchEventSource)
+                    AppNavHost(
+                        notificationLaunchEventSource = notificationLaunchEventSource,
+                    )
 
                     ToastHost(
                         toastManager = toastManager,
@@ -74,6 +79,7 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         handleNotificationIntent(intent)
+        inviteLaunchEventSource.dispatchFromIntent(intent)
     }
 
     private fun handleNotificationIntent(intent: Intent?) {

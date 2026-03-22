@@ -18,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import com.twix.domain.model.enums.BetweenUs
 import com.twix.navigation.base.NavGraphContributor
 import com.twix.navigation_contract.AppNavigator
+import com.twix.navigation_contract.InviteLaunchEventSource
 import com.twix.navigation_contract.NotificationDeepLinkHandler
 import com.twix.navigation_contract.NotificationLaunchEventSource
 import org.koin.compose.getKoin
@@ -27,6 +28,7 @@ import java.time.LocalDate
 @Composable
 fun AppNavHost(
     notificationLaunchEventSource: NotificationLaunchEventSource,
+    inviteLaunchEventSource: InviteLaunchEventSource = koinInject(),
     notificationRouter: NotificationDeepLinkHandler = koinInject(),
 ) {
     val navController = rememberNavController()
@@ -109,6 +111,7 @@ fun AppNavHost(
             notificationLaunchEventSource.consumePendingDeepLink(deepLink)
         }
     }
+
 
     NavHost(
         navController = navController,

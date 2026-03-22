@@ -14,6 +14,7 @@ import com.twix.navigation.base.NavGraphContributor
 import com.twix.navigation.graphViewModel
 import com.twix.navigation_contract.InviteLaunchEventSource
 import com.twix.onboarding.OnBoardingViewModel
+import com.twix.onboarding.contract.OnBoardingIntent
 import com.twix.onboarding.couple.CoupleConnectRoute
 import com.twix.onboarding.dday.DdayRoute
 import com.twix.onboarding.invite.InviteCodeRoute
@@ -66,6 +67,14 @@ object OnboardingNavGraph : NavGraphContributor {
             ) { backStackEntry ->
                 val vm: OnBoardingViewModel = backStackEntry.graphViewModel(navController, graphRoute.route)
                 val inviteCode = backStackEntry.arguments?.getString(NavRoutes.InviteRoute.ARG_CODE)
+                val inviteLaunchEventSource: InviteLaunchEventSource = koinInject()
+                val pendingInviteCode by inviteLaunchEventSource.pendingInviteCode.collectAsStateWithLifecycle()
+
+                LaunchedEffect(pendingInviteCode) {
+                    val code = pendingInviteCode ?: return@LaunchedEffect
+                    inviteLaunchEventSource.consumePendingInviteCode()
+                    vm.dispatch(OnBoardingIntent.WriteInviteCode(code))
+                }
 
                 InviteCodeRoute(
                     navigateToNext = {

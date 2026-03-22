@@ -1,14 +1,14 @@
 package com.twix.onboarding.navigation
 
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.navigation.NavRoutes
 import com.twix.navigation.base.NavGraphContributor
 import com.twix.navigation.graphViewModel
@@ -55,13 +55,14 @@ object OnboardingNavGraph : NavGraphContributor {
             }
             composable(
                 route = NavRoutes.InviteRoute.route,
-                arguments = listOf(
-                    navArgument(NavRoutes.InviteRoute.ARG_CODE) {
-                        type = NavType.StringType
-                        nullable = true
-                        defaultValue = null
-                    },
-                ),
+                arguments =
+                    listOf(
+                        navArgument(NavRoutes.InviteRoute.ARG_CODE) {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        },
+                    ),
             ) { backStackEntry ->
                 val vm: OnBoardingViewModel = backStackEntry.graphViewModel(navController, graphRoute.route)
                 val inviteCode = backStackEntry.arguments?.getString(NavRoutes.InviteRoute.ARG_CODE)

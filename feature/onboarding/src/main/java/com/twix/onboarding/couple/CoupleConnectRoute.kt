@@ -83,16 +83,18 @@ fun CoupleConnectRoute(
 
             is OnBoardingSideEffect.InviteCode.ShareInviteLink -> {
                 val deepLink = InviteLaunchEventSource.buildInviteDeepLink(sideEffect.inviteCode)
-                val shareText = currentContext.getString(
-                    R.string.onboarding_invite_share_message,
-                    sideEffect.inviteCode,
-                    deepLink,
-                    InviteLaunchEventSource.PLAY_STORE_URL,
-                )
-                val sendIntent = Intent(Intent.ACTION_SEND).apply {
-                    type = "text/plain"
-                    putExtra(Intent.EXTRA_TEXT, shareText)
-                }
+                val shareText =
+                    currentContext.getString(
+                        R.string.onboarding_invite_share_message,
+                        sideEffect.inviteCode,
+                        deepLink,
+                        InviteLaunchEventSource.PLAY_STORE_URL,
+                    )
+                val sendIntent =
+                    Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, shareText)
+                    }
                 currentContext.startActivity(Intent.createChooser(sendIntent, null))
             }
 

@@ -112,7 +112,6 @@ fun AppNavHost(
         }
     }
 
-
     NavHost(
         navController = navController,
         startDestination = start.route,

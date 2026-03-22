@@ -17,7 +17,6 @@ interface InviteLaunchEventSource {
         const val PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.yapp.twix"
         const val INVITE_WEB_HOST = "keepiluv.web.app"
 
-        fun buildInviteDeepLink(inviteCode: String) =
-            "https://$INVITE_WEB_HOST?$INVITE_CODE_PARAM=$inviteCode"
+        fun buildInviteDeepLink(inviteCode: String) = "https://$INVITE_WEB_HOST?$INVITE_CODE_PARAM=$inviteCode"
     }
 }

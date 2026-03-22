@@ -17,15 +17,18 @@ class InviteLaunchDispatcher : InviteLaunchEventSource {
 
         if (!checkCustomScheme(uri) && !checkAppLink(uri)) return
 
-        val inviteCode = uri.getQueryParameter(InviteLaunchEventSource.INVITE_CODE_PARAM)
-            ?.takeIf { it.isNotBlank() } ?: return
+        val inviteCode =
+            uri
+                .getQueryParameter(InviteLaunchEventSource.INVITE_CODE_PARAM)
+                ?.takeIf { it.isNotBlank() } ?: return
         _pendingInviteCode.value = inviteCode
     }
 
     private fun checkCustomScheme(uri: Uri) =
         uri.scheme == InviteLaunchEventSource.INVITE_SCHEME && uri.host == InviteLaunchEventSource.INVITE_HOST
 
-    private fun checkAppLink(uri: Uri) = (uri.scheme == HTTP_SCHEME || uri.scheme == HTTPS_SCHEME) &&
+    private fun checkAppLink(uri: Uri) =
+        (uri.scheme == HTTP_SCHEME || uri.scheme == HTTPS_SCHEME) &&
             uri.host == InviteLaunchEventSource.INVITE_WEB_HOST
 
     override fun consumePendingInviteCode() {

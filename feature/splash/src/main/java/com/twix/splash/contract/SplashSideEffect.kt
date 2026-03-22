@@ -8,5 +8,7 @@ sealed interface SplashSideEffect : SideEffect {
 
     data object NavigateToLogin : SplashSideEffect
 
-    data class NavigateToOnBoarding(val status: OnboardingStatus) : SplashSideEffect
+    data class NavigateToOnBoarding(
+        val status: OnboardingStatus,
+    ) : SplashSideEffect
 }

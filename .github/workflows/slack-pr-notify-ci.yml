@@ -27,14 +27,24 @@ jobs:
               SLACK_MENTION="<@U0AL88TS412>"
               ;;
             *)
-              SLACK_MENTION="@$REQUESTED_REVIEWER"
+              echo "Slack user mapping not found for: $REQUESTED_REVIEWER" >&2
+              exit 1
               ;;
           esac
 
-          curl -H "Content-Type: application/json" \
+          PAYLOAD=$(jq -n \
+            --arg text "$SLACK_MENTION 리뷰 요청이 왔어요! 👀" \
+            --arg title "#$PR_NUMBER $PR_TITLE" \
+            --arg url "$PR_URL" \
+            '{text: $text, attachments: [{title: $title, title_link: $url, color: "#58B9FF"}]}')
+
+          curl --fail-with-body \
+               --max-time 10 \
+               --retry 2 \
+               -H "Content-Type: application/json" \
                -X POST \
-               -d "{\"text\": \"$SLACK_MENTION 리뷰 요청이 왔어요! 👀\", \"attachments\": [{\"title\": \"#$PR_NUMBER $PR_TITLE\", \"title_link\": \"$PR_URL\", \"color\": \"#58B9FF\"}]}" \
-               $SLACK_WEBHOOK
+               -d "$PAYLOAD" \
+               "$SLACK_WEBHOOK"
 
   review-completed-notify:
     if: |
@@ -62,7 +72,8 @@ jobs:
               AUTHOR_MENTION="<@U0AL88TS412>"
               ;;
             *)
-              AUTHOR_MENTION="@$AUTHOR"
+              echo "Slack user mapping not found for: $AUTHOR" >&2
+              exit 1
               ;;
           esac
 
@@ -77,7 +88,17 @@ jobs:
               ;;
           esac
 
-          curl -H "Content-Type: application/json" \
+          PAYLOAD=$(jq -n \
+            --arg text "$AUTHOR_MENTION $MESSAGE" \
+            --arg title "#$PR_NUMBER $PR_TITLE" \
+            --arg url "$PR_URL" \
+            --arg color "$COLOR" \
+            '{text: $text, attachments: [{title: $title, title_link: $url, color: $color}]}')
+
+          curl --fail-with-body \
+               --max-time 10 \
+               --retry 2 \
+               -H "Content-Type: application/json" \
                -X POST \
-               -d "{\"text\": \"$AUTHOR_MENTION $MESSAGE\", \"attachments\": [{\"title\": \"#$PR_NUMBER $PR_TITLE\", \"title_link\": \"$PR_URL\", \"color\": \"$COLOR\"}]}" \
-               $SLACK_WEBHOOK
+               -d "$PAYLOAD" \
+               "$SLACK_WEBHOOK"

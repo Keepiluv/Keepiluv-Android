@@ -1,0 +1,104 @@
+name: Slack PR Notifications
+
+on:
+  pull_request:
+    types: [review_requested]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  review-request-notify:
+    if: github.event.action == 'review_requested'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Review Request Notification
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          REQUESTED_REVIEWER: ${{ github.event.requested_reviewer.login }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          case "$REQUESTED_REVIEWER" in
+            "chanho0908"|"JoungPeto0908")
+              SLACK_MENTION="<@U0AKQT3ATF1>"
+              ;;
+            "dogmania")
+              SLACK_MENTION="<@U0AL88TS412>"
+              ;;
+            *)
+              echo "Slack user mapping not found for: $REQUESTED_REVIEWER" >&2
+              exit 1
+              ;;
+          esac
+
+          PAYLOAD=$(jq -n \
+            --arg text "$SLACK_MENTION 리뷰 요청이 왔어요! 👀" \
+            --arg title "#$PR_NUMBER $PR_TITLE" \
+            --arg url "$PR_URL" \
+            '{text: $text, attachments: [{title: $title, title_link: $url, color: "#58B9FF"}]}')
+
+          curl --fail-with-body \
+               --max-time 10 \
+               --retry 2 \
+               -H "Content-Type: application/json" \
+               -X POST \
+               -d "$PAYLOAD" \
+               "$SLACK_WEBHOOK"
+
+  review-completed-notify:
+    if: |
+      github.event_name == 'pull_request_review' &&
+      github.event.review.user.type != 'Bot' &&
+      github.event.review.user.login != github.event.pull_request.user.login &&
+      github.event.review.state != 'commented'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Review Completed Notification
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+          REVIEWER: ${{ github.event.review.user.login }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REVIEW_STATE: ${{ github.event.review.state }}
+        run: |
+          case "$AUTHOR" in
+            "chanho0908"|"JoungPeto0908")
+              AUTHOR_MENTION="<@U0AKQT3ATF1>"
+              ;;
+            "dogmania")
+              AUTHOR_MENTION="<@U0AL88TS412>"
+              ;;
+            *)
+              echo "Slack user mapping not found for: $AUTHOR" >&2
+              exit 1
+              ;;
+          esac
+
+          case "$REVIEW_STATE" in
+            "changes_requested")
+              MESSAGE="수정 요청이 있습니다 🔧"
+              COLOR="#E01E5A"
+              ;;
+            *)
+              MESSAGE="리뷰가 완료되었습니다 📝"
+              COLOR="#58B9FF"
+              ;;
+          esac
+
+          PAYLOAD=$(jq -n \
+            --arg text "$AUTHOR_MENTION $MESSAGE" \
+            --arg title "#$PR_NUMBER $PR_TITLE" \
+            --arg url "$PR_URL" \
+            --arg color "$COLOR" \
+            '{text: $text, attachments: [{title: $title, title_link: $url, color: $color}]}')
+
+          curl --fail-with-body \
+               --max-time 10 \
+               --retry 2 \
+               -H "Content-Type: application/json" \
+               -X POST \
+               -d "$PAYLOAD" \
+               "$SLACK_WEBHOOK"

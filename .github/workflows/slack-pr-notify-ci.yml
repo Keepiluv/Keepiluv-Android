@@ -21,10 +21,10 @@ jobs:
         run: |
           case "$REQUESTED_REVIEWER" in
             "chanho0908"|"JoungPeto0908")
-              SLACK_MENTION="<@U0AKQT3ATF1>"
+              SLACK_MENTION="<@U0AL88TS412>"
               ;;
             "dogmania")
-              SLACK_MENTION="<@U0AL88TS412>"
+              SLACK_MENTION="<@U0AKQT3ATF1>"
               ;;
             *)
               echo "Slack user mapping not found for: $REQUESTED_REVIEWER" >&2
@@ -66,10 +66,10 @@ jobs:
         run: |
           case "$AUTHOR" in
             "chanho0908"|"JoungPeto0908")
-              AUTHOR_MENTION="<@U0AKQT3ATF1>"
+              AUTHOR_MENTION="<@U0AL88TS412>"
               ;;
             "dogmania")
-              AUTHOR_MENTION="<@U0AL88TS412>"
+              AUTHOR_MENTION="<@U0AKQT3ATF1>"
               ;;
             *)
               echo "Slack user mapping not found for: $AUTHOR" >&2

@@ -65,7 +65,7 @@ class HomeViewModel(
             is HomeIntent.UpdateVisibleDate -> updateVisibleDate(intent.date)
             is HomeIntent.Verification -> handleGoalVerification(intent)
             is HomeIntent.PokeGoal -> pokeGoal(intent.goalId)
-            HomeIntent.Refresh -> fetchGoalList()
+            HomeIntent.Refresh -> fetchGoalList(isUserRefresh = true)
         }
     }
 
@@ -136,12 +136,26 @@ class HomeViewModel(
     /**
      * 서버에서 데이터를 가져오는 부분
      * */
-    private fun fetchGoalList() {
+    private fun fetchGoalList(isUserRefresh: Boolean = false) {
         val date = currentState.selectedDate.toString()
 
         launchResult(
-            onStart = { reduce { copy(isRefreshing = true) } },
-            onFinally = { reduce { copy(isRefreshing = false) } },
+            onStart = {
+                reduce {
+                    copy(
+                        isInitialLoading = !isUserRefresh,
+                        isRefreshing = isUserRefresh,
+                    )
+                }
+            },
+            onFinally = {
+                reduce {
+                    copy(
+                        isInitialLoading = false,
+                        isRefreshing = false,
+                    )
+                }
+            },
             block = { goalRepository.fetchGoalList(date = date) },
             onSuccess = { goalList -> reduce { copy(goalList = goalList) } },
             onError = {

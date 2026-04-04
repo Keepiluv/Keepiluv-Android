@@ -14,6 +14,7 @@ data class HomeUiState(
     val referenceDate: LocalDate = LocalDate.now(), // 7일 달력을 생성하기 위한 레퍼런스 날짜
     val goalList: GoalList = GoalList(),
     val selectedGoalId: Long = -1,
+    val isInitialLoading: Boolean = false,
     val isRefreshing: Boolean = false, // 당겨서 리프레시에 사용
 ) : State {
     val monthYear: String

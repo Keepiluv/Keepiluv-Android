@@ -311,6 +311,8 @@ private fun RepeatCountBottomSheetContent(
     var internalRepeatCount by remember { mutableIntStateOf(repeatCount) }
     var internalSelectedRepeatType by remember { mutableStateOf(selectedRepeatCycle) }
     val maxCount = if (internalSelectedRepeatType == RepeatCycle.WEEKLY) 6 else 25
+    val minusEnabled = internalRepeatCount > 1
+    val plusEnabled = internalRepeatCount < maxCount
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -363,13 +365,13 @@ private fun RepeatCountBottomSheetContent(
             Image(
                 painter = painterResource(R.drawable.ic_minus),
                 contentDescription = "minus",
-                colorFilter = ColorFilter.tint(CommonColor.White),
+                colorFilter = ColorFilter.tint(if (minusEnabled) CommonColor.White else GrayColor.C300),
                 modifier =
                     Modifier
-                        .background(GrayColor.C500, CircleShape)
+                        .background(if (minusEnabled) GrayColor.C500 else GrayColor.C100, CircleShape)
                         .padding(4.dp)
                         .size(28.dp)
-                        .noRippleClickable(onClick = { if (internalRepeatCount > 1) internalRepeatCount-- }),
+                        .noRippleClickable(onClick = { if (minusEnabled) internalRepeatCount-- }),
             )
 
             Row(
@@ -406,13 +408,13 @@ private fun RepeatCountBottomSheetContent(
             Image(
                 painter = painterResource(R.drawable.ic_plus),
                 contentDescription = "plus",
-                colorFilter = ColorFilter.tint(CommonColor.White),
+                colorFilter = ColorFilter.tint(if (plusEnabled) CommonColor.White else GrayColor.C300),
                 modifier =
                     Modifier
-                        .background(GrayColor.C500, CircleShape)
+                        .background(if (plusEnabled) GrayColor.C500 else GrayColor.C100, CircleShape)
                         .padding(4.dp)
                         .size(28.dp)
-                        .noRippleClickable(onClick = { if (maxCount > internalRepeatCount) internalRepeatCount++ }),
+                        .noRippleClickable(onClick = { if (plusEnabled) internalRepeatCount++ }),
             )
         }
 

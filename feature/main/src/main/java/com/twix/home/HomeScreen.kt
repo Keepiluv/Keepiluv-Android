@@ -5,7 +5,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,9 +24,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -279,42 +274,26 @@ fun GoalList(
 
     val listState = rememberLazyListState()
     val density = androidx.compose.ui.platform.LocalDensity.current
-    val coroutineScope = rememberCoroutineScope()
 
     val refreshTriggerPx = with(density) { 88.dp.toPx() }
     val refreshingHoldPx = with(density) { 56.dp.toPx() }
     val maxPullPx = with(density) { 140.dp.toPx() }
 
-    val contentOffsetPx = remember { androidx.compose.animation.core.Animatable(0f) }
-    val indicatorAlpha = remember { androidx.compose.animation.core.Animatable(0f) }
+    var pullOffsetPx by remember { mutableFloatStateOf(0f) }
 
-    var wasRefreshing by remember { androidx.compose.runtime.mutableStateOf(false) }
+    val animatedPullOffsetPx by animateFloatAsState(
+        targetValue =
+            when {
+                isRefreshing -> refreshingHoldPx
+                else -> pullOffsetPx
+            },
+        animationSpec = spring(),
+        label = "pull_offset",
+    )
 
     LaunchedEffect(isRefreshing) {
-        if (isRefreshing) {
-            wasRefreshing = true
-            contentOffsetPx.animateTo(
-                targetValue = refreshingHoldPx,
-                animationSpec = spring(),
-            )
-            indicatorAlpha.animateTo(
-                targetValue = 1f,
-                animationSpec = spring(),
-            )
-        } else if (wasRefreshing) {
-            wasRefreshing = false
-
-            // 인디케이터 먼저 제거
-            indicatorAlpha.animateTo(
-                targetValue = 0f,
-                animationSpec = tween(durationMillis = 180),
-            )
-
-            // 인디케이터가 사라지 후에 리스트가 원위치로 복귀
-            contentOffsetPx.animateTo(
-                targetValue = 0f,
-                animationSpec = spring(),
-            )
+        if (!isRefreshing) {
+            pullOffsetPx = 0f
         }
     }
 
@@ -326,72 +305,37 @@ fun GoalList(
                     source: NestedScrollSource,
                 ): Offset {
                     if (source != NestedScrollSource.Drag) return Offset.Zero
-                    if (isRefreshing) return Offset.Zero
 
                     val isAtTop =
                         listState.firstVisibleItemIndex == 0 &&
-                                listState.firstVisibleItemScrollOffset == 0
+                            listState.firstVisibleItemScrollOffset == 0
 
                     val delta = available.y
 
-                    if (delta > 0 && isAtTop) {
-                        val current = contentOffsetPx.value
+                    if (delta > 0 && isAtTop && !isRefreshing) {
                         val newOffset =
-                            (current + delta * 0.5f)
+                            (pullOffsetPx + (delta * 0.5f))
                                 .coerceAtMost(maxPullPx)
-                        val consumed = newOffset - current
-
-                        coroutineScope.launch {
-                            contentOffsetPx.snapTo(newOffset)
-                            indicatorAlpha.snapTo(
-                                (newOffset / refreshTriggerPx).coerceIn(0f, 1f),
-                            )
-                        }
-
+                        val consumed = newOffset - pullOffsetPx
+                        pullOffsetPx = newOffset
                         return Offset(x = 0f, y = consumed / 0.5f)
                     }
 
-                    if (delta < 0 && contentOffsetPx.value > 0f) {
-                        val current = contentOffsetPx.value
-                        val newOffset = (current + delta).coerceAtLeast(0f)
-                        val consumed = newOffset - current
-
-                        coroutineScope.launch {
-                            contentOffsetPx.snapTo(newOffset)
-                            indicatorAlpha.snapTo(
-                                (newOffset / refreshTriggerPx).coerceIn(0f, 1f),
-                            )
-                        }
-
+                    if (delta < 0 && pullOffsetPx > 0f) {
+                        val newOffset = (pullOffsetPx + delta).coerceAtLeast(0f)
+                        val consumed = newOffset - pullOffsetPx
+                        pullOffsetPx = newOffset
                         return Offset(x = 0f, y = consumed)
                     }
 
                     return Offset.Zero
                 }
 
-                // 경고는 무시해도 됨
                 override suspend fun onPreFling(available: Velocity): Velocity {
-                    if (isRefreshing) return Velocity.Zero
-
-                    if (contentOffsetPx.value >= refreshTriggerPx) {
-                        contentOffsetPx.animateTo(
-                            targetValue = refreshingHoldPx,
-                            animationSpec = spring(),
-                        )
-                        indicatorAlpha.animateTo(
-                            targetValue = 1f,
-                            animationSpec = spring(),
-                        )
+                    if (pullOffsetPx >= refreshTriggerPx && !isRefreshing) {
                         onRefresh()
-                    } else {
-                        contentOffsetPx.animateTo(
-                            targetValue = 0f,
-                            animationSpec = spring(),
-                        )
-                        indicatorAlpha.animateTo(
-                            targetValue = 0f,
-                            animationSpec = tween(durationMillis = 120),
-                        )
+                    } else if (!isRefreshing) {
+                        pullOffsetPx = 0f
                     }
                     return Velocity.Zero
                 }
@@ -405,10 +349,11 @@ fun GoalList(
             state = listState,
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(
-                top = with(density) { contentOffsetPx.value.toDp() },
-                bottom = 20.dp,
-            ),
+            contentPadding =
+                PaddingValues(
+                    top = with(density) { animatedPullOffsetPx.toDp() },
+                    bottom = 20.dp,
+                ),
         ) {
             item {
                 Row(
@@ -472,26 +417,34 @@ fun GoalList(
             }
         }
 
-        if (indicatorAlpha.value > 0f) {
-            Box(
-                modifier =
-                    Modifier
-                        .align(Alignment.TopCenter)
-                        .offset {
-                            IntOffset(
-                                x = 0,
-                                y = ((contentOffsetPx.value - with(density) { 32.dp.toPx() }) / 2f)
+        val indicatorAlpha =
+            if (animatedPullOffsetPx <= 0f) {
+                0f
+            } else {
+                (animatedPullOffsetPx / refreshTriggerPx).coerceIn(0f, 1f)
+            }
+
+        Box(
+            modifier =
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .offset {
+                        IntOffset(
+                            x = 0,
+                            y =
+                                ((animatedPullOffsetPx - with(density) { 32.dp.toPx() }) / 2f)
                                     .coerceAtLeast(0f)
                                     .roundToInt(),
-                            )
-                        },
-                contentAlignment = Alignment.Center,
-            ) {
+                        )
+                    },
+            contentAlignment = Alignment.Center,
+        ) {
+            if (animatedPullOffsetPx > 0f || isRefreshing) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
-                    strokeWidth = 2.dp,
-                    color = GrayColor.C500.copy(alpha = indicatorAlpha.value),
-                    trackColor = GrayColor.C100.copy(alpha = indicatorAlpha.value * 0.4f),
+                    strokeWidth = 2.5.dp,
+                    color = GrayColor.C500,
+                    trackColor = GrayColor.C100.copy(alpha = indicatorAlpha),
                 )
             }
         }

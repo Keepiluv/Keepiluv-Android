@@ -373,6 +373,9 @@ fun GoalList(
                         text = stringResource(R.string.word_edit),
                         style = AppTextStyle.B1,
                         color = GrayColor.C500,
+                        modifier =
+                            Modifier
+                                .noRippleClickable(onClick = onEditClick)
                     )
                 }
             }

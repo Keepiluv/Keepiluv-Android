@@ -125,7 +125,7 @@ private fun WeekDayCell(
         Box(
             modifier =
                 Modifier
-                    .size(44.dp)
+                    .size(40.dp)
                     .then(
                         if (selected) Modifier.border(1.dp, GrayColor.C500, CircleShape) else Modifier,
                     ),

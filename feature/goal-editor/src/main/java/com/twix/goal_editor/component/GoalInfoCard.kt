@@ -40,6 +40,8 @@ import com.twix.domain.model.enums.RepeatCycle
 import com.twix.ui.extension.noRippleClickable
 import java.time.LocalDate
 
+private val frameHeight = 64.dp
+
 @Composable
 fun GoalInfoCard(
     selectedRepeatCycle: RepeatCycle,
@@ -192,7 +194,8 @@ private fun DateSettings(
     Row(
         modifier =
             Modifier
-                .padding(16.dp)
+                .height(frameHeight)
+                .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -233,7 +236,8 @@ private fun EndDateOption(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .height(frameHeight)
+                .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         HeaderText(stringResource(R.string.header_end_date_option))

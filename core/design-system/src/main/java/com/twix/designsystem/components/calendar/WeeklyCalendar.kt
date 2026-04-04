@@ -1,5 +1,14 @@
 package com.twix.designsystem.components.calendar
 
+import android.annotation.SuppressLint
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
@@ -15,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -31,6 +41,13 @@ import com.twix.ui.extension.weekStartSunday
 import java.time.LocalDate
 import kotlin.math.abs
 
+private enum class WeekSwipeDirection {
+    PREVIOUS,
+    NEXT,
+    NONE,
+}
+
+@SuppressLint("UnusedContentLambdaTargetStateParameter")
 @Composable
 fun WeeklyCalendar(
     selectedDate: LocalDate,
@@ -41,8 +58,6 @@ fun WeeklyCalendar(
     onUpdateVisibleDate: (LocalDate) -> Unit = {},
 ) {
     val today = remember { LocalDate.now() }
-    val weekStart = remember(referenceDate) { referenceDate.weekStartSunday() }
-    val days = remember(weekStart) { (0..6).map { weekStart.plusDays(it.toLong()) } }
 
     val dayLabels =
         listOf(
@@ -54,48 +69,110 @@ fun WeeklyCalendar(
             stringResource(R.string.word_friday),
             stringResource(R.string.word_saturday),
         )
-    // 스와이프 처리용 누적 드래그
-    var dragSumPx by remember { mutableFloatStateOf(0f) }
 
-    LaunchedEffect(days.first()) {
-        if (dragSumPx > 0) {
-            onUpdateVisibleDate(days.first())
-        } else if (dragSumPx < 0) {
-            onUpdateVisibleDate(days.last())
+    var dragSumPx by remember { mutableFloatStateOf(0f) }
+    var transitionDirection by remember { mutableStateOf(WeekSwipeDirection.NONE) }
+
+    val visibleWeekKey =
+        remember(referenceDate) {
+            referenceDate.weekStartSunday().toEpochDay().toInt()
         }
+
+    LaunchedEffect(referenceDate, transitionDirection) {
+        val weekStart = referenceDate.weekStartSunday()
+        when (transitionDirection) {
+            WeekSwipeDirection.PREVIOUS -> onUpdateVisibleDate(weekStart)
+            WeekSwipeDirection.NEXT -> onUpdateVisibleDate(weekStart.plusDays(6))
+            WeekSwipeDirection.NONE -> Unit
+        }
+    }
+
+    LaunchedEffect(visibleWeekKey) {
+        transitionDirection = WeekSwipeDirection.NONE
     }
 
     Column(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .pointerInput(Unit) {
+                .pointerInput(referenceDate) {
                     detectHorizontalDragGestures(
                         onDragStart = { dragSumPx = 0f },
                         onHorizontalDrag = { _, dragAmount ->
                             dragSumPx += dragAmount
                         },
                         onDragEnd = {
-                            if (abs(dragSumPx) < 120f) return@detectHorizontalDragGestures
+                            if (abs(dragSumPx) < 120f) {
+                                transitionDirection = WeekSwipeDirection.NONE
+                                return@detectHorizontalDragGestures
+                            }
 
-                            if (dragSumPx > 0f) onPreviousWeek() else onNextWeek()
+                            if (dragSumPx > 0f) {
+                                transitionDirection = WeekSwipeDirection.PREVIOUS
+                                onPreviousWeek()
+                            } else {
+                                transitionDirection = WeekSwipeDirection.NEXT
+                                onNextWeek()
+                            }
+
+                            dragSumPx = 0f
+                        },
+                        onDragCancel = {
+                            dragSumPx = 0f
+                            transitionDirection = WeekSwipeDirection.NONE
                         },
                     )
                 }.padding(horizontal = 12.dp),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            days.forEachIndexed { index, date ->
-                val header = if (date == today) stringResource(R.string.word_today) else dayLabels[index]
+        AnimatedContent(
+            targetState = visibleWeekKey,
+            transitionSpec = {
+                val isNext = transitionDirection == WeekSwipeDirection.NEXT
 
-                WeekDayCell(
-                    header = header,
-                    dayOfMonth = date.dayOfMonth,
-                    selected = date == selectedDate,
-                    onClick = { onSelectDate(date) },
-                    modifier = Modifier.weight(1f),
+                ContentTransform(
+                    targetContentEnter =
+                        slideInHorizontally(
+                            initialOffsetX = { fullWidth ->
+                                if (isNext) fullWidth else -fullWidth
+                            },
+                            animationSpec = tween(durationMillis = 280),
+                        ) + fadeIn(animationSpec = tween(durationMillis = 220)),
+                    initialContentExit =
+                        slideOutHorizontally(
+                            targetOffsetX = { fullWidth ->
+                                if (isNext) -fullWidth else fullWidth
+                            },
+                            animationSpec = tween(durationMillis = 280),
+                        ) + fadeOut(animationSpec = tween(durationMillis = 180)),
+                    sizeTransform = SizeTransform(clip = false),
                 )
+            },
+            label = "weekly-calendar-transition",
+        ) { targetWeekKey ->
+            val animatedWeekStart =
+                remember(targetWeekKey) {
+                    LocalDate.ofEpochDay(targetWeekKey.toLong())
+                }
+            val animatedDays =
+                remember(animatedWeekStart) {
+                    (0..6).map { animatedWeekStart.plusDays(it.toLong()) }
+                }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                animatedDays.forEachIndexed { index, date ->
+                    val header =
+                        if (date == today) stringResource(R.string.word_today) else dayLabels[index]
+
+                    WeekDayCell(
+                        header = header,
+                        dayOfMonth = date.dayOfMonth,
+                        selected = date == selectedDate,
+                        onClick = { onSelectDate(date) },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
         }
     }

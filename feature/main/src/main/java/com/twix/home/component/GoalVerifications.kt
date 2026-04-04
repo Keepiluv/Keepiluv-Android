@@ -118,7 +118,7 @@ private fun EmptyContent(
             Image(
                 painter = painterResource(R.drawable.ic_goal_action_cheer),
                 contentDescription = null,
-                modifier = Modifier.size(width = 56.dp, height = 64.dp),
+                modifier = Modifier.size(width = 70.dp, height = 64.dp),
             )
 
             AppText(

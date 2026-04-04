@@ -227,7 +227,6 @@ fun HomeScreen(
                     text = stringResource(R.string.home_empty_goal_guide),
                 )
             } else {
-                Spacer(Modifier.height(12.dp))
                 GoalList(
                     modifier =
                         Modifier

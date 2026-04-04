@@ -289,6 +289,7 @@ private fun GoalSummaryItem(
     isPending: Boolean,
 ) {
     val menuVisible = openedMenuGoalId == item.goalId
+    val shape = RoundedCornerShape(8.dp)
 
     GoalCardFrame(
         goalName = item.name,
@@ -317,10 +318,10 @@ private fun GoalSummaryItem(
                                 .width(88.dp)
                                 .shadow(
                                     elevation = 8.dp,
-                                    shape = RoundedCornerShape(12.dp),
+                                    shape = shape,
                                     clip = false,
-                                ).background(CommonColor.White, RoundedCornerShape(12.dp))
-                                .border(1.dp, GrayColor.C500, RoundedCornerShape(12.dp)),
+                                ).background(CommonColor.White, shape)
+                                .border(1.dp, GrayColor.C500, shape),
                     ) {
                         CommonPopupItem(
                             text = stringResource(R.string.action_edit),

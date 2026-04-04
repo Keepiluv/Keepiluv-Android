@@ -211,7 +211,7 @@ private fun WeekDayCell(
             AppText(
                 text = dayOfMonth.toString(),
                 style = AppTextStyle.B1,
-                color = GrayColor.C400,
+                color = GrayColor.C500,
                 modifier =
                     Modifier
                         .fillMaxSize()

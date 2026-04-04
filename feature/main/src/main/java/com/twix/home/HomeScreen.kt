@@ -368,13 +368,10 @@ fun GoalList(
 
                     Spacer(Modifier.weight(1f))
 
-                    Image(
-                        painter = painterResource(R.drawable.ic_edit),
-                        contentDescription = null,
-                        modifier =
-                            Modifier
-                                .size(24.dp)
-                                .noRippleClickable { onEditClick() },
+                    AppText(
+                        text = stringResource(R.string.word_edit),
+                        style = AppTextStyle.B1,
+                        color = GrayColor.C500,
                     )
                 }
             }

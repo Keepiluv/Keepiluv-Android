@@ -89,7 +89,7 @@ class GoalEditorViewModel(
     }
 
     private suspend fun validateSaveInput(): Boolean {
-        if (!currentState.isEnabled) {
+        if (!currentState.isSaveEnabled) {
             emitSideEffect(
                 GoalEditorSideEffect.ShowToast(
                     R.string.toast_input_goal_title,
@@ -99,7 +99,7 @@ class GoalEditorViewModel(
             return false
         }
 
-        if (currentState.endDateEnabled && currentState.endDate.isBefore(currentState.startDate)) {
+        if (!currentState.isEndDateValid) {
             emitSideEffect(
                 GoalEditorSideEffect.ShowToast(
                     R.string.toast_end_date_before_start_date,

@@ -34,6 +34,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -457,7 +458,11 @@ private fun AddGoalButton(
         modifier =
             modifier
                 .size(56.dp)
-                .background(GrayColor.C500, CircleShape)
+                .shadow(
+                    elevation = 8.dp,
+                    shape = CircleShape,
+                    clip = false,
+                ).background(GrayColor.C500, CircleShape)
                 .border(1.dp, GrayColor.C300, CircleShape)
                 .noRippleClickable(onClick = onClick),
         contentAlignment = Alignment.Center,

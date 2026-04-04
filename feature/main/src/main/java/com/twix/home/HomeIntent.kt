@@ -27,4 +27,6 @@ sealed interface HomeIntent : Intent {
     data class PokeGoal(
         val goalId: Long,
     ) : HomeIntent
+
+    data object Refresh : HomeIntent // 당겨서 리프레시
 }

@@ -29,6 +29,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -314,7 +315,11 @@ private fun GoalSummaryItem(
                         modifier =
                             Modifier
                                 .width(88.dp)
-                                .background(CommonColor.White, RoundedCornerShape(12.dp))
+                                .shadow(
+                                    elevation = 8.dp,
+                                    shape = RoundedCornerShape(12.dp),
+                                    clip = false,
+                                ).background(CommonColor.White, RoundedCornerShape(12.dp))
                                 .border(1.dp, GrayColor.C500, RoundedCornerShape(12.dp)),
                     ) {
                         CommonPopupItem(

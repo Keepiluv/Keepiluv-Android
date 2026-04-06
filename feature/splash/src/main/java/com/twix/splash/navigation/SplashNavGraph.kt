@@ -7,9 +7,7 @@ import androidx.navigation.navigation
 import com.twix.domain.model.OnboardingStatus
 import com.twix.navigation.NavRoutes
 import com.twix.navigation.base.NavGraphContributor
-import com.twix.navigation_contract.InviteLaunchEventSource
 import com.twix.splash.SplashRoute
-import org.koin.compose.koinInject
 
 object SplashNavGraph : NavGraphContributor {
     override val graphRoute: NavRoutes
@@ -25,8 +23,6 @@ object SplashNavGraph : NavGraphContributor {
             startDestination = startDestination,
         ) {
             composable(NavRoutes.SplashRoute.route) {
-                val inviteLaunchEventSource: InviteLaunchEventSource = koinInject()
-
                 SplashRoute(
                     navigateToMain = {
                         navController.navigate(NavRoutes.MainGraph.route) {
@@ -43,15 +39,7 @@ object SplashNavGraph : NavGraphContributor {
                     navigateToOnBoarding = { status ->
                         val destination =
                             when (status) {
-                                OnboardingStatus.COUPLE_CONNECTION -> {
-                                    val pendingCode = inviteLaunchEventSource.pendingInviteCode.value
-                                    if (pendingCode != null) {
-                                        inviteLaunchEventSource.consumePendingInviteCode()
-                                        NavRoutes.InviteRoute.createRoute(pendingCode)
-                                    } else {
-                                        NavRoutes.CoupleConnectionRoute.route
-                                    }
-                                }
+                                OnboardingStatus.COUPLE_CONNECTION -> NavRoutes.CoupleConnectionRoute.route
                                 OnboardingStatus.PROFILE_SETUP -> NavRoutes.ProfileRoute.route
                                 OnboardingStatus.ANNIVERSARY_SETUP -> NavRoutes.DdayRoute.route
                                 OnboardingStatus.COMPLETED -> return@SplashRoute

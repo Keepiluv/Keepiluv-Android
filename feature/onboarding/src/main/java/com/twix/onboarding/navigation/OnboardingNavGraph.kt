@@ -1,8 +1,5 @@
 package com.twix.onboarding.navigation
 
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -12,14 +9,11 @@ import androidx.navigation.navigation
 import com.twix.navigation.NavRoutes
 import com.twix.navigation.base.NavGraphContributor
 import com.twix.navigation.graphViewModel
-import com.twix.navigation_contract.InviteLaunchEventSource
 import com.twix.onboarding.OnBoardingViewModel
-import com.twix.onboarding.contract.OnBoardingIntent
 import com.twix.onboarding.couple.CoupleConnectRoute
 import com.twix.onboarding.dday.DdayRoute
 import com.twix.onboarding.invite.InviteCodeRoute
 import com.twix.onboarding.profile.ProfileRoute
-import org.koin.compose.koinInject
 
 object OnboardingNavGraph : NavGraphContributor {
     override val graphRoute: NavRoutes
@@ -37,14 +31,6 @@ object OnboardingNavGraph : NavGraphContributor {
         ) {
             composable(NavRoutes.CoupleConnectionRoute.route) { backStackEntry ->
                 val vm: OnBoardingViewModel = backStackEntry.graphViewModel(navController, graphRoute.route)
-                val inviteLaunchEventSource: InviteLaunchEventSource = koinInject()
-                val pendingInviteCode by inviteLaunchEventSource.pendingInviteCode.collectAsStateWithLifecycle()
-
-                LaunchedEffect(pendingInviteCode) {
-                    val code = pendingInviteCode ?: return@LaunchedEffect
-                    inviteLaunchEventSource.consumePendingInviteCode()
-                    navController.navigate(NavRoutes.InviteRoute.createRoute(code))
-                }
 
                 CoupleConnectRoute(
                     navigateToNext = {
@@ -67,14 +53,6 @@ object OnboardingNavGraph : NavGraphContributor {
             ) { backStackEntry ->
                 val vm: OnBoardingViewModel = backStackEntry.graphViewModel(navController, graphRoute.route)
                 val inviteCode = backStackEntry.arguments?.getString(NavRoutes.InviteRoute.ARG_CODE)
-                val inviteLaunchEventSource: InviteLaunchEventSource = koinInject()
-                val pendingInviteCode by inviteLaunchEventSource.pendingInviteCode.collectAsStateWithLifecycle()
-
-                LaunchedEffect(pendingInviteCode) {
-                    val code = pendingInviteCode ?: return@LaunchedEffect
-                    inviteLaunchEventSource.consumePendingInviteCode()
-                    vm.dispatch(OnBoardingIntent.WriteInviteCode(code))
-                }
 
                 InviteCodeRoute(
                     navigateToNext = {

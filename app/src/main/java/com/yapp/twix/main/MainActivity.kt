@@ -35,17 +35,20 @@ import kotlin.getValue
 class MainActivity : ComponentActivity() {
     private val notificationLaunchEventSource: NotificationLaunchEventSource by inject()
     private val inviteLaunchEventSource: InviteLaunchEventSource by inject()
-    private val requestNotificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+    private val requestNotificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         handleNotificationIntent(intent)
-        inviteLaunchEventSource.dispatchFromIntent(intent)
+        handleInviteCodeShareIntent(intent)
+
         enableEdgeToEdge()
         setContent {
             val toastManager: ToastManager = koinInject()
             WindowCompat.setDecorFitsSystemWindows(window, false)
-            WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = true
+            WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars =
+                true
 
             LaunchedEffect(Unit) {
                 requestNotificationPermissionIfNeeded()
@@ -62,6 +65,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     AppNavHost(
                         notificationLaunchEventSource = notificationLaunchEventSource,
+                        inviteLaunchEventSource = inviteLaunchEventSource
                     )
 
                     ToastHost(
@@ -84,6 +88,10 @@ class MainActivity : ComponentActivity() {
 
     private fun handleNotificationIntent(intent: Intent?) {
         notificationLaunchEventSource.dispatchFromIntent(intent)
+    }
+
+    private fun handleInviteCodeShareIntent(intent: Intent) {
+        inviteLaunchEventSource.dispatchFromIntent(intent)
     }
 
     private fun requestNotificationPermissionIfNeeded() {

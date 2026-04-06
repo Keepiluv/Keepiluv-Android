@@ -43,15 +43,17 @@ class SplashViewModel(
         }
     }
 
-    private suspend fun checkOnboardingStatus() {
-        when (val result = onBoardingRepository.fetchOnboardingStatus()) {
-            is AppResult.Success ->
-                when (result.data) {
+    private fun checkOnboardingStatus() {
+        launchResult(
+            block = { onBoardingRepository.fetchOnboardingStatus() },
+            onSuccess = {
+                when (it) {
                     OnboardingStatus.COMPLETED -> tryEmitSideEffect(SplashSideEffect.NavigateToMain)
-                    else -> tryEmitSideEffect(SplashSideEffect.NavigateToOnBoarding(result.data))
+                    else -> tryEmitSideEffect(SplashSideEffect.NavigateToOnBoarding(it))
                 }
-            else -> tryEmitSideEffect(SplashSideEffect.NavigateToMain)
-        }
+            },
+            onError = { emitSideEffect(SplashSideEffect.NavigateToMain) },
+        )
     }
 
     private companion object {

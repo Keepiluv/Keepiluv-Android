@@ -19,24 +19,29 @@ class InviteLaunchDispatcher : InviteLaunchEventSource {
 
         val inviteCode =
             uri
-                .getQueryParameter(InviteLaunchEventSource.INVITE_CODE_PARAM)
+                .getQueryParameter(INVITE_CODE_PARAM)
                 ?.takeIf { it.isNotBlank() } ?: return
         _pendingInviteCode.value = inviteCode
     }
 
-    private fun checkCustomScheme(uri: Uri) =
-        uri.scheme == InviteLaunchEventSource.INVITE_SCHEME && uri.host == InviteLaunchEventSource.INVITE_HOST
+    private fun checkCustomScheme(uri: Uri) = uri.scheme == INVITE_SCHEME && uri.host == INVITE_HOST
 
     private fun checkAppLink(uri: Uri) =
         (uri.scheme == HTTP_SCHEME || uri.scheme == HTTPS_SCHEME) &&
-            uri.host == InviteLaunchEventSource.INVITE_WEB_HOST
+            uri.host == INVITE_WEB_HOST
 
     override fun consumePendingInviteCode() {
         _pendingInviteCode.value = null
     }
 
     companion object {
+        private const val INVITE_SCHEME = "twix"
+        private const val INVITE_HOST = "invite"
+        private const val INVITE_CODE_PARAM = "code"
+        private const val INVITE_WEB_HOST = "keepiluv.web.app"
         private const val HTTP_SCHEME = "http"
         private const val HTTPS_SCHEME = "https"
+
+        fun buildInviteDeepLink(inviteCode: String) = "https://$INVITE_WEB_HOST?$INVITE_CODE_PARAM=$inviteCode"
     }
 }

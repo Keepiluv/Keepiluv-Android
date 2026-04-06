@@ -8,4 +8,5 @@ android {
 
 dependencies {
     implementation(projects.core.navigationContract)
+    implementation(projects.core.share)
 }

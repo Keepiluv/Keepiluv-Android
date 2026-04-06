@@ -7,5 +7,5 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:navigation-contract"))
+    implementation(projects.core.navigationContract)
 }

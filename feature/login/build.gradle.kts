@@ -29,7 +29,7 @@ android {
     }
 }
 dependencies {
-    implementation(project(":core:navigation-contract"))
+    implementation(projects.core.navigationContract)
 
     implementation(libs.googleid)
     implementation(libs.androidx.credentials)

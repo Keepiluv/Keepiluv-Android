@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     AppNavHost(
                         notificationLaunchEventSource = notificationLaunchEventSource,
-                        inviteLaunchEventSource = inviteLaunchEventSource
+                        inviteLaunchEventSource = inviteLaunchEventSource,
                     )
 
                     ToastHost(

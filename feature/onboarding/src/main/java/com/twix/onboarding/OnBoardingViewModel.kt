@@ -24,6 +24,7 @@ class OnBoardingViewModel(
     private val notificationRepository: NotificationRepository,
 ) : BaseViewModel<OnBoardingUiState, OnBoardingIntent, OnBoardingSideEffect>(OnBoardingUiState()) {
     private var pollingJob: Job? = null
+    private var connectCoupleJob: Job? = null
 
     init {
         fetchMyInviteCode()
@@ -99,6 +100,7 @@ class OnBoardingViewModel(
                                 break
                             }
                         }
+
                         is AppResult.Error -> {
                             if (++consecutiveFailureCount >= MAX_POLLING_FAILURE_COUNT) {
                                 stopPolling()
@@ -117,7 +119,6 @@ class OnBoardingViewModel(
 
     private fun reduceInviteCode(value: String) {
         val isValidInviteCode = InviteCode.create(value).isSuccess
-
         reduce {
             copy(
                 inviteCode =
@@ -127,20 +128,23 @@ class OnBoardingViewModel(
                     ),
             )
         }
+        if (isValidInviteCode) connectCouple()
     }
 
     private fun connectCouple() {
         val currentUiState = currentState.inviteCode
-        if (!currentUiState.isValid) return
+        if (!currentState.inviteCode.isValid) return
+        if (connectCoupleJob?.isActive == true) return
 
-        launchResult(
-            block = { onBoardingRepository.coupleConnection(currentUiState.partnerInviteCode) },
-            onSuccess = {
-                stopPolling()
-                tryEmitSideEffect(OnBoardingSideEffect.InviteCode.NavigateToNext)
-            },
-            onError = { error -> handleCoupleConnectException(error) },
-        )
+        connectCoupleJob =
+            launchResult(
+                block = { onBoardingRepository.coupleConnection(currentUiState.partnerInviteCode) },
+                onSuccess = {
+                    stopPolling()
+                    tryEmitSideEffect(OnBoardingSideEffect.InviteCode.NavigateToNext)
+                },
+                onError = { error -> handleCoupleConnectException(error) },
+            )
     }
 
     private suspend fun handleCoupleConnectException(error: AppError) {

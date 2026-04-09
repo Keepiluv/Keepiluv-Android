@@ -52,7 +52,7 @@
 
                 <data
                     android:scheme="https"
-                    android:host="keepiluv.web.app" />
+                    android:host="keepiluv.jiyong.xyz" />
             </intent-filter>
         </activity>
 

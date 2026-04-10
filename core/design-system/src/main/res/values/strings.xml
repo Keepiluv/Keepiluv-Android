@@ -117,6 +117,9 @@
     <string name="toast_camera_permission_request">인증샷 촬영을 위해서 카메라 권한이 필요해요.</string>
     <string name="toast_fetch_notification_failed">알림 목록 조회에 실패했습니다.</string>
     <string name="toast_poke_goal_failed">찌르기에 실패했습니다.</string>
+    <string name="toast_poke_cooldown">%1$s 뒤에 다시 찌를 수 있어요</string>
+    <string name="cooldown_hours_minutes">%1$d시간 %2$d분</string>
+    <string name="cooldown_minutes">%1$d분</string>
     <string name="toast_already_used_invite_code_message">이미 사용된 초대 코드입니다.</string>
     <string name="toast_invite_code_copy">초대 코드가 복사되었어요</string>
     <string name="toast_invalid_invite_code">잘못된 초대 코드입니다</string>

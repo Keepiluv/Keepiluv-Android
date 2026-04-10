@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -118,6 +120,7 @@ private fun ProfileScreen(
             placeHolder = stringResource(R.string.onboarding_name_placeholder),
             showTrailing = true,
             onValueChange = onChangeNickName,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
             trailing = {
                 Image(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_clear_text),

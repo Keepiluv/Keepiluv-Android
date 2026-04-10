@@ -146,7 +146,10 @@ fun CoupleConnectScreen(
             Image(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_invite),
                 contentDescription = null,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
+                modifier =
+                    Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(35.dp),
             )
 
             Spacer(modifier = Modifier.height(2.dp))

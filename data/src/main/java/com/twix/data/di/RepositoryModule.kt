@@ -42,6 +42,6 @@ internal val repositoryModule =
             DefaultNotificationRepository(get())
         }
         single<PokeRepository> {
-            DefaultPokeRepository(get())
+            DefaultPokeRepository(get(), get())
         }
     }

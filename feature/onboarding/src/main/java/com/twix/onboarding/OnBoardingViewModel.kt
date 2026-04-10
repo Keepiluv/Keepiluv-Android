@@ -122,7 +122,7 @@ class OnBoardingViewModel(
             profileSetup()
         } else {
             viewModelScope.launch {
-                showToast(R.string.onboarding_profile_invalid_name_length_toast, ToastType.ERROR)
+                showToast(R.string.onboarding_profile_invalid_name_length_toast, ToastType.DEFAULT)
             }
         }
     }

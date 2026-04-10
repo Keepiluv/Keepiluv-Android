@@ -130,6 +130,7 @@ private fun ToastItem(
             ToastType.DELETE -> painterResource(R.drawable.ic_toast_delete)
             ToastType.LIKE -> painterResource(R.drawable.ic_toast_heart)
             ToastType.ERROR -> painterResource(R.drawable.ic_toast_warning)
+            ToastType.DEFAULT -> null
         }
 
     Surface(
@@ -148,13 +149,15 @@ private fun ToastItem(
                     .padding(vertical = 12.dp, horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Image(
-                painter = res,
-                contentDescription = "toast icon",
-                modifier = Modifier.size(24.dp),
-            )
+            if (res != null) {
+                Image(
+                    painter = res,
+                    contentDescription = "toast icon",
+                    modifier = Modifier.size(24.dp),
+                )
 
-            Spacer(Modifier.width(3.5.dp))
+                Spacer(Modifier.width(3.5.dp))
+            }
 
             AppText(
                 text = data.message,

@@ -16,5 +16,9 @@ sealed interface HomeSideEffect : SideEffect {
         val message: String,
     ) : HomeSideEffect
 
+    data class ShowPokeCooldownToast(
+        val remainingMs: Long,
+    ) : HomeSideEffect
+
     data object ShowPermissionLauncher : HomeSideEffect
 }

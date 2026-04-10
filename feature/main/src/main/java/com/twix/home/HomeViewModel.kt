@@ -5,8 +5,9 @@ import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.enums.GoalCheckState
 import com.twix.domain.model.enums.WeekNavigation
+import com.twix.domain.model.poke.PokeGoalResult
 import com.twix.domain.repository.GoalRepository
-import com.twix.domain.repository.PokeRepository
+import com.twix.domain.usecase.PokeGoalUseCase
 import com.twix.home.model.CalendarState
 import com.twix.home.model.HomeUiState
 import com.twix.ui.base.BaseViewModel
@@ -21,7 +22,7 @@ import java.time.LocalDate
 
 class HomeViewModel(
     private val goalRepository: GoalRepository,
-    private val pokeRepository: PokeRepository,
+    private val pokeGoalUseCase: PokeGoalUseCase,
     private val goalRefreshBus: GoalRefreshBus,
 ) : BaseViewModel<HomeUiState, HomeIntent, HomeSideEffect>(
         HomeUiState(),
@@ -125,11 +126,16 @@ class HomeViewModel(
     }
 
     private fun pokeGoal(goalId: Long) {
-        launchResult(
-            block = { pokeRepository.pokeGoal(goalId) },
-            onSuccess = { tryEmitSideEffect(HomeSideEffect.ShowPokeToast(it.message)) },
-            onError = { emitSideEffect(HomeSideEffect.ShowToast(R.string.toast_poke_goal_failed, ToastType.ERROR)) },
-        )
+        viewModelScope.launch {
+            when (val result = pokeGoalUseCase.invoke(goalId)) {
+                is PokeGoalResult.Success ->
+                    tryEmitSideEffect(HomeSideEffect.ShowPokeToast(result.message))
+                is PokeGoalResult.OnCooldown ->
+                    tryEmitSideEffect(HomeSideEffect.ShowPokeCooldownToast(result.remainingMs))
+                PokeGoalResult.Error ->
+                    emitSideEffect(HomeSideEffect.ShowToast(R.string.toast_poke_goal_failed, ToastType.ERROR))
+            }
+        }
     }
 
     /**

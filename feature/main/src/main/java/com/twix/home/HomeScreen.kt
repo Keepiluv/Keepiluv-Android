@@ -57,6 +57,7 @@ import com.twix.home.model.HomeUiState
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.findActivity
 import com.twix.ui.extension.noRippleClickable
+import com.twix.util.CooldownFormatter
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -133,6 +134,22 @@ fun HomeRoute(
                         ToastType.SUCCESS,
                     ),
                 )
+
+            is HomeSideEffect.ShowPokeCooldownToast -> {
+                val cooldown = CooldownFormatter.format(sideEffect.remainingMs)
+                val timeLabel =
+                    if (cooldown.hours > 0) {
+                        currentContext.getString(R.string.cooldown_hours_minutes, cooldown.hours, cooldown.minutes)
+                    } else {
+                        currentContext.getString(R.string.cooldown_minutes, cooldown.minutes)
+                    }
+                toastManager.show(
+                    ToastData(
+                        currentContext.getString(R.string.toast_poke_cooldown, timeLabel),
+                        ToastType.ERROR,
+                    ),
+                )
+            }
         }
     }
 

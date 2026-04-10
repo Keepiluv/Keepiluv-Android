@@ -5,4 +5,11 @@ import com.twix.result.AppResult
 
 interface PokeRepository {
     suspend fun pokeGoal(goalId: Long): AppResult<PokeResult>
+
+    suspend fun savePokeHistory(
+        goalId: Long,
+        pokedAt: Long,
+    )
+
+    suspend fun findPokeHistory(goalId: Long): Long?
 }

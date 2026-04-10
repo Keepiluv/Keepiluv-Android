@@ -45,6 +45,7 @@ import com.twix.photolog.detail.preview.PhotologDetailPreviewProvider
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.findActivity
 import com.twix.ui.extension.hasCameraPermission
+import com.twix.util.CooldownFormatter
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -74,6 +75,22 @@ fun PhotologDetailRoute(
             is PhotologDetailSideEffect.ShowPokeToast -> {
                 toastManager.tryShow(
                     ToastData(sideEffect.message, ToastType.SUCCESS),
+                )
+            }
+
+            is PhotologDetailSideEffect.ShowPokeCooldownToast -> {
+                val cooldown = CooldownFormatter.format(sideEffect.remainingMs)
+                val timeLabel =
+                    if (cooldown.hours > 0) {
+                        currentContext.getString(R.string.cooldown_hours_minutes, cooldown.hours, cooldown.minutes)
+                    } else {
+                        currentContext.getString(R.string.cooldown_minutes, cooldown.minutes)
+                    }
+                toastManager.tryShow(
+                    ToastData(
+                        currentContext.getString(R.string.toast_poke_cooldown, timeLabel),
+                        ToastType.ERROR,
+                    ),
                 )
             }
         }
@@ -181,6 +198,7 @@ fun PhotologDetailScreen(
         if (uiState.isLoading) {
             PhotologCardContent(
                 uiState = uiState,
+                isPokeDisabled = uiState.isPokeDisabled,
                 onSwipe = onSwipe,
                 onClickUpload = onClickUpload,
                 onPoke = onPoke,

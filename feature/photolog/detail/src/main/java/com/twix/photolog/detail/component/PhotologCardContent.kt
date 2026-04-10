@@ -25,6 +25,7 @@ import com.twix.photolog.detail.preview.PhotologDetailPreviewProvider
 @Composable
 internal fun PhotologCardContent(
     uiState: PhotologDetailUiState,
+    isPokeDisabled: Boolean,
     onSwipe: () -> Unit,
     onClickUpload: () -> Unit,
     onPoke: () -> Unit,
@@ -38,7 +39,12 @@ internal fun PhotologCardContent(
                     BetweenUs.PARTNER -> stringResource(R.string.action_poke)
                 },
             rotation = if (uiState.isDisplayedMyPhotolog) -8f else 0f,
-            onClickAction = if (uiState.isDisplayedMyPhotolog) onClickUpload else onPoke,
+            onClickAction =
+                if (uiState.isDisplayedMyPhotolog) {
+                    onClickUpload
+                } else {
+                    { if (!isPokeDisabled) onPoke() }
+                },
             showActionButton = uiState.showActionButton,
         )
 
@@ -103,6 +109,7 @@ private fun PhotologCardContentPreview(
     TwixTheme {
         PhotologCardContent(
             uiState = uiState.copy(isLoading = true),
+            isPokeDisabled = false,
             onSwipe = {},
             onClickUpload = {},
             onPoke = {},

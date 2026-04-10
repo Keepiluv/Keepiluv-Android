@@ -12,4 +12,8 @@ sealed interface PhotologDetailSideEffect : SideEffect {
     data class ShowPokeToast(
         val message: String,
     ) : PhotologDetailSideEffect
+
+    data class ShowPokeCooldownToast(
+        val remainingMs: Long,
+    ) : PhotologDetailSideEffect
 }

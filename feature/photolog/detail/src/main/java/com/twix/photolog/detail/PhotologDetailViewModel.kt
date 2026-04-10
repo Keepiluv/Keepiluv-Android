@@ -6,8 +6,9 @@ import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalReactionType
+import com.twix.domain.model.poke.PokeGoalResult
 import com.twix.domain.repository.PhotoLogRepository
-import com.twix.domain.repository.PokeRepository
+import com.twix.domain.usecase.PokeGoalUseCase
 import com.twix.navigation.NavRoutes
 import com.twix.photolog.detail.contract.PhotologDetailIntent
 import com.twix.photolog.detail.contract.PhotologDetailSideEffect
@@ -27,7 +28,7 @@ import java.time.LocalDate
 
 class PhotologDetailViewModel(
     private val photologRepository: PhotoLogRepository,
-    private val pokeRepository: PokeRepository,
+    private val pokeGoalUseCase: PokeGoalUseCase,
     private val detailRefreshBus: PhotologRefreshBus,
     private val goalRefreshBus: GoalRefreshBus,
     savedStateHandle: SavedStateHandle,
@@ -63,6 +64,7 @@ class PhotologDetailViewModel(
         fetchPhotolog()
         collectReactionFlow()
         collectEventBus()
+        checkPokeCooldown()
     }
 
     private fun fetchPhotolog() {
@@ -147,12 +149,31 @@ class PhotologDetailViewModel(
         reactionFlow.tryEmit(reaction)
     }
 
+    private fun checkPokeCooldown() {
+        viewModelScope.launch {
+            val remaining = pokeGoalUseCase.remainingCooldown(argGoalId)
+            if (remaining > 0) reduce { copy(pokeCooldownRemaining = remaining) }
+        }
+    }
+
     private fun pokeToPartner() {
-        launchResult(
-            block = { pokeRepository.pokeGoal(argGoalId) },
-            onSuccess = { tryEmitSideEffect(PhotologDetailSideEffect.ShowPokeToast(it.message)) },
-            onError = { showToast(R.string.toast_poke_goal_failed, ToastType.ERROR) },
-        )
+        viewModelScope.launch {
+            reduce { copy(isPoking = true) }
+            when (val result = pokeGoalUseCase.invoke(argGoalId)) {
+                is PokeGoalResult.Success -> {
+                    reduce { copy(isPoking = false, pokeCooldownRemaining = PokeGoalUseCase.COOLDOWN_MS) }
+                    tryEmitSideEffect(PhotologDetailSideEffect.ShowPokeToast(result.message))
+                }
+                is PokeGoalResult.OnCooldown -> {
+                    reduce { copy(isPoking = false) }
+                    tryEmitSideEffect(PhotologDetailSideEffect.ShowPokeCooldownToast(result.remainingMs))
+                }
+                PokeGoalResult.Error -> {
+                    reduce { copy(isPoking = false) }
+                    showToast(R.string.toast_poke_goal_failed, ToastType.ERROR)
+                }
+            }
+        }
     }
 
     private fun reduceShownCard() {

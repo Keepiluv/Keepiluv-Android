@@ -28,7 +28,8 @@ class InviteLaunchDispatcher : InviteLaunchEventSource {
 
     private fun checkAppLink(uri: Uri) =
         (uri.scheme == HTTP_SCHEME || uri.scheme == HTTPS_SCHEME) &&
-            uri.host == INVITE_WEB_HOST
+            uri.host == INVITE_WEB_HOST &&
+            uri.path == "/invite"
 
     override fun consumePendingInviteCode() {
         _pendingInviteCode.value = null
@@ -42,6 +43,6 @@ class InviteLaunchDispatcher : InviteLaunchEventSource {
         private const val HTTP_SCHEME = "http"
         private const val HTTPS_SCHEME = "https"
 
-        fun buildInviteDeepLink(inviteCode: String) = "https://$INVITE_WEB_HOST?$INVITE_CODE_PARAM=$inviteCode"
+        fun buildInviteDeepLink(inviteCode: String) = "https://$INVITE_WEB_HOST/invite?$INVITE_CODE_PARAM=$inviteCode"
     }
 }

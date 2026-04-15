@@ -52,7 +52,8 @@
 
                 <data
                     android:scheme="https"
-                    android:host="keepiluv.jiyong.xyz" />
+                    android:host="keepiluv.jiyong.xyz"
+                    android:pathPrefix="/invite" />
             </intent-filter>
         </activity>
 

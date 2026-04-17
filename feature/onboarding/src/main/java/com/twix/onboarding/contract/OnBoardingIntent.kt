@@ -22,6 +22,8 @@ sealed interface OnBoardingIntent : Intent {
 
     data object CopyInviteCode : OnBoardingIntent
 
+    data object ShareInviteLink : OnBoardingIntent
+
     data object ConnectCouple : OnBoardingIntent
 
     data class SelectDate(

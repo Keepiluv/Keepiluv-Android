@@ -6,33 +6,28 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
-import kotlin.ranges.random
 
 /**
  * 리액션 파티클 애니메이션을 표시하는 컴포저블.
  */
 @Composable
 fun ReactionEffect(
+    spec: ReactionEffectSpec,
     targetReaction: ReactionUiModel?,
     modifier: Modifier = Modifier,
-    spec: ReactionEffectSpec = ReactionEffectSpec(),
     onFinished: () -> Unit = {},
 ) {
     if (targetReaction == null) return
@@ -42,16 +37,17 @@ fun ReactionEffect(
      */
     val particles = remember { mutableStateListOf<ReactionParticle>() }
     val density = LocalDensity.current
-    val scope = rememberCoroutineScope()
 
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         val maxWidthPx = with(density) { maxWidth.toPx() }
         val maxHeightPx = with(density) { maxHeight.toPx() }
 
-        val sidePaddingPx = with(density) { spec.sidePaddingDp.dp.toPx() }
-        val startOffsetPx = with(density) { spec.startOffsetDp.dp.toPx() }
+        val sidePaddingPx = with(density) { spec.sidePadding.dp.toPx() }
+        val startOffsetPx = with(density) { spec.startOffset.dp.toPx() }
 
         LaunchedEffect(targetReaction) {
+            particles.clear()
+
             // 1.️ 파티클 생성
             val newParticles =
                 List(spec.particleCount) {
@@ -64,7 +60,7 @@ fun ReactionEffect(
 
             // 2. 파티클 애니메이션 실행
             newParticles.forEach { particle ->
-                scope.launch {
+                launch {
                     /**
                      * 살짝 시간차를 둬 자연스럽게 퍼지도록 함
                      * */
@@ -159,38 +155,21 @@ fun ReactionEffect(
          * 현재 존재하는 모든 파티클을 화면에 그림
          */
         particles.forEach { particle ->
-            /**
-             * 파티클마다 랜덤 크기 부여
-             */
-            key(particle) {
-                val randomSize = remember { spec.sizeRangeDp.random().dp }
-
-                Image(
-                    painter = painterResource(id = particle.iconRes),
-                    contentDescription = null,
-                    modifier =
-                        Modifier
-                            .size(randomSize)
-                            /**
-                             * 위치 이동
-                             */
-                            .offset {
-                                IntOffset(
-                                    x = particle.animX.value.toInt(),
-                                    y = particle.animY.value.toInt(),
-                                )
-                            }
-                            /**
-                             * 스케일 / 투명도 / 회전 효과
-                             */
-                            .graphicsLayer {
-                                scaleX = particle.animScale.value
-                                scaleY = particle.animScale.value
-                                alpha = particle.animAlpha.value
-                                rotationZ = (particle.animX.value % 50f) - 25f
-                            },
-                )
-            }
+            Image(
+                painter = painterResource(id = particle.iconRes),
+                contentDescription = null,
+                modifier =
+                    Modifier
+                        .size(spec.iconSize.dp)
+                        .graphicsLayer {
+                            translationX = particle.animX.value
+                            translationY = particle.animY.value
+                            scaleX = particle.animScale.value
+                            scaleY = particle.animScale.value
+                            alpha = particle.animAlpha.value
+                            rotationZ = (particle.animX.value % 50f) - 25f
+                        },
+            )
         }
     }
 }

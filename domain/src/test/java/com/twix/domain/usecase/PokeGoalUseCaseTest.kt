@@ -25,7 +25,8 @@ class PokeGoalUseCaseTest {
         runTest {
             // given
             val goalId = 1L
-            fakePokeRepository.pokeGoalResult = AppResult.Success(PokeResult(message = "찌르기를 보냈습니다."))
+            val serverMessage = "서버 응답 메시지"
+            fakePokeRepository.pokeGoalResult = AppResult.Success(PokeResult(message = serverMessage))
             fakePokeRepository.pokeHistory[goalId] = null
 
             // when
@@ -33,7 +34,7 @@ class PokeGoalUseCaseTest {
 
             // then
             assertThat(result).isInstanceOf(PokeGoalResult.Success::class.java)
-            assertThat((result as PokeGoalResult.Success).message).isEqualTo("찌르기를 보냈습니다.")
+            assertThat((result as PokeGoalResult.Success).message).isEqualTo(serverMessage)
             assertThat(fakePokeRepository.savedPokeHistory[goalId]).isNotNull()
         }
 
@@ -76,15 +77,16 @@ class PokeGoalUseCaseTest {
             // given
             val goalId = 4L
             val justExpiredPokedAt = System.currentTimeMillis() - PokeGoalUseCase.COOLDOWN_MS - 1
+            val serverMessage = "서버 응답 메시지"
             fakePokeRepository.pokeHistory[goalId] = justExpiredPokedAt
-            fakePokeRepository.pokeGoalResult = AppResult.Success(PokeResult(message = "찌르기를 보냈습니다."))
+            fakePokeRepository.pokeGoalResult = AppResult.Success(PokeResult(message = serverMessage))
 
             // when
             val result = useCase.invoke(goalId)
 
             // then
             assertThat(result).isInstanceOf(PokeGoalResult.Success::class.java)
-            assertThat((result as PokeGoalResult.Success).message).isEqualTo("찌르기를 보냈습니다.")
+            assertThat((result as PokeGoalResult.Success).message).isEqualTo(serverMessage)
         }
 
     @Test

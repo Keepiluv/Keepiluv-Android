@@ -73,9 +73,9 @@ fun PhotologDetailRoute(
                 )
             }
 
-            is PhotologDetailSideEffect.ShowPokeToast -> {
+            PhotologDetailSideEffect.ShowPokeToast -> {
                 toastManager.tryShow(
-                    ToastData(sideEffect.message, ToastType.SUCCESS),
+                    ToastData(currentContext.getString(R.string.toast_poke_goal_success), ToastType.LIKE),
                 )
             }
 

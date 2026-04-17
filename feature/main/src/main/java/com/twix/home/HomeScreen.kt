@@ -127,11 +127,11 @@ fun HomeRoute(
                 )
 
             HomeSideEffect.ShowMonthPickerBottomSheet -> Unit
-            is HomeSideEffect.ShowPokeToast ->
+            HomeSideEffect.ShowPokeToast ->
                 toastManager.show(
                     ToastData(
-                        sideEffect.message,
-                        ToastType.SUCCESS,
+                        currentContext.getString(R.string.toast_poke_goal_success),
+                        ToastType.LIKE,
                     ),
                 )
 

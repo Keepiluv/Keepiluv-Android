@@ -129,7 +129,7 @@ class HomeViewModel(
         viewModelScope.launch {
             when (val result = pokeGoalUseCase.invoke(goalId)) {
                 is PokeGoalResult.Success ->
-                    tryEmitSideEffect(HomeSideEffect.ShowPokeToast(result.message))
+                    tryEmitSideEffect(HomeSideEffect.ShowPokeToast)
                 is PokeGoalResult.OnCooldown ->
                     tryEmitSideEffect(HomeSideEffect.ShowPokeCooldownToast(result.remainingMs))
                 PokeGoalResult.Error ->

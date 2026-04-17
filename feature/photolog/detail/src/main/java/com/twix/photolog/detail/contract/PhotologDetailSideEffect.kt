@@ -9,9 +9,7 @@ sealed interface PhotologDetailSideEffect : SideEffect {
         val type: ToastType,
     ) : PhotologDetailSideEffect
 
-    data class ShowPokeToast(
-        val message: String,
-    ) : PhotologDetailSideEffect
+    data object ShowPokeToast : PhotologDetailSideEffect
 
     data class ShowPokeCooldownToast(
         val remainingMs: Long,

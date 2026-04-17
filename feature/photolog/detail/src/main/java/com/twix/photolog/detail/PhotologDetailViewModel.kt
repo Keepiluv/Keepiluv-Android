@@ -162,7 +162,7 @@ class PhotologDetailViewModel(
             when (val result = pokeGoalUseCase.invoke(argGoalId)) {
                 is PokeGoalResult.Success -> {
                     reduce { copy(isPoking = false, pokeCooldownRemaining = PokeGoalUseCase.COOLDOWN_MS) }
-                    tryEmitSideEffect(PhotologDetailSideEffect.ShowPokeToast(result.message))
+                    tryEmitSideEffect(PhotologDetailSideEffect.ShowPokeToast)
                 }
                 is PokeGoalResult.OnCooldown -> {
                     reduce { copy(isPoking = false) }

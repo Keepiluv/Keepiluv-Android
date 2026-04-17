@@ -64,7 +64,7 @@ class PhotologEditorViewModel(
                 onSuccess = {
                     detailRefreshBus.notifyChanged(PhotologRefreshBus.Publisher.EDITOR)
                     goalRefreshBus.notifyGoalListChanged()
-                    showToast(R.string.toast_comment_modify_success, ToastType.SUCCESS)
+                    tryEmitSideEffect(PhotologEditorSideEffect.NavigateToBack)
                 },
                 onError = {
                     showToast(R.string.toast_comment_modify_fail, ToastType.ERROR)

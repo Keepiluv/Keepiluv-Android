@@ -86,6 +86,7 @@ fun PhotologEditorRoute(
                     ToastData(sideEffect.message, ToastType.SUCCESS),
                 )
             }
+            PhotologEditorSideEffect.NavigateToBack -> navigateToBack()
         }
     }
 

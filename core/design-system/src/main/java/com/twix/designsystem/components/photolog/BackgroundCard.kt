@@ -60,6 +60,7 @@ fun BackgroundCard(
                             Modifier
                                 .width(150.dp)
                                 .height(74.dp)
+                                .padding(top = 7.dp)
                                 .noRippleClickable { onClickAction() },
                         contentColor = CommonColor.White,
                         contentHeight = 68.dp,

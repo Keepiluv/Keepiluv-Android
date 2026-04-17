@@ -63,6 +63,7 @@ fun PhotologDetailRoute(
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
     val coroutineScope = rememberCoroutineScope()
+    val density = LocalDensity.current
 
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
@@ -128,11 +129,11 @@ fun PhotologDetailRoute(
         }
 
     BoxWithConstraints {
-        val density = LocalDensity.current
         val screenHeightPx = with(density) { maxHeight.toPx() }
 
         PhotologDetailScreen(
             uiState = uiState,
+            screenHeightPx = screenHeightPx,
             onBack = navigateToBack,
             onClickModify = {
                 navigateToEditor(
@@ -152,15 +153,14 @@ fun PhotologDetailRoute(
             onSwipe = { viewModel.dispatch(PhotologDetailIntent.SwipeCard) },
         )
         if (!uiState.hasShownMyReaction && uiState.isDisplayedMyPhotolog) {
-            val model = uiState.myReaction
-            if (model != null) {
+            val reaction = uiState.myReaction
+            if (reaction != null) {
                 ReactionEffect(
-                    targetReaction = model,
+                    targetReaction = reaction,
                     spec =
                         ReactionEffectSpec(
                             particleCount = 10,
                             durationRange = 500..800,
-                            // 전체 화면 높이까지 퍼짐
                             travelDistanceRange = 500..screenHeightPx.toInt(),
                         ),
                     onFinished = {
@@ -175,6 +175,7 @@ fun PhotologDetailRoute(
 @Composable
 fun PhotologDetailScreen(
     uiState: PhotologDetailUiState,
+    screenHeightPx: Float,
     onBack: () -> Unit,
     onClickModify: () -> Unit,
     onClickReaction: (GoalReactionType) -> Unit,
@@ -206,6 +207,7 @@ fun PhotologDetailScreen(
 
             if (uiState.canReaction) {
                 ReactionContent(
+                    screenHeightPx = screenHeightPx,
                     reaction = uiState.partnerPhotolog?.reaction,
                     onClickReaction = onClickReaction,
                 )
@@ -224,6 +226,7 @@ private fun PhotologDetailScreenPreview(
         var previewState by remember { mutableStateOf(uiState) }
         PhotologDetailScreen(
             uiState = previewState,
+            screenHeightPx = 0f,
             onBack = {},
             onClickModify = {},
             onClickReaction = {},

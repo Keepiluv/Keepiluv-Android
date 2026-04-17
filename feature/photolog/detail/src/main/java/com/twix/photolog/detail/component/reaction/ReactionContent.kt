@@ -1,6 +1,7 @@
 package com.twix.photolog.detail.component.reaction
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -16,6 +17,7 @@ import com.twix.domain.model.enums.GoalReactionType
 
 @Composable
 internal fun ReactionContent(
+    screenHeightPx: Float,
     reaction: GoalReactionType? = null,
     onClickReaction: (GoalReactionType) -> Unit,
 ) {
@@ -40,8 +42,10 @@ internal fun ReactionContent(
 
         ReactionEffect(
             targetReaction = effectTarget,
-            modifier = Modifier.padding(bottom = 100.dp),
+            spec = ReactionEffectSpec(travelDistanceRange = 500..screenHeightPx.toInt()),
         )
+
+        Spacer(modifier = Modifier.padding(bottom = 100.dp))
     }
 }
 
@@ -50,6 +54,7 @@ internal fun ReactionContent(
 private fun ReactionContentPreview() {
     TwixTheme {
         ReactionContent(
+            screenHeightPx = 0f,
             onClickReaction = {},
         )
     }

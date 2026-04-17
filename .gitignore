@@ -89,3 +89,7 @@ lint/tmp/
 /scripts/install-hooks.sh
 /scripts/pre-push
 /scripts/uninstall-hooks.sh
+
+.claude
+
+/public/.well-known

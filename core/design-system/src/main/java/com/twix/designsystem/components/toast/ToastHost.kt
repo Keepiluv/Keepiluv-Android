@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -132,26 +133,34 @@ private fun ToastItem(
             ToastType.ERROR -> painterResource(R.drawable.ic_toast_warning)
             ToastType.DEFAULT -> null
         }
+    val showIcon = res != null
 
     Surface(
         modifier =
             Modifier
                 .padding(horizontal = 16.dp)
                 .padding(bottom = bottomPadding)
-                .fillMaxWidth(),
+                .then(
+                    if (showIcon) {
+                        Modifier.fillMaxWidth()
+                    } else {
+                        Modifier.wrapContentSize()
+                    },
+                ),
         shape = RoundedCornerShape(12.dp),
         border = BorderStroke(1.dp, GrayColor.C500),
         color = GrayColor.C400,
     ) {
-        val verticalPadding = if (res == null) 17.dp else 12.dp
-
         Row(
             modifier =
                 Modifier
-                    .padding(vertical = verticalPadding, horizontal = 16.dp),
+                    .padding(
+                        vertical = if (showIcon) 12.dp else 17.dp,
+                        horizontal = 16.dp,
+                    ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (res != null) {
+            if (showIcon) {
                 Image(
                     painter = res,
                     contentDescription = "toast icon",
@@ -165,8 +174,8 @@ private fun ToastItem(
                 text = data.message,
                 style = AppTextStyle.B1,
                 color = CommonColor.White,
-                modifier = Modifier.weight(1f),
-                textAlign = if (res == null && data.action == null) TextAlign.Center else TextAlign.Start,
+                modifier = if (showIcon) Modifier.weight(1f) else Modifier,
+                textAlign = if (showIcon) TextAlign.Start else TextAlign.Center,
             )
 
             data.action?.let {

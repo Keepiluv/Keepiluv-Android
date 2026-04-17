@@ -5,3 +5,7 @@ plugins {
 android {
     namespace = "com.twix.splash"
 }
+
+dependencies {
+    implementation(projects.core.navigationContract)
+}

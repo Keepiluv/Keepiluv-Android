@@ -14,10 +14,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.twix.domain.model.enums.BetweenUs
 import com.twix.navigation.base.NavGraphContributor
 import com.twix.navigation_contract.AppNavigator
+import com.twix.navigation_contract.InviteLaunchEventSource
 import com.twix.navigation_contract.NotificationDeepLinkHandler
 import com.twix.navigation_contract.NotificationLaunchEventSource
 import org.koin.compose.getKoin
@@ -27,6 +29,7 @@ import java.time.LocalDate
 @Composable
 fun AppNavHost(
     notificationLaunchEventSource: NotificationLaunchEventSource,
+    inviteLaunchEventSource: InviteLaunchEventSource,
     notificationRouter: NotificationDeepLinkHandler = koinInject(),
 ) {
     val navController = rememberNavController()
@@ -41,6 +44,26 @@ fun AppNavHost(
             ?.graphRoute
             ?: error("해당 Graph를 찾을 수 없습니다.")
     val pendingDeepLink by notificationLaunchEventSource.pendingDeepLink.collectAsStateWithLifecycle()
+    val pendingInviteCode by inviteLaunchEventSource.pendingInviteCode.collectAsStateWithLifecycle()
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
+
+    LaunchedEffect(pendingInviteCode, currentRoute) {
+        val inviteCode = pendingInviteCode ?: return@LaunchedEffect
+        when {
+            currentRoute == NavRoutes.CoupleConnectionRoute.route -> {
+                inviteLaunchEventSource.consumePendingInviteCode()
+                navController.navigate(NavRoutes.InviteRoute.createRoute(inviteCode)) {
+                    launchSingleTop = true
+                }
+            }
+
+            currentRoute?.startsWith("invite") == true -> {
+                inviteLaunchEventSource.consumePendingInviteCode()
+            }
+        }
+    }
+
     val appNavigator =
         remember(navController) {
             object : AppNavigator {
@@ -91,7 +114,6 @@ fun AppNavHost(
 
                 override fun toStatisticsEndedGoals() {
                     ensureMainStack(navController)
-                    TODO("Not yet implemented")
                 }
             }
         }

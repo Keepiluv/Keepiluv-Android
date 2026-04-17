@@ -143,10 +143,12 @@ private fun ToastItem(
         border = BorderStroke(1.dp, GrayColor.C500),
         color = GrayColor.C400,
     ) {
+        val verticalPadding = if (res == null) 17.dp else 12.dp
+
         Row(
             modifier =
                 Modifier
-                    .padding(vertical = 12.dp, horizontal = 16.dp),
+                    .padding(vertical = verticalPadding, horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             if (res != null) {

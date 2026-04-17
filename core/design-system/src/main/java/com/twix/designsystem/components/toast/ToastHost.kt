@@ -164,7 +164,7 @@ private fun ToastItem(
                 style = AppTextStyle.B1,
                 color = CommonColor.White,
                 modifier = Modifier.weight(1f),
-                textAlign = TextAlign.Start,
+                textAlign = if (res == null && data.action == null) TextAlign.Center else TextAlign.Start,
             )
 
             data.action?.let {

@@ -165,8 +165,7 @@ private fun ProfileScreen(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .padding(bottom = 20.dp),
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
         )
     }
 }

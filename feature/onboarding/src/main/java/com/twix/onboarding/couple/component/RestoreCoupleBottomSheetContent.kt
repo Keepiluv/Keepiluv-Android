@@ -40,7 +40,7 @@ internal fun RestoreCoupleBottomSheetContent() {
             color = GrayColor.C500,
         )
 
-        Spacer(Modifier.height(3.dp))
+        Spacer(Modifier.height(10.dp))
 
         AppText(
             text = stringResource(R.string.onboarding_couple_restore_bottom_sheet_content),
@@ -71,12 +71,12 @@ private fun BulletItem(text: String) {
         verticalAlignment = Alignment.CenterVertically,
         modifier =
             Modifier
-                .padding(start = 16.dp),
+                .padding(start = 16.dp, top = 5.dp),
     ) {
         Box(
             modifier =
                 Modifier
-                    .size(6.dp)
+                    .size(4.dp)
                     .background(GrayColor.C300, CircleShape),
         )
 

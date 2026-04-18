@@ -51,5 +51,9 @@ gradlePlugin {
             id = "twix.data"
             implementationClass = "com.twix.convention.DataConventionPlugin"
         }
+        register("kermit") {
+            id = "twix.kermit"
+            implementationClass = "com.twix.convention.KermitConventionPlugin"
+        }
     }
 }

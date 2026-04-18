@@ -28,7 +28,8 @@ data class AppTypography(
     val h1: TextStyle,
     val h2: TextStyle,
     val h3: TextStyle,
-    val h4: TextStyle,
+    val h3Brand: TextStyle,
+    val h4Brand: TextStyle,
     val t1: TextStyle,
     val t2: TextStyle,
     val t3: TextStyle,
@@ -60,13 +61,21 @@ fun provideAppTypography(): AppTypography =
             ),
         h3 =
             TextStyle(
-                fontFamily = LaundryGothicFamily,
-                fontWeight = FontWeight.Bold,
+                fontFamily = NanumSquareNeoFamily,
+                fontWeight = FontWeight.ExtraBold,
                 fontSize = 22.sp,
                 lineHeight = lineHeightPercent(22f, 140f),
                 letterSpacing = letterSpacingPercent(22f, -1f),
             ),
-        h4 =
+        h3Brand =
+            TextStyle(
+                fontFamily = LaundryGothicFamily,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+                lineHeight = lineHeightPercent(20f, 140f),
+                letterSpacing = letterSpacingPercent(20f, -2f),
+            ),
+        h4Brand =
             TextStyle(
                 fontFamily = LaundryGothicFamily,
                 fontWeight = FontWeight.Bold,

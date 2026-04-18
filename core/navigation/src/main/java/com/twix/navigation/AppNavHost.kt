@@ -6,15 +6,32 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.twix.domain.model.enums.BetweenUs
 import com.twix.navigation.base.NavGraphContributor
+import com.twix.navigation_contract.AppNavigator
+import com.twix.navigation_contract.InviteLaunchEventSource
+import com.twix.navigation_contract.NotificationDeepLinkHandler
+import com.twix.navigation_contract.NotificationLaunchEventSource
 import org.koin.compose.getKoin
+import org.koin.compose.koinInject
+import java.time.LocalDate
 
 @Composable
-fun AppNavHost() {
+fun AppNavHost(
+    notificationLaunchEventSource: NotificationLaunchEventSource,
+    inviteLaunchEventSource: InviteLaunchEventSource,
+    notificationRouter: NotificationDeepLinkHandler = koinInject(),
+) {
     val navController = rememberNavController()
     val koin = getKoin()
     val contributors =
@@ -23,10 +40,97 @@ fun AppNavHost() {
         }
     val start =
         contributors
-            .firstOrNull { it.graphRoute == NavRoutes.LoginGraph }
+            .firstOrNull { it.graphRoute == NavRoutes.SplashGraph }
             ?.graphRoute
             ?: error("해당 Graph를 찾을 수 없습니다.")
+    val pendingDeepLink by notificationLaunchEventSource.pendingDeepLink.collectAsStateWithLifecycle()
+    val pendingInviteCode by inviteLaunchEventSource.pendingInviteCode.collectAsStateWithLifecycle()
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
+
+    LaunchedEffect(pendingInviteCode, currentRoute) {
+        val inviteCode = pendingInviteCode ?: return@LaunchedEffect
+        when {
+            currentRoute == NavRoutes.CoupleConnectionRoute.route -> {
+                inviteLaunchEventSource.consumePendingInviteCode()
+                navController.navigate(NavRoutes.InviteRoute.createRoute(inviteCode)) {
+                    launchSingleTop = true
+                }
+            }
+
+            currentRoute?.startsWith("invite") == true -> {
+                inviteLaunchEventSource.consumePendingInviteCode()
+            }
+        }
+    }
+
+    val appNavigator =
+        remember(navController) {
+            object : AppNavigator {
+                override fun toHome() {
+                    navController.navigate(NavRoutes.MainGraph.route) { launchSingleTop = true }
+                }
+
+                override fun toLogin() {
+                    navController.navigate(NavRoutes.LoginGraph.route) {
+                        launchSingleTop = true
+                        popUpTo(NavRoutes.LoginGraph) {
+                            inclusive = true
+                        }
+                    }
+                }
+
+                override fun toMyPhotolog(
+                    goalId: Long,
+                    date: LocalDate,
+                ) {
+                    ensureMainStack(navController)
+                    navController.navigate(
+                        NavRoutes.PhotologDetailRoute.createRoute(
+                            goalId = goalId,
+                            date = date,
+                            betweenUs = BetweenUs.ME.name,
+                        ),
+                    ) {
+                        launchSingleTop = true
+                    }
+                }
+
+                override fun toPartnerPhotolog(
+                    goalId: Long,
+                    date: LocalDate,
+                ) {
+                    ensureMainStack(navController)
+                    navController.navigate(
+                        NavRoutes.PhotologDetailRoute.createRoute(
+                            goalId = goalId,
+                            date = date,
+                            betweenUs = BetweenUs.PARTNER.name,
+                        ),
+                    ) {
+                        launchSingleTop = true
+                    }
+                }
+
+                override fun toStatisticsEndedGoals() {
+                    ensureMainStack(navController)
+                }
+            }
+        }
     val duration = 300
+
+    LaunchedEffect(pendingDeepLink) {
+        val deepLink = pendingDeepLink ?: return@LaunchedEffect
+
+        try {
+            notificationRouter.handle(
+                rawDeepLink = deepLink,
+                navigator = appNavigator,
+            )
+        } finally {
+            notificationLaunchEventSource.consumePendingDeepLink(deepLink)
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -58,5 +162,23 @@ fun AppNavHost() {
         modifier = Modifier.fillMaxSize(),
     ) {
         contributors.forEach { with(it) { registerGraph(navController) } }
+    }
+}
+
+/**
+ * 푸쉬알림 클릭으로 앱 진입 시 네비게이션 백스택이 없어서 뒤로가기를 누르면 바로 앱이 종료될 수 있음
+ * 이를 방지하기 위해 백스택에 MainGraph를 미리 넣어두는 메서드
+ * hierarchy는 현재 화면이 속하는 그래프를 검사할 수 있게 해줌
+ * */
+private fun ensureMainStack(navController: NavHostController) {
+    val inMainGraph =
+        navController.currentDestination
+            ?.hierarchy
+            ?.any { it.route == NavRoutes.MainGraph.route } == true
+
+    if (!inMainGraph) {
+        navController.navigate(NavRoutes.MainGraph.route) {
+            launchSingleTop = true
+        }
     }
 }

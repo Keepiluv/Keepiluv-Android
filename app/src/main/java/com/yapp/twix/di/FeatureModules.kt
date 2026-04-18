@@ -1,9 +1,35 @@
 package com.yapp.twix.di
 
+import com.twix.goal_editor.di.goalEditorModule
+import com.twix.goal_manage.di.goalManageModule
+import com.twix.home.di.homeModule
 import com.twix.login.di.loginModule
+import com.twix.main.di.mainModule
+import com.twix.notification.di.notificationFeatureModule
+import com.twix.onboarding.di.onBoardingModule
+import com.twix.photolog.capture.di.photologCaptureModule
+import com.twix.photolog.detail.di.photologDetailModule
+import com.twix.photolog.editor.di.photologEditorModule
+import com.twix.settings.di.settingsModule
+import com.twix.splash.di.splashModule
+import com.twix.stats.detail.di.statsDetailModule
+import com.twix.stats.di.statsModule
 import org.koin.core.module.Module
 
 val featureModules: List<Module> =
     listOf(
         loginModule,
+        mainModule,
+        homeModule,
+        photologCaptureModule,
+        photologDetailModule,
+        photologEditorModule,
+        goalEditorModule,
+        goalManageModule,
+        settingsModule,
+        onBoardingModule,
+        statsModule,
+        statsDetailModule,
+        notificationFeatureModule,
+        splashModule,
     )

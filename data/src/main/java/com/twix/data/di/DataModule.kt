@@ -6,3 +6,4 @@ val dataModule =
     module {
         includes(repositoryModule, useCaseModule)
     }
+

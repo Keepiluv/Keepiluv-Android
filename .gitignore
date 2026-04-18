@@ -16,6 +16,7 @@ gen/
 out/
 #  Uncomment the following line in case you need and you don't have the release build type files in your app
 # release/
+app/release/
 
 # Gradle files
 .gradle/
@@ -88,3 +89,5 @@ lint/tmp/
 /scripts/install-hooks.sh
 /scripts/pre-push
 /scripts/uninstall-hooks.sh
+public/.well-known/assetlinks.json
+.firebase/

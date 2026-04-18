@@ -1,5 +1,10 @@
 package com.twix.navigation
 
+import android.net.Uri
+import com.twix.navigation.args.DetailNavArgs
+import kotlinx.serialization.json.Json
+import java.time.LocalDate
+
 /**
  * 앱 전반에서 사용하는 Navigation Route를 여기에서 정의합니다.
  *
@@ -10,15 +15,145 @@ package com.twix.navigation
 sealed class NavRoutes(
     val route: String,
 ) {
+    /**
+     * LoginGraph
+     * */
     object LoginGraph : NavRoutes("login_graph")
 
-    object Login : NavRoutes("login")
+    object LoginRoute : NavRoutes("login")
 
-    object HomeGraph : NavRoutes("home_graph")
+    /**
+     * MainGraph
+     * */
+    object MainGraph : NavRoutes("main_graph")
 
-    object Home : NavRoutes("home")
+    object MainRoute : NavRoutes("main")
 
-    object HomeDetail : NavRoutes("home_detail/{id}") {
-        fun createRoute(id: String) = "home_detail/$id"
+    /**
+     * PhotologGraph
+     * */
+    object PhotologGraph : NavRoutes("photolog_graph")
+
+    object PhotologDetailRoute :
+        NavRoutes("photolog_detail/{goalId}/{date}/{betweenUs}?isCompleted={isCompleted}") {
+        const val ARG_GOAL_ID = "goalId"
+        const val ARG_DATE = "date"
+        const val ARG_BETWEEN_US = "betweenUs"
+        const val ARG_IS_COMPLETED = "isCompleted"
+
+        fun createRoute(
+            goalId: Long,
+            date: LocalDate,
+            betweenUs: String,
+            isCompleted: Boolean = false,
+        ) = "photolog_detail/$goalId/$date/$betweenUs?isCompleted=$isCompleted"
     }
+
+    object PhotologRoute : NavRoutes("photolog/{data}") {
+        const val ARG_DATA = "data"
+
+        enum class From {
+            HOME,
+            DETAIL,
+            EDITOR,
+        }
+
+        fun createRoute(data: DetailNavArgs): String {
+            val json = Json.encodeToString(data)
+            val encoded = Uri.encode(json)
+            return "photolog/$encoded"
+        }
+    }
+
+    object PhotologEditorRoute :
+        NavRoutes("photolog_editor/{goalId}/{date}") {
+        const val ARG_GOAL_ID = "goalId"
+        const val ARG_DATE = "date"
+
+        fun createRoute(
+            goalId: Long,
+            date: LocalDate,
+        ) = "photolog_editor/$goalId/$date"
+    }
+
+    /**
+     * OnboardingGraph
+     * */
+    object OnboardingGraph : NavRoutes("onboarding_graph")
+
+    object OnboardingRoute : NavRoutes("onboarding")
+
+    object CoupleConnectionRoute : NavRoutes("couple_connect")
+
+    object InviteRoute : NavRoutes("invite?code={code}") {
+        const val ARG_CODE = "code"
+
+        fun createRoute(code: String? = null) = code?.let { "invite?code=$code" } ?: "invite?code="
+    }
+
+    object ProfileRoute : NavRoutes("profile")
+
+    object DdayRoute : NavRoutes("dday")
+
+    /**
+     * GoalEditorGraph
+     * */
+    object GoalEditorGraph : NavRoutes("goal_editor_graph")
+
+    object GoalEditorRoute : NavRoutes("goal_editor/{id}") {
+        const val ARG_ID = "id"
+
+        fun createRoute(id: Long) = "goal_editor/$id"
+    }
+
+    /**
+     * GoalManageGraph
+     * */
+    object GoalManageGraph : NavRoutes("goal_manage_graph")
+
+    object GoalManageRoute : NavRoutes("goal_manage/{date}") {
+        const val ARG_DATE = "date"
+
+        fun createRoute(date: LocalDate) = "goal_manage/$date"
+    }
+
+    /**
+     * SettingsGraph
+     * */
+    object SettingsGraph : NavRoutes("settings_graph")
+
+    object SettingsRoute : NavRoutes("settings")
+
+    object SettingsAccountRoute : NavRoutes("settings/account")
+
+    object SettingsAboutRoute : NavRoutes("settings/about")
+
+    /**
+     * StatsGraph
+     * */
+    object StatsDetailGraph : NavRoutes("stats_detail_graph")
+
+    object StatsDetailRoute : NavRoutes("stats_detail_graph/{goalId}/{date}") {
+        const val ARG_GOAL_ID = "goalId"
+        const val ARG_DATE = "date"
+
+        fun createRoute(
+            goalId: Long,
+            date: LocalDate,
+        ): String = "stats_detail_graph/$goalId/$date"
+    }
+
+    /**
+     * NotificationGraph
+     * */
+    object NotificationGraph : NavRoutes("notification_graph")
+
+    object NotificationRoute : NavRoutes("notification")
+
+    /**
+     * SplashGraph
+     * */
+    object SplashGraph : NavRoutes("splash_graph")
+
+    object SplashRoute : NavRoutes("splash")
 }

@@ -10,4 +10,8 @@ class SideEffectHolder<S : SideEffect> {
     suspend fun emit(effect: S) {
         channel.send(effect)
     }
+
+    fun tryEmit(effect: S) {
+        channel.trySend(effect)
+    }
 }

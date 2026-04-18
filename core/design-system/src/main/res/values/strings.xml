@@ -1,15 +1,223 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 찌르기 액션 -->
-    <string name="action_poke">찌르기</string>
-    <string name="action_poke_emphasized">찌르기!</string>
+    <string name="keep_it_up">keep it up!</string>
 
-    <!-- 찌르기 토스트 메시지 -->
-    <string name="toast_poke_goal_success">상대방을 찔렀어요!</string>
-    <string name="toast_poke_goal_failed">찌르기에 실패했습니다.</string>
-    <string name="toast_poke_cooldown">%1$s 뒤에 다시 찌를 수 있어요</string>
+    <!-- 단어 -->
+    <string name="word_home">홈</string>
+    <string name="word_stats">통계</string>
+    <string name="word_couple_page">커플페이지</string>
+    <string name="word_today">오늘</string>
+    <string name="word_completion">완료</string>
+    <string name="word_count">번</string>
+    <string name="word_edit">편집</string>
+    <string name="word_start_date">시작일</string>
+    <string name="word_end_date">종료일</string>
+    <string name="word_repeat_type">반복 주기</string>
+    <string name="word_end_count">달성 횟수</string>
+    <string name="word_not_set">미설정</string>
+    <string name="word_cancel">취소</string>
+    <string name="word_delete">삭제</string>
+    <string name="word_modify">수정</string>
+    <string name="word_confirm">확인</string>
+    <string name="word_save">저장</string>
+    <string name="word_setting">설정</string>
+    <string name="word_account">계정</string>
+    <string name="word_information">정보</string>
+    <string name="word_logout">로그아웃</string>
+    <string name="word_sting">찌르기</string>
+    <string name="word_notification">알림</string>
+    <string name="word_new">NEW</string>
+
+    <string name="word_daily">매일</string>
+    <string name="word_weekly">매주</string>
+    <string name="word_monthly">매월</string>
+
+    <string name="word_sunday">일</string>
+    <string name="word_monday">월</string>
+    <string name="word_tuesday">화</string>
+    <string name="word_wednesday">수</string>
+    <string name="word_thursday">목</string>
+    <string name="word_friday">금</string>
+    <string name="word_saturday">토</string>
+
+    <!-- 날짜 포맷 -->
+    <string name="date_year_month_day">%s년 %02d월 %02d일</string>
+    <string name="date_year_month_day_no_padding">%1$d년 %2$d월 %3$d일</string>
 
     <!-- 쿨타임 포맷 -->
     <string name="cooldown_hours_minutes">%1$d시간 %2$d분</string>
     <string name="cooldown_minutes">%1$d분</string>
+
+    <!-- 동작 -->
+    <string name="action_edit">수정하기</string>
+    <string name="action_delete">삭제하기</string>
+    <string name="action_finish">끝내기</string>
+    <string name="action_complete_goal">이뤘어요</string>
+    <string name="action_withdraw_account">탈퇴하기</string>
+    <string name="action_poke">찌르기</string>
+    <string name="action_poke_emphasized">찌르기!</string>
+
+    <!-- 홈 화면 -->
+    <string name="home_today_goal">오늘 우리 목표</string>
+    <string name="home_empty_goal_guide">첫 목표를 세워볼까요?</string>
+    <string name="home_empty_goal_content">+ 버튼을 눌러 목표를 추가해보세요</string>
+
+    <!-- 코멘트 입력 -->
+    <string name="comment_text_field_placeholder">코멘트추가</string>
+    <string name="comment_condition_guide">5글자로 코멘트를 남길 수 있어요</string>
+
+    <!-- 인증샷 화면 -->
+    <string name="partner_not_photolog">%s님은\n아직…</string>
+
+    <!-- 목표 생성, 편집 화면 -->
+    <string name="goal_editor_title">목표 직접 만들기</string>
+    <string name="goal_editor_title_edit">목표 수정하기</string>
+    <string name="goal_editor_text_field_placeholder">목표를 입력해 보세요.</string>
+    <string name="header_start_date">시작 날짜</string>
+    <string name="header_end_date">종료 날짜</string>
+    <string name="header_end_date_option">종료 날짜 설정</string>
+    <string name="icon_editor_dialog_title">아이콘 변경</string>
+    <string name="repeat_count">%s %s번</string>
+    <string name="goal_action_cheer">KEEP IT UP!</string>
+    <string name="goal_list_title_previous">지난 우리 목표</string>
+    <string name="goal_list_title_today">오늘 우리 목표</string>
+    <string name="goal_list_title_next">다음 우리 목표</string>
+    <string name="goal_detail_empty_goal_guide">아직 목표가 없어요!</string>
+
+    <!-- 설정 화면 -->
+    <string name="settings_privacy_policy">개인정보 처리방침</string>
+    <string name="settings_my_app_version">나의 버전</string>
+    <string name="settings_notification">알림 설정</string>
+
+    <!-- 통계 화면 -->
+    <string name="stats_top_bar_title">스탬프 통계</string>
+    <string name="stats_stamp_total_count">이번달 목표 %d번</string>
+    <string name="stats_stamp_not_has_in_progress_goal">아직 목표가 없어요!</string>
+    <string name="stats_stamp_not_has_complete_goal">아직 끝낸 목표가 없어요!</string>
+    <string name="stats_stamp_total_end_count">총 목표 %d번</string>
+    <string name="stats_stamp_end_count">%d번 완료</string>
+    <string name="stats_stamp_in_progress_tab_title">진행중</string>
+    <string name="stats_stamp_end_tab_title">종료</string>
+
+    <!-- 통계 상세 화면 -->
+    <string name="stats_complete_count">%1$s - %2$d/%3$d</string>
+
+    <!-- 알림 화면 -->
+    <string name="notification_recent_14_days">최근 14일</string>
+
+    <!-- 토스트 메시지 -->
+    <string name="toast_end_date_before_start_date">종료 날짜가 시작 날짜보다 이전입니다.</string>
+    <string name="toast_goal_fetch_failed">목표 조회에 실패했습니다.</string>
+    <string name="toast_create_goal_failed">목표 생성에 실패했습니다.</string>
+    <string name="toast_update_goal_failed">목표 수정에 실패했습니다.</string>
+    <string name="toast_delete_goal_failed">목표 삭제에 실패했습니다.</string>
+    <string name="toast_complete_goal_failed">목표 완료에 실패했습니다.</string>
+    <string name="toast_input_goal_title">목표를 입력해주세요.</string>
+    <string name="toast_logout_completed">로그아웃되었습니다.</string>
+    <string name="toast_logout_failed">로그아웃에 실패했습니다.</string>
+    <string name="toast_account_deleted">계정이 삭제되었습니다.</string>
+    <string name="toast_account_delete_failed">계정 삭제에 실패했습니다.</string>
+    <string name="toast_fetch_stats_failed">통계 조회에 실패했습니다.</string>
+    <string name="toast_already_certificated">이미 인증되었어요.</string>
+    <string name="toast_camera_permission_request">인증샷 촬영을 위해서 카메라 권한이 필요해요.</string>
+    <string name="toast_fetch_notification_failed">알림 목록 조회에 실패했습니다.</string>
+    <string name="toast_poke_goal_failed">찌르기에 실패했습니다.</string>
+    <string name="toast_already_used_invite_code_message">이미 사용된 초대 코드입니다.</string>
+    <string name="toast_invite_code_copy">초대 코드가 복사되었어요</string>
+    <string name="toast_invalid_invite_code">잘못된 초대 코드입니다</string>
+    <string name="toast_reaction_fail">리액션 요청에 실패했어요.</string>
+    <string name="toast_photolog_upload_fail">인증샷 등록에 실패했습니다.</string>
+    <string name="toast_image_translate_fail">이미지 변환에 실패했습니다.</string>
+    <string name="toast_image_capture_fail">인증샷 촬영에 실패했습니다. 다시 시도해 주세요.</string>
+    <string name="toast_photolog_detail_fetch_fail">인증샷 조회에 실패했습니다.</string>
+    <string name="toast_comment_modify_success">코멘트가 수정 되었어요.</string>
+    <string name="toast_comment_not_modified">코멘트가 수정되지 않았어요.</string>
+    <string name="toast_comment_modify_fail">코멘트 수정에 실패했어요.</string>
+    <string name="toast_photolog_modify_fail">인증샷 수정에 실패했어요.</string>
+    <string name="toast_comment_length_guide">코멘트는 5글자로 입력해주세요!</string>
+    <string name="toast_poke_goal_success">상대방을 찔렀어요!</string>
+    <string name="toast_poke_goal_failed">찌르기에 실패했습니다.</string>
+    <string name="toast_poke_cooldown">%1$s 뒤에 다시 찌를 수 있어요</string>
+
+    <!-- 다이얼로그 -->
+    <string name="dialog_end_goal_title">%s\n목표를 이루셨나요?</string>
+    <string name="dialog_end_goal_content">이룬 목표에서 확인하실 수 있어요.</string>
+    <string name="dialog_delete_goal_title">%s\n목표를 삭제할까요?</string>
+    <string name="dialog_delete_goal_content">저장된 인증샷은 모두 삭제됩니다.</string>
+    <string name="dialog_withdraw_account_title">정말 탈퇴하시겠어요?</string>
+    <string name="dialog_withdraw_account_content">커플 연결이 끊어집니다.\n데이터는 전부 삭제되며 복구가 불가능합니다.</string>
+
+    <!-- 마케팅 다이얼로그 -->
+    <string name="marketing_dialog_title">도움이 되는 정보를\n알림으로 받아보시겠어요?</string>
+    <string name="marketing_dialog_marketing">[선택] 마케팅 정보 알림</string>
+    <string name="marketing_dialog_night_marketing">[선택] 야간 마케팅 정보 알림</string>
+    <string name="marketing_dialog_description">* 언제든지 설정 > 알림 설정에서 변경 가능해요</string>
+
+    <!-- 인증샷 촬영 화면 -->
+    <string name="photolog_upload">업로드</string>
+    <string name="photolog_picture_upload">업로드하기</string>
+    <string name="photolog_take_picture">인증샷 찍기</string>
+    <string name="photolog_loading">인증샷 업로드 중...</string>
+    <string name="photolog_plz_waiting">잠시만 기다려 주세요.</string>
+
+    <!-- 인증샷 상세 화면 -->
+    <string name="photolog_detail_upload_guide">인증샷을\n올려보세요!</string>
+
+    <!-- 인증샷 수정 화면 -->
+    <string name="photolog_editor_retake">다시 찍기</string>
+
+    <!-- 로그인 화면 -->
+    <string name="google_login_button_title">Google로 시작하기</string>
+    <string name="kakao_login_button_title">카카오로 시작하기</string>
+    <string name="login_fail_message">로그인에 실패했습니다. 다시 시도해주세요</string>
+    <string name="fetch_onboarding_status_fail_message">온보딩 정보를 불러오는 데 실패했습니다. 다시 시도해주세요</string>
+    <string name="login_title_message">함께니까 멈추지 않아요.\n지금 바로 키피럽 시작하기!</string>
+
+    <!-- 온보딩 화면 -->
+    <string name="onboarding_name_placeholder">닉네임을 입력해 주세요.</string>
+    <string name="onboarding_name_helper">닉네임 2~8자</string>
+    <string name="onboarding_profile_title">짝꿍에게 보일\n내 이름을 입력해 주세요</string>
+    <string name="onboarding_profile_placeholder">닉네임을 입력해 주세요.</string>
+    <string name="onboarding_profile_helper">닉네임 2~8자</string>
+    <string name="onboarding_profile_button_title">완료</string>
+    <string name="onboarding_profile_invalid_name_length_toast">2자에서 8자 이내로 닉네임을 입력해주세요.</string>
+    <string name="onboarding_profile_setup_fail">프로필 설정 요청에 실패했습니다.</string>
+
+    <string name="onboarding_couple_connect_description">짝꿍과 연결하고\n함께 키피럽 시작하세요</string>
+    <string name="onboarding_couple_connect_send_invitation">초대장 보내기</string>
+    <string name="onboarding_couple_connect_direct_description">짝꿍에게 코드를 받았다면?</string>
+    <string name="onboarding_couple_direct_connect_button_title">직접 연결하기</string>
+    <string name="onboarding_couple_restore">해지한 커플 복구하려면?</string>
+    <string name="onboarding_couple_restore_bottom_sheet_content">아래 내용을 포함하여 문의해 주시기 바랍니다.\n고객센터 메일 - ttwixteamm@gmail.com</string>
+    <string name="onboarding_couple_restore_content_my_email">본인 로그인 계정 메일</string>
+    <string name="onboarding_couple_restore_content_partner_email">짝꿍의 로그인 계정 메일</string>
+    <string name="onboarding_couple_restore_content_restore_date">해지 일시</string>
+    <string name="onboarding_couple_fetch_my_invite_code_fail">내 조회코드 조회에 실패했습니다.</string>
+    <string name="onboarding_couple_connection_fail">커플 연결 요청에 실패했어요</string>
+
+    <string name="toast_self_invite_code">자신의 초대 코드는 사용할 수 없어요</string>
+
+    <string name="onboarding_invite_share_message">
+        [키피럽 함께 시작해요]
+        함께 시작하고 일상 속 시너지를!
+
+        1. '키피럽'을 설치해 주세요.
+        %3$s
+
+        2. 회원가입을 해 주세요.
+
+        3. 아래 링크를 통해 연결하거나, 연결 코드를 메이트와 공유하세요!
+
+        연결 코드: %1$s
+        %2$s
+    </string>
+
+    <string name="onboarding_invite_code_plz_write_invite_code">짝꿍에게 받은\n초대 코드를 써주세요</string>
+    <string name="onboarding_invite_code_my_invite_code">내 초대 코드</string>
+    <string name="onboarding_invite_code_write_invite_code">받은 코드 쓰기</string>
+
+    <string name="onboarding_dday_plz_set_dday">우리의 기념일을 등록해 주세요</string>
+    <string name="onboarding_dday_placeholder">YYYY-MM-DD</string>
+    <string name="onboarding_dday_setup_fail">기념일 설정에 실패했습니다.</string>
+
 </resources>

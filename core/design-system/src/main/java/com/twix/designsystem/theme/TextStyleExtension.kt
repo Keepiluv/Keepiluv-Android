@@ -8,7 +8,8 @@ fun AppTextStyle.toTextStyle(typography: AppTypography): TextStyle =
         AppTextStyle.H1 -> typography.h1
         AppTextStyle.H2 -> typography.h2
         AppTextStyle.H3 -> typography.h3
-        AppTextStyle.H4 -> typography.h4
+        AppTextStyle.H3Brand -> typography.h3Brand
+        AppTextStyle.H4Brand -> typography.h4Brand
         AppTextStyle.T1 -> typography.t1
         AppTextStyle.T2 -> typography.t2
         AppTextStyle.T3 -> typography.t3

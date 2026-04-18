@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 찌르기 액션 -->
+    <string name="action_poke">찌르기</string>
+    <string name="action_poke_emphasized">찌르기!</string>
+
+    <!-- 찌르기 토스트 메시지 -->
+    <string name="toast_poke_goal_success">상대방을 찔렀어요!</string>
+    <string name="toast_poke_goal_failed">찌르기에 실패했습니다.</string>
+    <string name="toast_poke_cooldown">%1$s 뒤에 다시 찌를 수 있어요</string>
+
+    <!-- 쿨타임 포맷 -->
+    <string name="cooldown_hours_minutes">%1$d시간 %2$d분</string>
+    <string name="cooldown_minutes">%1$d분</string>
+</resources>

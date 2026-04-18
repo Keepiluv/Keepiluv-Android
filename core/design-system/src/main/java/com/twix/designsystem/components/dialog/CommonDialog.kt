@@ -129,8 +129,7 @@ private fun DialogContent(
                 Row(
                     modifier =
                         Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
+                            .fillMaxWidth(),
                 ) {
                     if (dismissText != null && onDismiss != null) {
                         AppButton(

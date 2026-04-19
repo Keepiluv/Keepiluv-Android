@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -97,7 +98,8 @@ fun DdayScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(color = CommonColor.White),
+                .background(color = CommonColor.White)
+                .statusBarsPadding(),
     ) {
         Column {
             DdayTopBar(navigateToBack = onClickBack)
@@ -129,8 +131,7 @@ fun DdayScreen(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp)
-                        .padding(bottom = 20.dp),
+                        .padding(horizontal = 20.dp, vertical = 8.dp),
             )
         }
 

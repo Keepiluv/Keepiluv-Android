@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -156,18 +158,21 @@ private fun InviteCodeScreen(
     onCopyInviteCode: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
+    val focusManager = LocalFocusManager.current
 
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(CommonColor.White),
+                .background(CommonColor.White)
+                .statusBarsPadding(),
     ) {
         Column(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .verticalScroll(scrollState),
+                    .verticalScroll(scrollState)
+                    .noRippleClickable { focusManager.clearFocus() },
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -298,8 +303,7 @@ private fun InviteCodeScreen(
                 Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .padding(bottom = 20.dp)
+                    .padding(horizontal = 20.dp, vertical = 8.dp)
                     .imePadding(),
         )
     }

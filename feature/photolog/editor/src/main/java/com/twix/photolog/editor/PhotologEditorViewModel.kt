@@ -55,16 +55,16 @@ class PhotologEditorViewModel(
 
     private fun modifyComment() {
         if (currentState.comment.canUpload.not()) {
-            showToast(R.string.toast_comment_length_guide, ToastType.ERROR)
+            showToast(R.string.toast_comment_length_guide, ToastType.DEFAULT)
         } else if (currentState.isCommentNotChanged) {
-            showToast(R.string.toast_comment_not_modified, ToastType.ERROR)
+            showToast(R.string.toast_comment_not_modified, ToastType.DEFAULT)
         } else {
             launchResult(
                 block = { launchModifyComment() },
                 onSuccess = {
                     detailRefreshBus.notifyChanged(PhotologRefreshBus.Publisher.EDITOR)
                     goalRefreshBus.notifyGoalListChanged()
-                    showToast(R.string.toast_comment_modify_success, ToastType.SUCCESS)
+                    tryEmitSideEffect(PhotologEditorSideEffect.NavigateToBack)
                 },
                 onError = {
                     showToast(R.string.toast_comment_modify_fail, ToastType.ERROR)

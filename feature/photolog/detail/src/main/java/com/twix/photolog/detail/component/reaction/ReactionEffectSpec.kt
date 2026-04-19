@@ -13,10 +13,10 @@ data class ReactionEffectSpec(
     val travelDistanceRange: IntRange = 500..1500,
     /** 좌우 퍼짐(px) */
     val spreadX: Int = 180,
-    /** 아이콘 크기(dp) */
-    val sizeRangeDp: IntRange = 32..48,
     /** 시작 위치 패딩(dp) */
-    val sidePaddingDp: Int = 40,
+    val sidePadding: Int = 40,
     /** 시작 바닥 높이(dp) */
-    val startOffsetDp: Int = 80,
+    val startOffset: Int = 80,
+    /** 아이콘 크기(dp) */
+    val iconSize: Int = 40,
 )

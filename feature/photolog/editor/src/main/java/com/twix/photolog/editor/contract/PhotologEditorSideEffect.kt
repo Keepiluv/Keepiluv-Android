@@ -4,6 +4,8 @@ import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.ui.base.SideEffect
 
 sealed interface PhotologEditorSideEffect : SideEffect {
+    data object NavigateToBack : PhotologEditorSideEffect
+
     data class ShowToast(
         val message: Int,
         val type: ToastType,

@@ -45,6 +45,7 @@ import com.twix.photolog.detail.preview.PhotologDetailPreviewProvider
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.findActivity
 import com.twix.ui.extension.hasCameraPermission
+import com.twix.util.CooldownFormatter
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -62,6 +63,7 @@ fun PhotologDetailRoute(
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
     val coroutineScope = rememberCoroutineScope()
+    val density = LocalDensity.current
 
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
@@ -71,9 +73,25 @@ fun PhotologDetailRoute(
                 )
             }
 
-            is PhotologDetailSideEffect.ShowPokeToast -> {
+            PhotologDetailSideEffect.ShowPokeToast -> {
                 toastManager.tryShow(
-                    ToastData(sideEffect.message, ToastType.SUCCESS),
+                    ToastData(currentContext.getString(R.string.toast_poke_goal_success), ToastType.LIKE),
+                )
+            }
+
+            is PhotologDetailSideEffect.ShowPokeCooldownToast -> {
+                val cooldown = CooldownFormatter.format(sideEffect.remainingMs)
+                val timeLabel =
+                    if (cooldown.hours > 0) {
+                        currentContext.getString(R.string.cooldown_hours_minutes, cooldown.hours, cooldown.minutes)
+                    } else {
+                        currentContext.getString(R.string.cooldown_minutes, cooldown.minutes)
+                    }
+                toastManager.tryShow(
+                    ToastData(
+                        currentContext.getString(R.string.toast_poke_cooldown, timeLabel),
+                        ToastType.ERROR,
+                    ),
                 )
             }
         }
@@ -111,11 +129,11 @@ fun PhotologDetailRoute(
         }
 
     BoxWithConstraints {
-        val density = LocalDensity.current
         val screenHeightPx = with(density) { maxHeight.toPx() }
 
         PhotologDetailScreen(
             uiState = uiState,
+            screenHeightPx = screenHeightPx,
             onBack = navigateToBack,
             onClickModify = {
                 navigateToEditor(
@@ -135,15 +153,14 @@ fun PhotologDetailRoute(
             onSwipe = { viewModel.dispatch(PhotologDetailIntent.SwipeCard) },
         )
         if (!uiState.hasShownMyReaction && uiState.isDisplayedMyPhotolog) {
-            val model = uiState.myReaction
-            if (model != null) {
+            val reaction = uiState.myReaction
+            if (reaction != null) {
                 ReactionEffect(
-                    targetReaction = model,
+                    targetReaction = reaction,
                     spec =
                         ReactionEffectSpec(
                             particleCount = 10,
                             durationRange = 500..800,
-                            // 전체 화면 높이까지 퍼짐
                             travelDistanceRange = 500..screenHeightPx.toInt(),
                         ),
                     onFinished = {
@@ -158,6 +175,7 @@ fun PhotologDetailRoute(
 @Composable
 fun PhotologDetailScreen(
     uiState: PhotologDetailUiState,
+    screenHeightPx: Float,
     onBack: () -> Unit,
     onClickModify: () -> Unit,
     onClickReaction: (GoalReactionType) -> Unit,
@@ -181,6 +199,7 @@ fun PhotologDetailScreen(
         if (uiState.isLoading) {
             PhotologCardContent(
                 uiState = uiState,
+                isPokeDisabled = uiState.isPokeDisabled,
                 onSwipe = onSwipe,
                 onClickUpload = onClickUpload,
                 onPoke = onPoke,
@@ -188,6 +207,7 @@ fun PhotologDetailScreen(
 
             if (uiState.canReaction) {
                 ReactionContent(
+                    screenHeightPx = screenHeightPx,
                     reaction = uiState.partnerPhotolog?.reaction,
                     onClickReaction = onClickReaction,
                 )
@@ -206,6 +226,7 @@ private fun PhotologDetailScreenPreview(
         var previewState by remember { mutableStateOf(uiState) }
         PhotologDetailScreen(
             uiState = previewState,
+            screenHeightPx = 0f,
             onBack = {},
             onClickModify = {},
             onClickReaction = {},

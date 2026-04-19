@@ -70,8 +70,14 @@ class CaptureCamera(
         cameraInfo = camera.cameraInfo
     }
 
-    override suspend fun takePicture(): Result<Uri> =
+    override suspend fun takePicture(torch: TorchStatus): Result<Uri> =
         suspendCancellableCoroutine { continuation ->
+            imageCapture.flashMode =
+                when (torch) {
+                    TorchStatus.On -> ImageCapture.FLASH_MODE_ON
+                    TorchStatus.Off -> ImageCapture.FLASH_MODE_OFF
+                }
+
             val contentValues = contentValues()
             val outputOptions = outputFileOptions(contentValues)
 
@@ -125,13 +131,6 @@ class CaptureCamera(
     override fun unbind() {
         cameraProvider?.unbindAll()
         _surfaceRequests.value = null
-    }
-
-    override fun toggleTorch(torch: TorchStatus) {
-        when (torch) {
-            TorchStatus.On -> cameraControl?.enableTorch(true)
-            TorchStatus.Off -> cameraControl?.enableTorch(false)
-        }
     }
 
     companion object Companion {

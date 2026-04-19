@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -145,7 +146,8 @@ fun CoupleConnectScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(color = CommonColor.White),
+                .background(color = CommonColor.White)
+                .statusBarsPadding(),
     ) {
         Column(
             Modifier.verticalScroll(scrollState),
@@ -166,7 +168,10 @@ fun CoupleConnectScreen(
             Image(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_invite),
                 contentDescription = null,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
+                modifier =
+                    Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(35.dp),
             )
 
             Spacer(modifier = Modifier.height(2.dp))

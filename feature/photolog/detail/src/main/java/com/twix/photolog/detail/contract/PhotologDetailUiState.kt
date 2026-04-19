@@ -30,7 +30,18 @@ data class PhotologDetailUiState(
      * 초기값으로 인해 찌르기/업로드 버튼이 렌더링 되는 것을 막기 위한 변수
      */
     val isLoading: Boolean = false,
+    /**
+     * 찌르기 API 호출 중 여부 - 낙관적 UI를 위해 버튼 중복 클릭 방지에 사용
+     */
+    val isPoking: Boolean = false,
+    /**
+     * 찌르기 쿨타임 잔여 시간(ms). 0보다 크면 쿨타임 중
+     */
+    val pokeCooldownRemaining: Long = 0L,
 ) : State {
+    val isPokeDisabled: Boolean
+        get() = isPoking || pokeCooldownRemaining > 0
+
     /**
      * 현재 [currentShow]에 해당하는 사용자의 인증샷 인증 여부
      *

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
@@ -130,6 +131,12 @@ private fun StatsTabRow(pagerState: PagerState) {
                         .height(1.4.dp)
                         .background(GrayColor.C500),
                 color = GrayColor.C500,
+            )
+        },
+        divider = {
+            HorizontalDivider(
+                thickness = 1.4.dp,
+                color = GrayColor.C100,
             )
         },
         containerColor = CommonColor.White,

@@ -84,10 +84,6 @@ fun PhotologCaptureRoute(
         }
     }
 
-    LaunchedEffect(uiState.torch) {
-        camera.toggleTorch(uiState.torch)
-    }
-
     ObserveAsEvents(viewModel.sideEffect) { event ->
         when (event) {
             is PhotologCaptureSideEffect.ShowToast -> {
@@ -119,7 +115,7 @@ fun PhotologCaptureRoute(
             onCaptureClick = {
                 coroutineScope.launch {
                     camera
-                        .takePicture()
+                        .takePicture(uiState.torch)
                         .onSuccess {
                             viewModel.dispatch(PhotologCaptureIntent.TakePicture(it))
                         }.onFailure {

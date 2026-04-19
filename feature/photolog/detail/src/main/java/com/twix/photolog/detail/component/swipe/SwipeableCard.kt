@@ -1,121 +1,163 @@
 package com.twix.photolog.detail.component.swipe
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import kotlin.math.abs
-import kotlin.math.roundToInt
+import kotlin.math.min
 
-/**
- * 드래그하여 스와이프할 수 있는 카드 컴포넌트.
- *
- * ## 동작
- * 1. 사용자가 카드를 드래그
- * 2. threshold 이상 이동 시 → 카드 dismiss
- * 3. 화면 밖으로 날아간 뒤 onSwipe 호출
- * 4. 반대편에서 다시 등장
- *
- */
 @Composable
 fun SwipeableCard(
+    isShowMyCard: Boolean,
     onSwipe: () -> Unit,
-    isDisplayingMyPhoto: Boolean,
     modifier: Modifier = Modifier,
-    spec: SwipeCardSpec = SwipeCardSpec(),
-    content: @Composable () -> Unit,
+    config: SwipeCardConfig = SwipeCardConfig(),
+    content: @Composable (SwipeState) -> Unit,
 ) {
     val coroutineScope = rememberCoroutineScope()
     val density = LocalDensity.current
-    val threshold = with(density) { spec.dismissThreshold.toPx() }
 
     /**
      * 카드 상태 값
      */
-    val offsetX = remember { Animatable(0f) }
-    val opacity = remember { Animatable(1f) }
+    val cardOffset = remember { Animatable(0f) }
+    var isCrossingDuringDrag by remember { mutableStateOf(false) }
+
+    val maxCardOffset = with(density) { config.maxCardOffset.dp.toPx() }
+    val dragVelocityThreshold = config.dragVelocityThreshold
+    val minimumDragResistance = config.minimumDragResistance
 
     /**
-     * 드래그 거리 기반 회전
+     * 드래그 폭 계산
      */
-    val rotation =
-        (offsetX.value / spec.rotationFactor)
-            .coerceIn(-spec.maxRotation, spec.maxRotation)
+    fun calculateResistedDragWidth(
+        proposedWidth: Float,
+        velocity: Float,
+    ): Float {
+        val speed = abs(velocity)
+        if (speed <= dragVelocityThreshold) return proposedWidth
 
-    BoxWithConstraints(modifier = modifier) {
-        val dismissDistance = constraints.maxWidth * 1.3f
+        val excessSpeedRatio = (speed - dragVelocityThreshold) / dragVelocityThreshold
+        val normalizedOverflow = min(excessSpeedRatio, 1f)
+        val resistance = 1 - (normalizedOverflow * (1 - minimumDragResistance))
+        return proposedWidth * resistance
+    }
 
-        Box(
-            modifier =
-                modifier
-                    /**
-                     * 카드 위치 이동
-                     */
-                    .offset {
-                        IntOffset(
-                            offsetX.value.roundToInt(),
-                            0,
-                        )
-                    }
-                    /**
-                     * 회전 + 투명도 적용
-                     */
-                    .graphicsLayer {
-                        rotationZ = rotation
-                        alpha = opacity.value
-                    }.pointerInput(isDisplayingMyPhoto) {
-                        detectDragGestures(
-                            /**
-                             * 드래그 중
-                             * → 위치 즉시 반영 (snap)
-                             */
-                            onDrag = { _, dragAmount ->
-                                coroutineScope.launch {
-                                    offsetX.snapTo(offsetX.value + dragAmount.x)
-                                }
-                            },
-                            /**
-                             * 드래그 종료 시 처리
-                             */
-                            onDragEnd = {
-                                val shouldDismiss = abs(offsetX.value) > threshold
-                                coroutineScope.launch {
-                                    if (shouldDismiss) {
-                                        onSwipe()
+    /**
+     * 무한 좌우 스크롤 적용을 위한 반복 오프셋 계산
+     */
+    fun calculateRepeatedCardOffset(width: Float): Float {
+        val direction = if (width >= 0) 1f else -1f
+        val fullCycleDistance = maxCardOffset * 2
+        val progressInCycle = abs(width) % fullCycleDistance
 
-                                        /**
-                                         * 반대편 위치 세팅
-                                         */
-                                        val reappearStartX =
-                                            if (isDisplayingMyPhoto) {
-                                                dismissDistance * spec.reappearOffsetRatio
-                                            } else {
-                                                -dismissDistance * spec.reappearOffsetRatio
-                                            }
-                                        offsetX.snapTo(reappearStartX)
+        if (progressInCycle <= maxCardOffset) return progressInCycle * direction
 
-                                        launch { offsetX.animateTo(0f) }
-                                        launch { opacity.animateTo(1f) }
-                                    } else {
-                                        // threshold 미만 → 제자리 복귀
-                                        launch { offsetX.animateTo(0f) }
-                                    }
-                                }
-                            },
-                        )
-                    },
-        ) {
-            content()
+        val reversedProgress = fullCycleDistance - progressInCycle
+        return reversedProgress * direction
+    }
+
+    /**
+     * 카드 교차 여부 판단
+     */
+    fun shouldCrossCards(width: Float): Boolean {
+        val fullCycleDistance = maxCardOffset * 2
+        val progressInCycle = abs(width) % fullCycleDistance
+        return progressInCycle > maxCardOffset
+    }
+
+    /**
+     * 카드 오프셋 애니메이션으로 원위치
+     */
+    fun animateCardToOrigin() {
+        coroutineScope.launch {
+            cardOffset.animateTo(
+                0f,
+                animationSpec =
+                    spring(
+                        dampingRatio = config.dampingRatio,
+                        stiffness = config.stiffness,
+                    ),
+            )
         }
+    }
+
+    /**
+     * 드래그 상태 초기화
+     */
+    fun resetCrossingState() {
+        isCrossingDuringDrag = false
+    }
+
+    /**
+     * 드래그 처리 (오프셋 업데이트 및 교차 상태 갱신)
+     */
+    fun handleDragMovement(
+        totalDragDistance: Float,
+        velocity: Float,
+    ) {
+        val maximumOffsetRange = maxCardOffset * 2
+        val resistedWidth = calculateResistedDragWidth(totalDragDistance, velocity)
+
+        if (resistedWidth !in -maximumOffsetRange..maximumOffsetRange) return
+
+        coroutineScope.launch {
+            cardOffset.snapTo(calculateRepeatedCardOffset(resistedWidth))
+        }
+        isCrossingDuringDrag = shouldCrossCards(resistedWidth)
+    }
+
+    /**
+     * 드래그 종료 처리
+     */
+    fun finalizeDrag() {
+        if (isCrossingDuringDrag) {
+            onSwipe()
+        }
+        animateCardToOrigin()
+        resetCrossingState()
+    }
+
+    Box(
+        modifier =
+            modifier
+                .pointerInput(isShowMyCard) {
+                    var totalDragDistance = 0f
+                    var lastVelocity = 0f
+
+                    detectDragGestures(
+                        onDrag = { _, dragAmount ->
+                            val horizontalDragAmount = dragAmount.x
+                            totalDragDistance += horizontalDragAmount
+                            lastVelocity = horizontalDragAmount
+
+                            handleDragMovement(totalDragDistance, abs(lastVelocity))
+                        },
+                        onDragEnd = {
+                            finalizeDrag()
+                            totalDragDistance = 0f
+                            lastVelocity = 0f
+                        },
+                    )
+                },
+    ) {
+        content(
+            SwipeState(
+                cardOffset = cardOffset.value,
+                isCrossingDuringDrag = isCrossingDuringDrag,
+            ),
+        )
     }
 }

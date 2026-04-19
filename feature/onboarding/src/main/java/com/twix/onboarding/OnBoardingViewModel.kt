@@ -1,6 +1,5 @@
 package com.twix.onboarding
 
-import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.OnboardingStatus
@@ -12,7 +11,6 @@ import com.twix.onboarding.contract.OnBoardingSideEffect
 import com.twix.onboarding.contract.OnBoardingUiState
 import com.twix.result.AppError
 import com.twix.ui.base.BaseViewModel
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class OnBoardingViewModel(
@@ -88,11 +86,7 @@ class OnBoardingViewModel(
 
         launchResult(
             block = { onBoardingRepository.coupleConnection(currentUiState.partnerInviteCode) },
-            onSuccess = {
-                viewModelScope.launch {
-                    emitSideEffect(OnBoardingSideEffect.InviteCode.NavigateToNext)
-                }
-            },
+            onSuccess = { tryEmitSideEffect(OnBoardingSideEffect.InviteCode.NavigateToNext) },
             onError = { error -> handleCoupleConnectException(error) },
         )
     }
@@ -124,13 +118,11 @@ class OnBoardingViewModel(
         reduce { copy(profile = profile.updateNickname(value)) }
     }
 
-    private fun handleSubmitNickname() {
+    private suspend fun handleSubmitNickname() {
         if (currentState.isValidNickName) {
             profileSetup()
         } else {
-            viewModelScope.launch {
-                showToast(R.string.onboarding_profile_invalid_name_length_toast, ToastType.ERROR)
-            }
+            showToast(R.string.onboarding_profile_invalid_name_length_toast, ToastType.DEFAULT)
         }
     }
 
@@ -146,19 +138,17 @@ class OnBoardingViewModel(
         launchResult(
             block = { onBoardingRepository.fetchOnboardingStatus() },
             onSuccess = { onboardingStatus ->
-                viewModelScope.launch {
-                    val sideEffect =
-                        when (onboardingStatus) {
-                            OnboardingStatus.ANNIVERSARY_SETUP ->
-                                OnBoardingSideEffect.ProfileSetting.NavigateToNext
+                val sideEffect =
+                    when (onboardingStatus) {
+                        OnboardingStatus.ANNIVERSARY_SETUP ->
+                            OnBoardingSideEffect.ProfileSetting.NavigateToNext
 
-                            OnboardingStatus.COMPLETED ->
-                                OnBoardingSideEffect.ProfileSetting.NavigateToHome
+                        OnboardingStatus.COMPLETED ->
+                            OnBoardingSideEffect.ProfileSetting.NavigateToHome
 
-                            else -> return@launch
-                        }
-                    emitSideEffect(sideEffect)
-                }
+                        else -> return@launchResult
+                    }
+                tryEmitSideEffect(sideEffect)
             },
         )
     }
@@ -174,9 +164,7 @@ class OnBoardingViewModel(
     private fun anniversarySetup() {
         launchResult(
             block = { onBoardingRepository.anniversarySetup(currentState.dDay.anniversaryDate.toString()) },
-            onSuccess = {
-                viewModelScope.launch { emitSideEffect(OnBoardingSideEffect.DdaySetting.NavigateToHome) }
-            },
+            onSuccess = { tryEmitSideEffect(OnBoardingSideEffect.DdaySetting.NavigateToHome) },
             onError = {
                 showToast(R.string.onboarding_dday_setup_fail, ToastType.ERROR)
             },

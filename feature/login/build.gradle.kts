@@ -29,6 +29,8 @@ android {
     }
 }
 dependencies {
+    implementation(projects.core.navigationContract)
+
     implementation(libs.googleid)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)

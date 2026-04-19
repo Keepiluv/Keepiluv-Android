@@ -4,6 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.twix.domain.model.OnboardingStatus
 import com.twix.navigation.NavRoutes
 import com.twix.navigation.base.NavGraphContributor
 import com.twix.splash.SplashRoute
@@ -25,17 +26,27 @@ object SplashNavGraph : NavGraphContributor {
                 SplashRoute(
                     navigateToMain = {
                         navController.navigate(NavRoutes.MainGraph.route) {
-                            popUpTo(NavRoutes.SplashGraph.route) {
-                                inclusive = true
-                            }
+                            popUpTo(NavRoutes.SplashGraph.route) { inclusive = true }
                             launchSingleTop = true
                         }
                     },
                     navigateToLogin = {
                         navController.navigate(NavRoutes.LoginGraph.route) {
-                            popUpTo(NavRoutes.SplashGraph.route) {
-                                inclusive = true
+                            popUpTo(NavRoutes.SplashGraph.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    },
+                    navigateToOnBoarding = { status ->
+                        val destination =
+                            when (status) {
+                                OnboardingStatus.COUPLE_CONNECTION -> NavRoutes.CoupleConnectionRoute.route
+                                OnboardingStatus.PROFILE_SETUP -> NavRoutes.ProfileRoute.route
+                                OnboardingStatus.ANNIVERSARY_SETUP -> NavRoutes.DdayRoute.route
+                                OnboardingStatus.COMPLETED -> return@SplashRoute
                             }
+
+                        navController.navigate(destination) {
+                            popUpTo(NavRoutes.SplashGraph.route) { inclusive = true }
                             launchSingleTop = true
                         }
                     },

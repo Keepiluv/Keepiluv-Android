@@ -1,7 +1,9 @@
 package com.twix.splash
 
 import androidx.lifecycle.viewModelScope
+import com.twix.domain.model.OnboardingStatus
 import com.twix.domain.repository.AuthRepository
+import com.twix.domain.repository.OnBoardingRepository
 import com.twix.result.AppResult
 import com.twix.splash.contract.SplashSideEffect
 import com.twix.ui.base.BaseViewModel
@@ -14,6 +16,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 class SplashViewModel(
     private val authRepository: AuthRepository,
+    private val onBoardingRepository: OnBoardingRepository,
 ) : BaseViewModel<EmptyState, EmptyIntent, SplashSideEffect>(EmptyState) {
     init {
         autoLogin()
@@ -34,10 +37,23 @@ class SplashViewModel(
             if (refreshResult == null) refreshJob.cancel()
 
             when (refreshResult) {
-                is AppResult.Success -> tryEmitSideEffect(SplashSideEffect.NavigateToMain)
+                is AppResult.Success -> checkOnboardingStatus()
                 else -> tryEmitSideEffect(SplashSideEffect.NavigateToLogin) // TODO: 네트워크 연결 불안정은 다이얼로그로 분리
             }
         }
+    }
+
+    private fun checkOnboardingStatus() {
+        launchResult(
+            block = { onBoardingRepository.fetchOnboardingStatus() },
+            onSuccess = {
+                when (it) {
+                    OnboardingStatus.COMPLETED -> tryEmitSideEffect(SplashSideEffect.NavigateToMain)
+                    else -> tryEmitSideEffect(SplashSideEffect.NavigateToOnBoarding(it))
+                }
+            },
+            onError = { emitSideEffect(SplashSideEffect.NavigateToMain) },
+        )
     }
 
     private companion object {

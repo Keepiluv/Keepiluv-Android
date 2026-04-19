@@ -26,6 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -89,6 +90,13 @@ internal fun InviteCodeRoute(
     val currentContext by rememberUpdatedState(context)
     val clipboard = LocalClipboard.current
 
+    DisposableEffect(Unit) {
+        viewModel.dispatch(OnBoardingIntent.StartPollingStatus)
+        onDispose {
+            viewModel.dispatch(OnBoardingIntent.StopPollingStatus)
+        }
+    }
+
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
             is OnBoardingSideEffect.ShowToast -> {
@@ -101,6 +109,7 @@ internal fun InviteCodeRoute(
             }
 
             OnBoardingSideEffect.InviteCode.NavigateToNext -> navigateToNext()
+            OnBoardingSideEffect.CoupleConnection.NavigateToNext -> navigateToNext()
             is OnBoardingSideEffect.InviteCode.CopyInviteCode -> {
                 coroutineScope.launch {
                     val clipData =

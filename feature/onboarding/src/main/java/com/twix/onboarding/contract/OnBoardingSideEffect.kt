@@ -22,6 +22,10 @@ sealed interface OnBoardingSideEffect : SideEffect {
         ) : InviteCode
     }
 
+    sealed interface CoupleConnection : OnBoardingSideEffect {
+        data object NavigateToNext : CoupleConnection
+    }
+
     sealed interface DdaySetting : OnBoardingSideEffect {
         data object NavigateToHome : DdaySetting
     }

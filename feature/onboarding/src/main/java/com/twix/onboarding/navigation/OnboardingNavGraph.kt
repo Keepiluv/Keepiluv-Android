@@ -56,7 +56,9 @@ object OnboardingNavGraph : NavGraphContributor {
 
                 InviteCodeRoute(
                     navigateToNext = {
-                        navController.navigate(NavRoutes.ProfileRoute.route)
+                        navController.navigate(NavRoutes.ProfileRoute.route) {
+                            popUpTo(NavRoutes.InviteRoute.route) { inclusive = true }
+                        }
                     },
                     navigateToBack = navController::popBackStack,
                     viewModel = vm,

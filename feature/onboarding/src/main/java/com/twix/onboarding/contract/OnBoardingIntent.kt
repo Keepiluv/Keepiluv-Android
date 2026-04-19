@@ -31,4 +31,8 @@ sealed interface OnBoardingIntent : Intent {
     ) : OnBoardingIntent
 
     data object SubmitDday : OnBoardingIntent
+
+    data object StartPollingStatus : OnBoardingIntent
+
+    data object StopPollingStatus : OnBoardingIntent
 }

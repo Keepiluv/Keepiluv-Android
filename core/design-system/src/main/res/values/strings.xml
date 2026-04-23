@@ -202,4 +202,10 @@
     <string name="onboarding_dday_placeholder">YYYY-MM-DD</string>
     <string name="onboarding_dday_setup_fail">기념일 설정에 실패했습니다.</string>
 
+    <!-- 인증 시간 -->
+    <string name="certification_time_just_now">방금 전</string>
+    <string name="certification_time_minutes_ago">%d분 전</string>
+    <string name="certification_time_hours_ago">%d시간 전</string>
+    <string name="certification_time_days_ago">%d일 전</string>
+
 </resources>

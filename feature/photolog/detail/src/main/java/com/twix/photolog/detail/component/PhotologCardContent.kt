@@ -45,10 +45,13 @@ internal fun PhotologCardContent(
             }
 
         Box {
-            // 뒷 카드 (BackgroundCard) - 드래그 중이 아닐 때만 표시
+            // 뒷 카드
             if (swipeState.cardOffset == 0f) {
                 BackgroundCard(
-                    uploadedAt = uiState.displayedGoalUpdateAt,
+                    uploadedAt =
+                        uiState.displayedGoalUploadedAt?.let { certifiedAt ->
+                            formatCertificationTime(CertificationTime.from(certifiedAt))
+                        } ?: "",
                     actionLabel =
                         when (uiState.currentShow) {
                             BetweenUs.ME -> stringResource(R.string.photolog_picture_upload)
@@ -147,6 +150,16 @@ private fun MyReactionBadge(
         }
     }
 }
+
+@Composable
+private fun formatCertificationTime(certificationTime: CertificationTime?): String =
+    when (certificationTime) {
+        is CertificationTime.JustNow -> stringResource(R.string.certification_time_just_now)
+        is CertificationTime.Minutes -> stringResource(R.string.certification_time_minutes_ago, certificationTime.value)
+        is CertificationTime.Hours -> stringResource(R.string.certification_time_hours_ago, certificationTime.value)
+        is CertificationTime.Days -> stringResource(R.string.certification_time_days_ago, certificationTime.value)
+        null -> ""
+    }
 
 @Preview(showBackground = true)
 @Composable

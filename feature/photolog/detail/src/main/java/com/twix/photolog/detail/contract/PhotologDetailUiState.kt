@@ -7,7 +7,6 @@ import com.twix.domain.model.photolog.PhotoLogs
 import com.twix.domain.model.photolog.PhotologDetail
 import com.twix.photolog.detail.component.reaction.ReactionUiModel
 import com.twix.ui.base.State
-import com.twix.util.RelativeTimeFormatter
 import java.time.LocalDate
 
 @Immutable
@@ -56,23 +55,16 @@ data class PhotologDetailUiState(
             }
 
     /**
-     * 현재 [currentShow]에 해당하는 인증샷의 업로드 시간을 상대적 시간 문자열
+     * 현재 [currentShow]에 해당하는 인증샷의 업로드 시간 (ISO 형식)
      *
      * - [BetweenUs.ME]: 내 인증샷 업로드 시간
      * - [BetweenUs.PARTNER]: 파트너 인증샷 업로드 시간
      */
-    val displayedGoalUpdateAt: String
+    val displayedGoalUploadedAt: String?
         get() =
             when (currentShow) {
-                BetweenUs.ME ->
-                    myPhotolog?.uploadedAt?.let {
-                        RelativeTimeFormatter.format(it)
-                    } ?: ""
-
-                BetweenUs.PARTNER ->
-                    partnerPhotolog?.uploadedAt?.let {
-                        RelativeTimeFormatter.format(it)
-                    } ?: ""
+                BetweenUs.ME -> myPhotolog?.uploadedAt
+                BetweenUs.PARTNER -> partnerPhotolog?.uploadedAt
             }
 
     /**

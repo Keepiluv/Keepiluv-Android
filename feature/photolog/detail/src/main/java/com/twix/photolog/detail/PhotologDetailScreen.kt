@@ -45,7 +45,6 @@ import com.twix.photolog.detail.preview.PhotologDetailPreviewProvider
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.findActivity
 import com.twix.ui.extension.hasCameraPermission
-import com.twix.util.CooldownFormatter
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -80,13 +79,8 @@ fun PhotologDetailRoute(
             }
 
             is PhotologDetailSideEffect.ShowPokeCooldownToast -> {
-                val cooldown = CooldownFormatter.format(sideEffect.remainingMs)
-                val timeLabel =
-                    if (cooldown.hours > 0) {
-                        currentContext.getString(R.string.cooldown_hours_minutes, cooldown.hours, cooldown.minutes)
-                    } else {
-                        currentContext.getString(R.string.cooldown_minutes, cooldown.minutes)
-                    }
+                val cooldownTime = CooldownTime.from(sideEffect.remainingMs)
+                val timeLabel = formatCooldownTime(cooldownTime)
                 toastManager.tryShow(
                     ToastData(
                         currentContext.getString(R.string.toast_poke_cooldown, timeLabel),
@@ -215,6 +209,22 @@ fun PhotologDetailScreen(
         }
     }
 }
+
+@Composable
+private fun formatCooldownTime(cooldownTime: CooldownTime): String =
+    when (cooldownTime) {
+        is CooldownTime.HoursAndMinutes ->
+            stringResource(
+                R.string.cooldown_hours_minutes,
+                cooldownTime.hours,
+                cooldownTime.minutes,
+            )
+        is CooldownTime.MinutesOnly ->
+            stringResource(
+                R.string.cooldown_minutes,
+                cooldownTime.minutes,
+            )
+    }
 
 @Preview(showBackground = true)
 @Composable

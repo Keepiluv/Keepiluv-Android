@@ -19,6 +19,7 @@ import com.twix.designsystem.components.photolog.BackgroundCard
 import com.twix.designsystem.components.photolog.ForegroundCard
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.BetweenUs
+import com.twix.domain.model.time.CertificationTime
 import com.twix.photolog.detail.component.reaction.ReactionUiModel
 import com.twix.photolog.detail.component.swipe.SwipeableCard
 import com.twix.photolog.detail.contract.PhotologDetailUiState
@@ -152,13 +153,12 @@ private fun MyReactionBadge(
 }
 
 @Composable
-private fun formatCertificationTime(certificationTime: CertificationTime?): String =
-    when (certificationTime) {
+private fun formatCertificationTime(time: CertificationTime): String =
+    when (time) {
         is CertificationTime.JustNow -> stringResource(R.string.certification_time_just_now)
-        is CertificationTime.Minutes -> stringResource(R.string.certification_time_minutes_ago, certificationTime.value)
-        is CertificationTime.Hours -> stringResource(R.string.certification_time_hours_ago, certificationTime.value)
-        is CertificationTime.Days -> stringResource(R.string.certification_time_days_ago, certificationTime.value)
-        null -> ""
+        is CertificationTime.Minutes -> stringResource(R.string.certification_time_minutes_ago, time.value)
+        is CertificationTime.Hours -> stringResource(R.string.certification_time_hours_ago, time.value)
+        is CertificationTime.Days -> stringResource(R.string.certification_time_days_ago, time.value)
     }
 
 @Preview(showBackground = true)

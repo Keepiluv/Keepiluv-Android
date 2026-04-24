@@ -119,6 +119,7 @@ internal fun PhotologCardContent(
                 modifier =
                     Modifier
                         .align(Alignment.TopEnd)
+                        .zIndex(2f)
                         .offset(x = (-8).dp, y = (-13).dp),
             )
         }

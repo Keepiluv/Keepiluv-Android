@@ -14,8 +14,8 @@ class CooldownTimeTest {
 
         // then
         assertThat(result)
-            .isInstanceOf(CooldownTime.MinutesOnly::class.java)
-            .extracting { (it as CooldownTime.MinutesOnly).minutes }
+            .isInstanceOf(CooldownTime.Minutes::class.java)
+            .extracting { (it as CooldownTime.Minutes).value }
             .isEqualTo(0L)
     }
 
@@ -29,8 +29,8 @@ class CooldownTimeTest {
 
         // then
         assertThat(result)
-            .isInstanceOf(CooldownTime.MinutesOnly::class.java)
-            .extracting { (it as CooldownTime.MinutesOnly).minutes }
+            .isInstanceOf(CooldownTime.Minutes::class.java)
+            .extracting { (it as CooldownTime.Minutes).value }
             .isEqualTo(30L)
     }
 
@@ -44,13 +44,13 @@ class CooldownTimeTest {
 
         // then
         assertThat(result)
-            .isInstanceOf(CooldownTime.MinutesOnly::class.java)
-            .extracting { (it as CooldownTime.MinutesOnly).minutes }
+            .isInstanceOf(CooldownTime.Minutes::class.java)
+            .extracting { (it as CooldownTime.Minutes).value }
             .isEqualTo(59L)
     }
 
     @Test
-    fun `1시간 0분이 주어지면 HoursAndMinutes 1시간 0분을 반환한다`() {
+    fun `1시간 0분이 주어지면 HoursOnly 1시간을 반환한다`() {
         // given
         val remainingMs = 3_600_000L // 1시간 * 60분 * 60초 * 1000ms
 
@@ -58,10 +58,25 @@ class CooldownTimeTest {
         val result = CooldownTime.from(remainingMs)
 
         // then
-        assertThat(result).isInstanceOf(CooldownTime.HoursAndMinutes::class.java)
-        val hoursAndMinutes = result as CooldownTime.HoursAndMinutes
-        assertThat(hoursAndMinutes.hours).isEqualTo(1L)
-        assertThat(hoursAndMinutes.minutes).isEqualTo(0L)
+        assertThat(result)
+            .isInstanceOf(CooldownTime.Hours::class.java)
+            .extracting { (it as CooldownTime.Hours).value }
+            .isEqualTo(1L)
+    }
+
+    @Test
+    fun `2시간 0분이 주어지면 HoursOnly 2시간을 반환한다`() {
+        // given
+        val remainingMs = 7_200_000L // 2시간 * 60분 * 60초 * 1000ms
+
+        // when
+        val result = CooldownTime.from(remainingMs)
+
+        // then
+        assertThat(result)
+            .isInstanceOf(CooldownTime.Hours::class.java)
+            .extracting { (it as CooldownTime.Hours).value }
+            .isEqualTo(2L)
     }
 
     @Test

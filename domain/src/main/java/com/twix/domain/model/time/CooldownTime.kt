@@ -1,13 +1,17 @@
 package com.twix.domain.model.time
 
 sealed interface CooldownTime {
+    data class Hours(
+        val value: Long,
+    ) : CooldownTime
+
     data class HoursAndMinutes(
         val hours: Long,
         val minutes: Long,
     ) : CooldownTime
 
-    data class MinutesOnly(
-        val minutes: Long,
+    data class Minutes(
+        val value: Long,
     ) : CooldownTime
 
     companion object {
@@ -17,8 +21,9 @@ sealed interface CooldownTime {
             val minutes = totalMinutes % 60
 
             return when {
+                hours > 0 && minutes == 0L -> Hours(hours)
                 hours > 0 -> HoursAndMinutes(hours, minutes)
-                else -> MinutesOnly(minutes)
+                else -> Minutes(minutes)
             }
         }
     }

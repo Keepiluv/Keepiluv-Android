@@ -1,14 +1,14 @@
 package com.twix.domain.model.time
 
-sealed class CooldownTime {
+sealed interface CooldownTime {
     data class HoursAndMinutes(
         val hours: Long,
         val minutes: Long,
-    ) : CooldownTime()
+    ) : CooldownTime
 
     data class MinutesOnly(
         val minutes: Long,
-    ) : CooldownTime()
+    ) : CooldownTime
 
     companion object {
         fun from(remainingMs: Long): CooldownTime {

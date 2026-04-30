@@ -147,7 +147,6 @@ fun WeeklyCalendar(
                     sizeTransform = SizeTransform(clip = false),
                 )
             },
-            label = "weekly-calendar-transition",
         ) { targetWeekKey ->
             val animatedWeekStart =
                 remember(targetWeekKey) {

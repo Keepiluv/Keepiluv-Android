@@ -65,12 +65,12 @@
     <string name="partner_not_photolog">%s님은\n아직…</string>
 
     <!-- 목표 생성, 편집 화면 -->
-    <string name="goal_editor_title">목표 직접 만들기</string>
+    <string name="goal_editor_title">직접 만들기</string>
     <string name="goal_editor_title_edit">목표 수정하기</string>
     <string name="goal_editor_text_field_placeholder">목표를 입력해 보세요.</string>
-    <string name="header_start_date">시작 날짜</string>
-    <string name="header_end_date">종료 날짜</string>
-    <string name="header_end_date_option">종료 날짜 설정</string>
+    <string name="header_start_date">시작일</string>
+    <string name="header_end_date">종료일</string>
+    <string name="header_end_date_option">종료일 설정</string>
     <string name="icon_editor_dialog_title">아이콘 변경</string>
     <string name="repeat_count">%s %s번</string>
     <string name="goal_action_cheer">KEEP IT UP!</string>

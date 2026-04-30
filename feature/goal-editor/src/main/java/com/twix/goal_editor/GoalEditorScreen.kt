@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -128,6 +130,7 @@ fun GoalEditorScreen(
     var showIconEditorDialog by remember { mutableStateOf(false) }
     var isEndDate by remember { mutableStateOf(true) }
     var internalSelectedIcon by remember { mutableStateOf(uiState.selectedIcon) }
+    val scrollState = rememberScrollState()
 
     Box {
         Column(
@@ -155,37 +158,43 @@ fun GoalEditorScreen(
 
             Spacer(Modifier.height(52.dp))
 
-            EmojiPicker(
-                icon = uiState.selectedIcon,
-                onClick = { showIconEditorDialog = true },
-            )
+            Column(
+                modifier =
+                    Modifier
+                        .verticalScroll(scrollState)
+                        .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                EmojiPicker(
+                    icon = uiState.selectedIcon,
+                    onClick = { showIconEditorDialog = true },
+                )
 
-            Spacer(Modifier.height(44.dp))
+                Spacer(Modifier.height(44.dp))
 
-            GoalTextField(
-                value = uiState.goalTitle,
-                onCommitTitle = onCommitTitle,
-            )
+                GoalTextField(
+                    value = uiState.goalTitle,
+                    onCommitTitle = onCommitTitle,
+                )
 
-            Spacer(Modifier.height(44.dp))
+                Spacer(Modifier.height(44.dp))
 
-            GoalInfoCard(
-                selectedRepeatCycle = uiState.selectedRepeatCycle,
-                repeatCount = uiState.repeatCount,
-                startDate = uiState.startDate,
-                endDateEnabled = uiState.endDateEnabled,
-                endDate = uiState.endDate,
-                isEdit = isEdit,
-                onSelectedRepeatType = onSelectRepeatType,
-                onShowRepeatCountBottomSheet = { showRepeatCountBottomSheet = true },
-                onShowCalendarBottomSheet = {
-                    isEndDate = it
-                    showCalendarBottomSheet = true
-                },
-                onToggleEndDateEnabled = onToggleEndDateEnabled,
-            )
-
-            Spacer(Modifier.weight(1f))
+                GoalInfoCard(
+                    selectedRepeatCycle = uiState.selectedRepeatCycle,
+                    repeatCount = uiState.repeatCount,
+                    startDate = uiState.startDate,
+                    endDateEnabled = uiState.endDateEnabled,
+                    endDate = uiState.endDate,
+                    isEdit = isEdit,
+                    onSelectedRepeatType = onSelectRepeatType,
+                    onShowRepeatCountBottomSheet = { showRepeatCountBottomSheet = true },
+                    onShowCalendarBottomSheet = {
+                        isEndDate = it
+                        showCalendarBottomSheet = true
+                    },
+                    onToggleEndDateEnabled = onToggleEndDateEnabled,
+                )
+            }
 
             AppButton(
                 onClick = onComplete,

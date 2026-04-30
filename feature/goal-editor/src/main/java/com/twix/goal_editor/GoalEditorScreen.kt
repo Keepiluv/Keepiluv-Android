@@ -177,8 +177,6 @@ fun GoalEditorScreen(
                     onCommitTitle = onCommitTitle,
                 )
 
-                Spacer(Modifier.height(44.dp))
-
                 GoalInfoCard(
                     selectedRepeatCycle = uiState.selectedRepeatCycle,
                     repeatCount = uiState.repeatCount,

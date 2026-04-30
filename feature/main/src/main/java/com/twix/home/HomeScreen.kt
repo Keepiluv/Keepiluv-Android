@@ -352,7 +352,7 @@ fun GoalList(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding =
                 PaddingValues(
-                    top = with(density) { animatedPullOffsetPx.toDp() },
+                    top = 20.dp + with(density) { animatedPullOffsetPx.toDp() },
                     bottom = 20.dp,
                 ),
         ) {

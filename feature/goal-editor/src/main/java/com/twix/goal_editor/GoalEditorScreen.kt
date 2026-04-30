@@ -303,7 +303,7 @@ private fun IconEditorDialogContent(
                         contentDescription = "emoji",
                         modifier =
                             Modifier
-                                .size(42.dp),
+                                .size(32.dp),
                     )
                 }
             }

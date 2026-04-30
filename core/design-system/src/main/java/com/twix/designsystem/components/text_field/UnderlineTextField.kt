@@ -32,6 +32,7 @@ fun UnderlineTextField(
     readOnly: Boolean = false,
     singleLine: Boolean = true,
     showTrailing: Boolean = false,
+    maxLength: Int? = null,
     maxLines: Int = 1,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -77,7 +78,10 @@ fun UnderlineTextField(
                 BasicTextField(
                     value = value,
                     textStyle = textStyle.toTextStyle(typo).copy(color = GrayColor.C500),
-                    onValueChange = onValueChange,
+                    onValueChange = { changedValue ->
+                        val limitedValue = maxLength?.let { changedValue.take(it) } ?: changedValue
+                        onValueChange(limitedValue)
+                    },
                     enabled = enabled,
                     readOnly = readOnly,
                     singleLine = singleLine,

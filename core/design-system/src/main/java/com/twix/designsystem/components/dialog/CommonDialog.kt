@@ -119,7 +119,7 @@ private fun DialogContent(
                 modifier =
                     Modifier
                         .padding(horizontal = 20.dp)
-                        .padding(top = 24.dp, bottom = 20.dp),
+                        .padding(top = 28.dp, bottom = 12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 content()

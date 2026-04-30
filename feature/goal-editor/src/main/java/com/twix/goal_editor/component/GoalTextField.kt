@@ -74,6 +74,7 @@ fun GoalTextField(
                 },
         value = internalValue,
         placeHolder = stringResource(R.string.goal_editor_text_field_placeholder),
+        maxLength = 14,
         onValueChange = { internalValue = it },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions =

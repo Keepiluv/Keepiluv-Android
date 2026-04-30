@@ -1,5 +1,6 @@
 package com.twix.goal_editor.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,11 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.R
 import com.twix.designsystem.components.text_field.UnderlineTextField
+import com.twix.ui.extension.noRippleClickable
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -75,6 +78,7 @@ fun GoalTextField(
         value = internalValue,
         placeHolder = stringResource(R.string.goal_editor_text_field_placeholder),
         maxLength = 14,
+        showTrailing = internalValue.isNotBlank(),
         onValueChange = { internalValue = it },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions =
@@ -84,5 +88,12 @@ fun GoalTextField(
                     focusManager.clearFocus(force = true)
                 },
             ),
+        trailing = {
+            Image(
+                painter = painterResource(R.drawable.ic_clear_text),
+                contentDescription = null,
+                modifier = Modifier.noRippleClickable { internalValue = "" },
+            )
+        },
     )
 }

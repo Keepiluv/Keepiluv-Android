@@ -1,11 +1,15 @@
 package com.twix.designsystem.components.button
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -33,17 +37,20 @@ fun AppButton(
         border = border,
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier,
+        modifier =
+            modifier
+                .height(52.dp),
     ) {
-        AppText(
-            text = text,
-            color = textColor,
-            style = AppTextStyle.T2,
-            textAlign = TextAlign.Center,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 14.dp),
-        )
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
+        ) {
+            AppText(
+                text = text,
+                color = textColor,
+                style = AppTextStyle.T2,
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }

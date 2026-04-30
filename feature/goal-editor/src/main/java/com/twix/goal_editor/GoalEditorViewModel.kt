@@ -58,15 +58,28 @@ class GoalEditorViewModel(
     }
 
     private fun setStartDate(startDate: LocalDate) {
-        reduce { copy(startDate = startDate) }
+        reduce {
+            val validStartDate = startDate.validStartDate()
+            copy(
+                startDate = validStartDate,
+                endDate = endDate.validEndDate(validStartDate),
+            )
+        }
     }
 
     private fun setEndDate(endDate: LocalDate) {
-        reduce { copy(endDate = endDate) }
+        reduce {
+            copy(endDate = endDate.validEndDate(startDate))
+        }
     }
 
     private fun setEndDateEnabled(enabled: Boolean) {
-        reduce { copy(endDateEnabled = enabled) }
+        reduce {
+            copy(
+                endDateEnabled = enabled,
+                endDate = if (enabled) endDate.validEndDate(startDate) else endDate,
+            )
+        }
     }
 
     private fun setGoal(goal: GoalDetail) {
@@ -76,7 +89,8 @@ class GoalEditorViewModel(
                 selectedIcon = goal.icon,
                 selectedRepeatCycle = goal.repeatCycle,
                 repeatCount = goal.repeatCount,
-                endDate = goal.endDate ?: LocalDate.now(),
+                startDate = goal.startDate.validStartDate(),
+                endDate = (goal.endDate ?: LocalDate.now()).validEndDate(goal.startDate.validStartDate()),
                 endDateEnabled = goal.endDate != null,
             )
         }
@@ -188,4 +202,8 @@ class GoalEditorViewModel(
             repeatCount = repeatCount,
             endDate = if (endDateEnabled) endDate else null,
         )
+
+    private fun LocalDate.validStartDate(): LocalDate = maxOf(this, LocalDate.now())
+
+    private fun LocalDate.validEndDate(startDate: LocalDate): LocalDate = maxOf(this, LocalDate.now(), startDate)
 }

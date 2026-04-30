@@ -134,6 +134,7 @@ private fun CalendarContent(
             modifier =
                 Modifier
                     .fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             for (week in 0 until grid.weeks) {
                 Row(

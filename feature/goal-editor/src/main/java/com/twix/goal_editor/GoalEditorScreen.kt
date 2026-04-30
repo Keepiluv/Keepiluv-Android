@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -332,36 +333,22 @@ private fun RepeatCountBottomSheetContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            AppText(
+            RepeatCycleChip(
                 text = RepeatCycle.WEEKLY.label(),
-                style = AppTextStyle.B2,
-                color = if (internalSelectedRepeatType == RepeatCycle.WEEKLY) CommonColor.White else GrayColor.C500,
-                modifier =
-                    Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(if (internalSelectedRepeatType == RepeatCycle.WEEKLY) GrayColor.C500 else CommonColor.White)
-                        .border(1.dp, GrayColor.C500, RoundedCornerShape(8.dp))
-                        .padding(horizontal = 12.dp, vertical = 5.5.dp)
-                        .noRippleClickable(onClick = {
-                            internalSelectedRepeatType = RepeatCycle.WEEKLY
-                            internalRepeatCount = 1
-                        }),
+                selected = internalSelectedRepeatType == RepeatCycle.WEEKLY,
+                onClick = {
+                    internalSelectedRepeatType = RepeatCycle.WEEKLY
+                    internalRepeatCount = 1
+                },
             )
 
-            AppText(
+            RepeatCycleChip(
                 text = RepeatCycle.MONTHLY.label(),
-                style = AppTextStyle.B2,
-                color = if (internalSelectedRepeatType == RepeatCycle.MONTHLY) CommonColor.White else GrayColor.C500,
-                modifier =
-                    Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(if (internalSelectedRepeatType == RepeatCycle.MONTHLY) GrayColor.C500 else CommonColor.White)
-                        .border(1.dp, GrayColor.C500, RoundedCornerShape(8.dp))
-                        .padding(horizontal = 12.dp, vertical = 5.5.dp)
-                        .noRippleClickable(onClick = {
-                            internalSelectedRepeatType = RepeatCycle.MONTHLY
-                            internalRepeatCount = 1
-                        }),
+                selected = internalSelectedRepeatType == RepeatCycle.MONTHLY,
+                onClick = {
+                    internalSelectedRepeatType = RepeatCycle.MONTHLY
+                    internalRepeatCount = 1
+                },
             )
         }
 
@@ -386,25 +373,34 @@ private fun RepeatCountBottomSheetContent(
             Row(
                 modifier =
                     Modifier
-                        .width(96.dp)
+                        .size(width = 96.dp, height = 58.dp)
                         .border(1.dp, GrayColor.C300, RoundedCornerShape(12.dp))
-                        .padding(horizontal = 27.5.dp, vertical = 12.dp),
+                        .padding(vertical = 12.dp)
+                        .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
             ) {
-                AppText(
-                    text = internalRepeatCount.toString(),
-                    style = AppTextStyle.H2,
-                    color = GrayColor.C500,
-                )
-
-                Spacer(Modifier.width(8.dp))
-
                 Box(
                     modifier =
                         Modifier
-                            .size(24.dp),
+                            .weight(1f),
                     contentAlignment = Alignment.Center,
+                ) {
+                    Box(
+                        modifier = Modifier.width(35.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        AppText(
+                            text = internalRepeatCount.toString(),
+                            style = AppTextStyle.H2,
+                            color = GrayColor.C500,
+                        )
+                    }
+                }
+
+                Box(
+                    modifier = Modifier.width(16.dp),
+                    contentAlignment = Alignment.CenterStart,
                 ) {
                     AppText(
                         text = stringResource(R.string.word_count),
@@ -436,6 +432,31 @@ private fun RepeatCountBottomSheetContent(
                     .padding(horizontal = 20.dp, vertical = 8.dp)
                     .fillMaxWidth(),
             text = stringResource(R.string.word_completion),
+        )
+    }
+}
+
+@Composable
+private fun RepeatCycleChip(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier =
+            Modifier
+                .size(width = 56.dp, height = 32.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(if (selected) GrayColor.C500 else CommonColor.White)
+                .border(1.dp, GrayColor.C500, RoundedCornerShape(8.dp))
+                .noRippleClickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        AppText(
+            text = text,
+            style = AppTextStyle.B2,
+            color = if (selected) CommonColor.White else GrayColor.C500,
+            textAlign = TextAlign.Center,
         )
     }
 }

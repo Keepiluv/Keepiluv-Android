@@ -132,6 +132,14 @@ fun GoalEditorScreen(
     var isEndDate by remember { mutableStateOf(true) }
     var internalSelectedIcon by remember { mutableStateOf(uiState.selectedIcon) }
     val scrollState = rememberScrollState()
+    val today = LocalDate.now()
+    val calendarMinDate = if (isEndDate) maxOf(today, uiState.startDate) else today
+    val calendarInitialDate =
+        if (isEndDate) {
+            maxOf(uiState.endDate, calendarMinDate)
+        } else {
+            maxOf(uiState.startDate, calendarMinDate)
+        }
 
     Box {
         Column(
@@ -214,7 +222,8 @@ fun GoalEditorScreen(
             onDismissRequest = { showCalendarBottomSheet = false },
             content = {
                 Calendar(
-                    initialDate = if (isEndDate) uiState.endDate else uiState.startDate,
+                    initialDate = calendarInitialDate,
+                    isDateSelectable = { !it.isBefore(calendarMinDate) },
                     onComplete = {
                         if (isEndDate) onCommitEndDate(it) else onCommitStartDate(it)
                         showCalendarBottomSheet = false

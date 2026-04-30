@@ -37,6 +37,7 @@ import java.time.LocalDate
 @Composable
 fun Calendar(
     initialDate: LocalDate,
+    isDateSelectable: (LocalDate) -> Boolean = { true },
     onComplete: (LocalDate) -> Unit,
 ) {
     // 헤더의 날짜를 나타내는 상태 변수
@@ -62,6 +63,7 @@ fun Calendar(
         CalendarContent(
             headerDate = headerDate,
             selectedDate = selectedDate,
+            isDateSelectable = isDateSelectable,
             onDateClick = { selectedDate = it },
         )
 
@@ -74,6 +76,7 @@ fun Calendar(
                     .padding(vertical = 8.dp)
                     .fillMaxWidth(),
             text = stringResource(R.string.word_completion),
+            enabled = isDateSelectable(selectedDate),
             onClick = { onComplete(selectedDate) },
         )
     }
@@ -83,6 +86,7 @@ fun Calendar(
 private fun CalendarContent(
     headerDate: LocalDate,
     selectedDate: LocalDate,
+    isDateSelectable: (LocalDate) -> Boolean,
     cellSize: Dp = 40.dp,
     onDateClick: (LocalDate) -> Unit,
 ) {
@@ -148,11 +152,13 @@ private fun CalendarContent(
                         val date = grid.days[index]
                         val inMonth = date.month == grid.month.month && date.year == grid.month.year
                         val isSelected = date == selectedDate
+                        val isSelectable = isDateSelectable(date)
 
                         DayCell(
                             date = date,
                             inMonth = inMonth,
                             isSelected = isSelected,
+                            isSelectable = isSelectable,
                             onClick = { onDateClick(date) },
                         )
                     }
@@ -167,12 +173,14 @@ private fun DayCell(
     date: LocalDate,
     inMonth: Boolean, // 현재 보고 있는 월에 포함되는 날짜인지 나타내는 변수
     isSelected: Boolean,
+    isSelectable: Boolean,
     cellSize: Dp = 40.dp,
     onClick: () -> Unit,
 ) {
     val dayTextColor =
         when {
-            isSelected -> CommonColor.White
+            isSelected && isSelectable -> CommonColor.White
+            !isSelectable -> GrayColor.C200
             inMonth -> GrayColor.C500
             else -> GrayColor.C200
         }
@@ -182,8 +190,8 @@ private fun DayCell(
             Modifier
                 .size(cellSize)
                 .clip(CircleShape)
-                .background(if (isSelected) GrayColor.C500 else CommonColor.White)
-                .noRippleClickable(enabled = inMonth, onClick = onClick),
+                .background(if (isSelected && isSelectable) GrayColor.C500 else CommonColor.White)
+                .noRippleClickable(enabled = inMonth && isSelectable, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         AppText(

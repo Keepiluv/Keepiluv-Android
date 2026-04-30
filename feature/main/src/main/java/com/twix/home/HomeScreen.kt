@@ -375,7 +375,7 @@ fun GoalList(
                         color = GrayColor.C500,
                         modifier =
                             Modifier
-                                .noRippleClickable(onClick = onEditClick)
+                                .noRippleClickable(onClick = onEditClick),
                     )
                 }
             }

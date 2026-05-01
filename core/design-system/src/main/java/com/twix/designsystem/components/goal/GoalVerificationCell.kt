@@ -65,7 +65,7 @@ fun GoalVerificationCell(
                     Image(
                         painter = painterResource(it.toRes()),
                         contentDescription = null,
-                        modifier = Modifier.size(32.dp),
+                        modifier = Modifier.size(40.dp),
                     )
                 }
             }

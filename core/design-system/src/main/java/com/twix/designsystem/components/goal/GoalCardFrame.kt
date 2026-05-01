@@ -35,7 +35,7 @@ fun GoalCardFrame(
     right: @Composable RowScope.() -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val shape = RoundedCornerShape(16.dp)
+    val shape = RoundedCornerShape(12.dp)
 
     Column(
         modifier =
@@ -56,7 +56,7 @@ fun GoalCardFrame(
             Image(
                 painter = painterResource(goalIcon.toRes()),
                 contentDescription = null,
-                modifier = Modifier.size(22.dp),
+                modifier = Modifier.size(32.dp),
             )
 
             Spacer(Modifier.width(10.dp))

@@ -3,6 +3,8 @@ package com.twix.home
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,23 +16,35 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -62,6 +76,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import java.time.LocalDate
+import kotlin.math.roundToInt
 
 @Composable
 fun HomeRoute(
@@ -170,6 +185,7 @@ fun HomeRoute(
         onSettingClick = navigateToSettings,
         onNotificationClick = navigateToNotification,
         onPokeGoal = { viewModel.dispatch(HomeIntent.PokeGoal(it)) },
+        onRefresh = { viewModel.dispatch(HomeIntent.Refresh) },
     )
 }
 
@@ -189,6 +205,7 @@ fun HomeScreen(
     onSettingClick: () -> Unit,
     onNotificationClick: () -> Unit,
     onPokeGoal: (Long) -> Unit,
+    onRefresh: () -> Unit,
 ) {
     Box(
         modifier =
@@ -223,7 +240,6 @@ fun HomeScreen(
                     text = stringResource(R.string.home_empty_goal_guide),
                 )
             } else {
-                Spacer(Modifier.height(12.dp))
                 GoalList(
                     modifier =
                         Modifier
@@ -231,10 +247,12 @@ fun HomeScreen(
                             .weight(1f),
                     goals = uiState.goalList.goals,
                     selectedDate = uiState.selectedDate,
+                    isRefreshing = uiState.isRefreshing,
                     onVerificationClick = onVerificationClick,
                     onEditClick = onEditClick,
                     onClickGoalCard = onClickCard,
                     onPokeGoal = onPokeGoal,
+                    onRefresh = onRefresh,
                 )
             }
         }
@@ -254,10 +272,12 @@ fun GoalList(
     modifier: Modifier = Modifier,
     goals: List<Goal>,
     selectedDate: LocalDate,
+    isRefreshing: Boolean,
     onVerificationClick: (Long, GoalCheckState) -> Unit,
     onClickGoalCard: (Long, LocalDate, BetweenUs) -> Unit,
     onEditClick: () -> Unit,
     onPokeGoal: (Long) -> Unit,
+    onRefresh: () -> Unit,
 ) {
     val today = remember { LocalDate.now() }
     val titleRes =
@@ -270,74 +290,181 @@ fun GoalList(
         }
     val title = stringResource(titleRes)
 
-    LazyColumn(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        contentPadding = PaddingValues(bottom = 20.dp),
+    val listState = rememberLazyListState()
+    val density = androidx.compose.ui.platform.LocalDensity.current
+
+    val refreshTriggerPx = with(density) { 88.dp.toPx() }
+    val refreshingHoldPx = with(density) { 56.dp.toPx() }
+    val maxPullPx = with(density) { 140.dp.toPx() }
+
+    var pullOffsetPx by remember { mutableFloatStateOf(0f) }
+
+    val animatedPullOffsetPx by animateFloatAsState(
+        targetValue =
+            when {
+                isRefreshing -> refreshingHoldPx
+                else -> pullOffsetPx
+            },
+        animationSpec = spring(),
+        label = "pull_offset",
+    )
+
+    LaunchedEffect(isRefreshing) {
+        if (!isRefreshing) {
+            pullOffsetPx = 0f
+        }
+    }
+
+    val nestedScrollConnection =
+        remember(listState, isRefreshing) {
+            object : NestedScrollConnection {
+                override fun onPreScroll(
+                    available: Offset,
+                    source: NestedScrollSource,
+                ): Offset {
+                    if (source != NestedScrollSource.Drag) return Offset.Zero
+
+                    val isAtTop =
+                        listState.firstVisibleItemIndex == 0 &&
+                            listState.firstVisibleItemScrollOffset == 0
+
+                    val delta = available.y
+
+                    if (delta > 0 && isAtTop && !isRefreshing) {
+                        val newOffset =
+                            (pullOffsetPx + (delta * 0.5f))
+                                .coerceAtMost(maxPullPx)
+                        val consumed = newOffset - pullOffsetPx
+                        pullOffsetPx = newOffset
+                        return Offset(x = 0f, y = consumed / 0.5f)
+                    }
+
+                    if (delta < 0 && pullOffsetPx > 0f) {
+                        val newOffset = (pullOffsetPx + delta).coerceAtLeast(0f)
+                        val consumed = newOffset - pullOffsetPx
+                        pullOffsetPx = newOffset
+                        return Offset(x = 0f, y = consumed)
+                    }
+
+                    return Offset.Zero
+                }
+
+                override suspend fun onPreFling(available: Velocity): Velocity {
+                    if (pullOffsetPx >= refreshTriggerPx && !isRefreshing) {
+                        onRefresh()
+                    } else if (!isRefreshing) {
+                        pullOffsetPx = 0f
+                    }
+                    return Velocity.Zero
+                }
+            }
+        }
+
+    Box(
+        modifier = modifier.nestedScroll(nestedScrollConnection),
     ) {
-        item {
-            Row(
-                modifier =
-                    Modifier
-                        .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                AppText(
-                    text = title,
-                    style = AppTextStyle.B1,
-                    color = GrayColor.C500,
-                )
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding =
+                PaddingValues(
+                    top = 20.dp + with(density) { animatedPullOffsetPx.toDp() },
+                    bottom = 20.dp,
+                ),
+        ) {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    AppText(
+                        text = title,
+                        style = AppTextStyle.B1,
+                        color = GrayColor.C500,
+                    )
 
-                Spacer(Modifier.weight(1f))
+                    Spacer(Modifier.weight(1f))
 
-                Image(
-                    painter = painterResource(R.drawable.ic_edit),
-                    contentDescription = null,
-                    modifier =
-                        Modifier
-                            .size(24.dp)
-                            .noRippleClickable { onEditClick() },
+                    AppText(
+                        text = stringResource(R.string.word_edit),
+                        style = AppTextStyle.B1,
+                        color = GrayColor.C500,
+                        modifier =
+                            Modifier
+                                .noRippleClickable(onClick = onEditClick),
+                    )
+                }
+            }
+
+            items(goals, key = { it.goalId }) { goal ->
+                GoalCardFrame(
+                    modifier = Modifier.fillMaxWidth(),
+                    goalName = goal.name,
+                    goalIcon = goal.icon,
+                    right = {
+                        GoalCheckIndicator(
+                            state = goal.checkState(),
+                            onClick = { onVerificationClick(goal.goalId, it) },
+                        )
+                    },
+                    content = {
+                        if (goal.myVerification != null || goal.partnerVerification != null) {
+                            GoalVerifications(
+                                myVerification = goal.myVerification,
+                                partnerVerification = goal.partnerVerification,
+                                onMyClick = {
+                                    onClickGoalCard(
+                                        goal.goalId,
+                                        selectedDate,
+                                        BetweenUs.ME,
+                                    )
+                                },
+                                onPartnerClick = {
+                                    onClickGoalCard(
+                                        goal.goalId,
+                                        selectedDate,
+                                        BetweenUs.PARTNER,
+                                    )
+                                },
+                                onPokeGoal = { onPokeGoal(goal.goalId) },
+                            )
+                        }
+                    },
                 )
             }
         }
 
-        items(goals, key = { it.goalId }) { goal ->
-            GoalCardFrame(
-                modifier =
-                    Modifier
-                        .fillMaxWidth(),
-                goalName = goal.name,
-                goalIcon = goal.icon,
-                right = {
-                    GoalCheckIndicator(
-                        state = goal.checkState(),
-                        onClick = { onVerificationClick(goal.goalId, it) },
-                    )
-                },
-                content = {
-                    if (goal.myVerification != null || goal.partnerVerification != null) {
-                        GoalVerifications(
-                            myVerification = goal.myVerification,
-                            partnerVerification = goal.partnerVerification,
-                            onMyClick = {
-                                onClickGoalCard(
-                                    goal.goalId,
-                                    selectedDate,
-                                    BetweenUs.ME,
-                                )
-                            },
-                            onPartnerClick = {
-                                onClickGoalCard(
-                                    goal.goalId,
-                                    selectedDate,
-                                    BetweenUs.PARTNER,
-                                )
-                            },
-                            onPokeGoal = { onPokeGoal(goal.goalId) },
+        val indicatorAlpha =
+            if (animatedPullOffsetPx <= 0f) {
+                0f
+            } else {
+                (animatedPullOffsetPx / refreshTriggerPx).coerceIn(0f, 1f)
+            }
+
+        Box(
+            modifier =
+                Modifier
+                    .align(Alignment.TopCenter)
+                    .offset {
+                        IntOffset(
+                            x = 0,
+                            y =
+                                ((animatedPullOffsetPx - with(density) { 32.dp.toPx() }) / 2f)
+                                    .coerceAtLeast(0f)
+                                    .roundToInt(),
                         )
-                    }
-                },
-            )
+                    },
+            contentAlignment = Alignment.Center,
+        ) {
+            if (animatedPullOffsetPx > 0f || isRefreshing) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.5.dp,
+                    color = GrayColor.C500,
+                    trackColor = GrayColor.C100.copy(alpha = indicatorAlpha),
+                )
+            }
         }
     }
 }
@@ -351,7 +478,11 @@ private fun AddGoalButton(
         modifier =
             modifier
                 .size(56.dp)
-                .background(GrayColor.C500, CircleShape)
+                .shadow(
+                    elevation = 8.dp,
+                    shape = CircleShape,
+                    clip = false,
+                ).background(GrayColor.C500, CircleShape)
                 .border(1.dp, GrayColor.C300, CircleShape)
                 .noRippleClickable(onClick = onClick),
         contentAlignment = Alignment.Center,

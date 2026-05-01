@@ -97,7 +97,10 @@ class GoalEditorViewModel(
     }
 
     private suspend fun save(id: Long) {
+        if (currentState.isSaving) return
         if (!validateSaveInput()) return
+
+        reduce { copy(isSaving = true) }
 
         if (id == -1L) createGoal() else updateGoal(id)
     }
@@ -129,6 +132,7 @@ class GoalEditorViewModel(
     private fun createGoal() {
         launchResult(
             block = { goalRepository.createGoal(currentState.toCreateParam()) },
+            onFinally = { reduce { copy(isSaving = false) } },
             onSuccess = { onGoalSaveSuccess(isUpdate = false) },
             onError = {
                 emitSideEffect(
@@ -144,6 +148,7 @@ class GoalEditorViewModel(
     private fun updateGoal(id: Long) {
         launchResult(
             block = { goalRepository.updateGoal(currentState.toUpdateParam(id)) },
+            onFinally = { reduce { copy(isSaving = false) } },
             onSuccess = { onGoalSaveSuccess(isUpdate = true) },
             onError = {
                 emitSideEffect(

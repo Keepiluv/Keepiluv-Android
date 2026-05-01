@@ -207,6 +207,7 @@ fun GoalEditorScreen(
                 onClick = onComplete,
                 textColor = if (uiState.canSave) CommonColor.White else GrayColor.C300,
                 backgroundColor = if (uiState.canSave) GrayColor.C500 else GrayColor.C100,
+                enabled = uiState.canSave,
                 modifier =
                     Modifier
                         .padding(horizontal = 20.dp)

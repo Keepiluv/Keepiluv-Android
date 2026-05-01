@@ -15,6 +15,7 @@ data class GoalEditorUiState(
     val startDate: LocalDate = LocalDate.now(),
     val endDateEnabled: Boolean = false,
     val endDate: LocalDate = LocalDate.now(),
+    val isSaving: Boolean = false,
 ) : State {
     val isSaveEnabled: Boolean
         get() = goalTitle.isNotBlank()
@@ -23,5 +24,5 @@ data class GoalEditorUiState(
         get() = !endDateEnabled || !endDate.isBefore(startDate)
 
     val canSave: Boolean
-        get() = isSaveEnabled && isEndDateValid
+        get() = isSaveEnabled && isEndDateValid && !isSaving
 }

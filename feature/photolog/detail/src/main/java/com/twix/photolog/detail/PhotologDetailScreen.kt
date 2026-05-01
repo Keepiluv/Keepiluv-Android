@@ -1,6 +1,7 @@
 package com.twix.photolog.detail
 
 import android.Manifest
+import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -33,6 +34,7 @@ import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalReactionType
+import com.twix.domain.model.time.CooldownTime
 import com.twix.photolog.detail.component.PhotologCardContent
 import com.twix.photolog.detail.component.PhotologDetailTopBar
 import com.twix.photolog.detail.component.reaction.ReactionContent
@@ -45,7 +47,6 @@ import com.twix.photolog.detail.preview.PhotologDetailPreviewProvider
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.findActivity
 import com.twix.ui.extension.hasCameraPermission
-import com.twix.util.CooldownFormatter
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -75,18 +76,16 @@ fun PhotologDetailRoute(
 
             PhotologDetailSideEffect.ShowPokeToast -> {
                 toastManager.tryShow(
-                    ToastData(currentContext.getString(R.string.toast_poke_goal_success), ToastType.LIKE),
+                    ToastData(
+                        currentContext.getString(R.string.toast_poke_goal_success),
+                        ToastType.LIKE,
+                    ),
                 )
             }
 
             is PhotologDetailSideEffect.ShowPokeCooldownToast -> {
-                val cooldown = CooldownFormatter.format(sideEffect.remainingMs)
-                val timeLabel =
-                    if (cooldown.hours > 0) {
-                        currentContext.getString(R.string.cooldown_hours_minutes, cooldown.hours, cooldown.minutes)
-                    } else {
-                        currentContext.getString(R.string.cooldown_minutes, cooldown.minutes)
-                    }
+                val cooldownTime = CooldownTime.from(sideEffect.remainingMs)
+                val timeLabel = formatCooldownTime(context, cooldownTime)
                 toastManager.tryShow(
                     ToastData(
                         currentContext.getString(R.string.toast_poke_cooldown, timeLabel),
@@ -215,6 +214,31 @@ fun PhotologDetailScreen(
         }
     }
 }
+
+private fun formatCooldownTime(
+    context: Context,
+    cooldownTime: CooldownTime,
+): String =
+    when (cooldownTime) {
+        is CooldownTime.Hours ->
+            context.getString(
+                R.string.hours_only,
+                cooldownTime.value,
+            )
+
+        is CooldownTime.HoursAndMinutes ->
+            context.getString(
+                R.string.hours_minutes,
+                cooldownTime.hours,
+                cooldownTime.minutes,
+            )
+
+        is CooldownTime.Minutes ->
+            context.getString(
+                R.string.minutes_only,
+                cooldownTime.value,
+            )
+    }
 
 @Preview(showBackground = true)
 @Composable

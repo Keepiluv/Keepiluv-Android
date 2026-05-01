@@ -19,6 +19,7 @@ import com.twix.designsystem.components.photolog.BackgroundCard
 import com.twix.designsystem.components.photolog.ForegroundCard
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.BetweenUs
+import com.twix.domain.model.time.CertificationTime
 import com.twix.photolog.detail.component.reaction.ReactionUiModel
 import com.twix.photolog.detail.component.swipe.SwipeableCard
 import com.twix.photolog.detail.contract.PhotologDetailUiState
@@ -45,10 +46,13 @@ internal fun PhotologCardContent(
             }
 
         Box {
-            // 뒷 카드 (BackgroundCard) - 드래그 중이 아닐 때만 표시
+            // 뒷 카드
             if (swipeState.cardOffset == 0f) {
                 BackgroundCard(
-                    uploadedAt = uiState.displayedGoalUpdateAt,
+                    uploadedAt =
+                        uiState.displayedGoalUploadedAt?.let { certifiedAt ->
+                            formatCertificationTime(CertificationTime.from(certifiedAt))
+                        } ?: "",
                     actionLabel =
                         when (uiState.currentShow) {
                             BetweenUs.ME -> stringResource(R.string.photolog_picture_upload)
@@ -115,6 +119,7 @@ internal fun PhotologCardContent(
                 modifier =
                     Modifier
                         .align(Alignment.TopEnd)
+                        .zIndex(2f)
                         .offset(x = (-8).dp, y = (-13).dp),
             )
         }
@@ -147,6 +152,15 @@ private fun MyReactionBadge(
         }
     }
 }
+
+@Composable
+private fun formatCertificationTime(time: CertificationTime): String =
+    when (time) {
+        is CertificationTime.JustNow -> stringResource(R.string.certification_time_just_now)
+        is CertificationTime.Minutes -> stringResource(R.string.certification_time_minutes_ago, time.value)
+        is CertificationTime.Hours -> stringResource(R.string.certification_time_hours_ago, time.value)
+        is CertificationTime.Days -> stringResource(R.string.certification_time_days_ago, time.value)
+    }
 
 @Preview(showBackground = true)
 @Composable

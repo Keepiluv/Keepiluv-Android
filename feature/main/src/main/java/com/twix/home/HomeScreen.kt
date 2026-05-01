@@ -1,6 +1,7 @@
 package com.twix.home
 
 import android.Manifest
+import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
@@ -65,13 +66,13 @@ import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalCheckState
 import com.twix.domain.model.goal.Goal
 import com.twix.domain.model.goal.checkState
+import com.twix.domain.model.time.CooldownTime
 import com.twix.home.component.GoalVerifications
 import com.twix.home.component.HomeTopBar
 import com.twix.home.model.HomeUiState
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.findActivity
 import com.twix.ui.extension.noRippleClickable
-import com.twix.util.CooldownFormatter
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
@@ -151,13 +152,8 @@ fun HomeRoute(
                 )
 
             is HomeSideEffect.ShowPokeCooldownToast -> {
-                val cooldown = CooldownFormatter.format(sideEffect.remainingMs)
-                val timeLabel =
-                    if (cooldown.hours > 0) {
-                        currentContext.getString(R.string.cooldown_hours_minutes, cooldown.hours, cooldown.minutes)
-                    } else {
-                        currentContext.getString(R.string.cooldown_minutes, cooldown.minutes)
-                    }
+                val cooldownTime = CooldownTime.from(sideEffect.remainingMs)
+                val timeLabel = formatCooldownTime(context, cooldownTime)
                 toastManager.show(
                     ToastData(
                         currentContext.getString(R.string.toast_poke_cooldown, timeLabel),
@@ -497,3 +493,28 @@ private fun AddGoalButton(
         )
     }
 }
+
+private fun formatCooldownTime(
+    context: Context,
+    cooldownTime: CooldownTime,
+): String =
+    when (cooldownTime) {
+        is CooldownTime.Hours ->
+            context.getString(
+                R.string.hours_only,
+                cooldownTime.value,
+            )
+
+        is CooldownTime.HoursAndMinutes ->
+            context.getString(
+                R.string.hours_minutes,
+                cooldownTime.hours,
+                cooldownTime.minutes,
+            )
+
+        is CooldownTime.Minutes ->
+            context.getString(
+                R.string.minutes_only,
+                cooldownTime.value,
+            )
+    }

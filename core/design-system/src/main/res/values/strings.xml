@@ -43,6 +43,11 @@
     <string name="date_year_month_day">%s년 %02d월 %02d일</string>
     <string name="date_year_month_day_no_padding">%1$d년 %2$d월 %3$d일</string>
 
+    <!-- 시간 포맷 -->
+    <string name="hours_only">%d시간</string>
+    <string name="hours_minutes">%d시간 %d분</string>
+    <string name="minutes_only">%d분</string>
+
     <!-- 동작 -->
     <string name="action_edit">수정하기</string>
     <string name="action_delete">삭제하기</string>
@@ -119,8 +124,6 @@
     <string name="toast_poke_goal_success">상대방을 찔렀어요!</string>
     <string name="toast_poke_goal_failed">찌르기에 실패했습니다.</string>
     <string name="toast_poke_cooldown">%1$s 뒤에 다시 찌를 수 있어요</string>
-    <string name="cooldown_hours_minutes">%1$d시간 %2$d분</string>
-    <string name="cooldown_minutes">%1$d분</string>
     <string name="toast_already_used_invite_code_message">이미 사용된 초대 코드입니다.</string>
     <string name="toast_invite_code_copy">초대 코드가 복사되었어요</string>
     <string name="toast_invalid_invite_code">잘못된 초대 코드입니다</string>
@@ -201,5 +204,11 @@
     <string name="onboarding_dday_plz_set_dday">우리의 기념일을 등록해 주세요</string>
     <string name="onboarding_dday_placeholder">YYYY-MM-DD</string>
     <string name="onboarding_dday_setup_fail">기념일 설정에 실패했습니다.</string>
+
+    <!-- 인증 시간 -->
+    <string name="certification_time_just_now">방금 전</string>
+    <string name="certification_time_minutes_ago">%d분 전</string>
+    <string name="certification_time_hours_ago">%d시간 전</string>
+    <string name="certification_time_days_ago">%d일 전</string>
 
 </resources>

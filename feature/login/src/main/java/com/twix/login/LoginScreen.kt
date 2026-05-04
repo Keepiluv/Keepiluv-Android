@@ -75,16 +75,17 @@ fun LoginRoute(
     Box(modifier = Modifier.fillMaxSize()) {
         when {
             isLoading -> TwixLoadingOverlay()
-            hasException -> ErrorScreen(
-                showBackButton = false,
-                onClickBack = {},
-                onClickRetry = { viewModel.clearException(showException = true) },
-            )
-            else -> LoginScreen { type ->
-                coroutineScope.launch {
-                    viewModel.dispatch(LoginIntent.Login(loginProvider[type].login()))
+            hasException ->
+                ErrorScreen(
+                    onClickRetry = { viewModel.clearException(showException = true) },
+                    showBackButton = false,
+                )
+            else ->
+                LoginScreen { type ->
+                    coroutineScope.launch {
+                        viewModel.dispatch(LoginIntent.Login(loginProvider[type].login()))
+                    }
                 }
-            }
         }
     }
 }

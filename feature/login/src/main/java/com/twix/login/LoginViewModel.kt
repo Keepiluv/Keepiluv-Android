@@ -24,22 +24,34 @@ class LoginViewModel(
     }
 
     private fun login(result: LoginResult) {
-        viewModelScope.launch {
-            when (result) {
-                is LoginResult.Success -> {
-                    authRepository.login(result.idToken, result.type)
-                    checkOnboardingStatus()
-                }
+        when (result) {
+            is LoginResult.Success -> {
+                launchResult(
+                    block = { authRepository.login(result.idToken, result.type) },
+                    onSuccess = { checkOnboardingStatus() },
+                    onError = {
+                        tryEmitSideEffect(
+                            LoginSideEffect.ShowToast(
+                                message = R.string.login_fail_message,
+                                type = ToastType.ERROR,
+                            ),
+                        )
+                    },
+                    showLoading = true,
+                    showException = true,
+                )
+            }
 
-                is LoginResult.Failure -> {
+            is LoginResult.Failure -> {
+                tryEmitSideEffect(
                     LoginSideEffect.ShowToast(
                         message = R.string.login_fail_message,
                         type = ToastType.ERROR,
-                    )
-                }
-
-                LoginResult.Cancel -> Unit
+                    ),
+                )
             }
+
+            LoginResult.Cancel -> Unit
         }
     }
 
@@ -47,28 +59,28 @@ class LoginViewModel(
         launchResult(
             block = { onBoardingRepository.fetchOnboardingStatus() },
             onSuccess = { onboardingStatus ->
-                viewModelScope.launch {
-                    val sideEffect =
-                        when (onboardingStatus) {
-                            OnboardingStatus.COUPLE_CONNECTION,
-                            OnboardingStatus.PROFILE_SETUP,
-                            OnboardingStatus.ANNIVERSARY_SETUP,
-                            -> LoginSideEffect.NavigateToOnBoarding(onboardingStatus)
+                val sideEffect =
+                    when (onboardingStatus) {
+                        OnboardingStatus.COUPLE_CONNECTION,
+                        OnboardingStatus.PROFILE_SETUP,
+                        OnboardingStatus.ANNIVERSARY_SETUP,
+                        -> LoginSideEffect.NavigateToOnBoarding(onboardingStatus)
 
-                            OnboardingStatus.COMPLETED -> LoginSideEffect.NavigateToHome
-                        }
+                        OnboardingStatus.COMPLETED -> LoginSideEffect.NavigateToHome
+                    }
 
-                    emitSideEffect(sideEffect)
-                }
+                tryEmitSideEffect(sideEffect)
             },
             onError = {
-                emitSideEffect(
+                tryEmitSideEffect(
                     LoginSideEffect.ShowToast(
                         message = R.string.fetch_onboarding_status_fail_message,
                         type = ToastType.ERROR,
                     ),
                 )
             },
+            showLoading = false,
+            showException = true,
         )
     }
 }

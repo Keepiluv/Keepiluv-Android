@@ -3,6 +3,7 @@ package com.twix.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +22,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -50,6 +54,8 @@ fun LoginRoute(
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val hasException by viewModel.hasException.collectAsStateWithLifecycle()
 
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
@@ -66,9 +72,19 @@ fun LoginRoute(
         }
     }
 
-    LoginScreen { type ->
-        coroutineScope.launch {
-            viewModel.dispatch(LoginIntent.Login(loginProvider[type].login()))
+    Box(modifier = Modifier.fillMaxSize()) {
+        when {
+            isLoading -> TwixLoadingOverlay()
+            hasException -> ErrorScreen(
+                showBackButton = false,
+                onClickBack = {},
+                onClickRetry = { viewModel.clearException(showException = true) },
+            )
+            else -> LoginScreen { type ->
+                coroutineScope.launch {
+                    viewModel.dispatch(LoginIntent.Login(loginProvider[type].login()))
+                }
+            }
         }
     }
 }

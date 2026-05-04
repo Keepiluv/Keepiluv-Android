@@ -43,9 +43,9 @@ class OnBoardingViewModel(
                     )
                 }
             },
-            onError = {
-                showToast(R.string.onboarding_couple_fetch_my_invite_code_fail, ToastType.ERROR)
-            },
+            onError = {},
+            showLoading = false,
+            showException = false,
         )
     }
 
@@ -191,6 +191,8 @@ class OnBoardingViewModel(
             block = { onBoardingRepository.profileSetup(currentState.profile.nickname) },
             onSuccess = { fetchOnboardingStatus() },
             onError = { showToast(R.string.onboarding_profile_setup_fail, ToastType.ERROR) },
+            showLoading = false,
+            showException = false,
         )
     }
 
@@ -228,6 +230,8 @@ class OnBoardingViewModel(
             onError = {
                 showToast(R.string.onboarding_dday_setup_fail, ToastType.ERROR)
             },
+            showLoading = false,
+            showException = false,
         )
     }
 
@@ -245,6 +249,8 @@ class OnBoardingViewModel(
                 )
             },
             onSuccess = {},
+            showLoading = false,
+            showException = false,
         )
     }
 

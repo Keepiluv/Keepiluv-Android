@@ -1,6 +1,5 @@
 package com.twix.login
 
-import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.login.LoginResult
@@ -11,7 +10,6 @@ import com.twix.login.contract.LoginIntent
 import com.twix.login.contract.LoginSideEffect
 import com.twix.login.contract.LoginUiState
 import com.twix.ui.base.BaseViewModel
-import kotlinx.coroutines.launch
 
 class LoginViewModel(
     private val authRepository: AuthRepository,
@@ -38,7 +36,7 @@ class LoginViewModel(
                         )
                     },
                     showLoading = true,
-                    showException = true,
+                    showException = false,
                 )
             }
 
@@ -80,7 +78,7 @@ class LoginViewModel(
                 )
             },
             showLoading = false,
-            showException = true,
+            showException = false,
         )
     }
 }

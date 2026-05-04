@@ -24,7 +24,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
-import com.twix.designsystem.components.error.ErrorScreen
 import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
@@ -55,7 +54,6 @@ fun LoginRoute(
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-    val hasException by viewModel.hasException.collectAsStateWithLifecycle()
 
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
@@ -73,19 +71,14 @@ fun LoginRoute(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        when {
-            isLoading -> TwixLoadingOverlay()
-            hasException ->
-                ErrorScreen(
-                    onClickRetry = { viewModel.clearException(showException = true) },
-                    showBackButton = false,
-                )
-            else ->
-                LoginScreen { type ->
-                    coroutineScope.launch {
-                        viewModel.dispatch(LoginIntent.Login(loginProvider[type].login()))
-                    }
+        if (isLoading) {
+            TwixLoadingOverlay()
+        } else {
+            LoginScreen { type ->
+                coroutineScope.launch {
+                    viewModel.dispatch(LoginIntent.Login(loginProvider[type].login()))
                 }
+            }
         }
     }
 }

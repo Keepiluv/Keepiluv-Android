@@ -33,20 +33,19 @@ class OnBoardingViewModel(
     private fun fetchMyInviteCode() {
         launchResult(
             block = { onBoardingRepository.fetchInviteCode() },
-            onSuccess = { fetchedInviteCode ->
-                reduce {
-                    copy(
-                        inviteCode =
-                            inviteCode.copy(
-                                myInviteCode = fetchedInviteCode.value,
-                            ),
-                    )
-                }
-            },
-            onError = {},
-            showLoading = false,
-            showException = false,
+            onSuccess = ::updateMyInviteCode,
         )
+    }
+
+    private fun updateMyInviteCode(fetchedInviteCode: InviteCode) {
+        reduce {
+            copy(
+                inviteCode =
+                    inviteCode.copy(
+                        myInviteCode = fetchedInviteCode.value,
+                    ),
+            )
+        }
     }
 
     override suspend fun handleIntent(intent: OnBoardingIntent) {
@@ -225,13 +224,12 @@ class OnBoardingViewModel(
 
     private fun anniversarySetup() {
         launchResult(
+            showException = false,
             block = { onBoardingRepository.anniversarySetup(currentState.dDay.anniversaryDate.toString()) },
             onSuccess = { tryEmitSideEffect(OnBoardingSideEffect.DdaySetting.NavigateToHome) },
             onError = {
                 showToast(R.string.onboarding_dday_setup_fail, ToastType.ERROR)
             },
-            showLoading = false,
-            showException = false,
         )
     }
 

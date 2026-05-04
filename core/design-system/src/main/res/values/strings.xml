@@ -211,4 +211,10 @@
     <string name="certification_time_hours_ago">%d시간 전</string>
     <string name="certification_time_days_ago">%d일 전</string>
 
+    <!-- 에러 화면 -->
+    <string name="error_load_failed_title">데이터를 불러오지 못했어요</string>
+    <string name="error_load_failed_message">잠시 후 다시 시도해 주세요</string>
+    <string name="error_back_button_label">뒤로가기</string>
+    <string name="error_retry_button_label">재시도</string>
+
 </resources>

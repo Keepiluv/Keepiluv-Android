@@ -17,16 +17,17 @@ class DefaultAuthRepository(
     override suspend fun login(
         idToken: String,
         type: LoginType,
-    ) {
-        val request = LoginRequest(idToken)
-        val response =
-            when (type) {
-                LoginType.GOOGLE -> service.googleLogin(request)
-                LoginType.KAKAO -> service.kakaoLogin(request)
-            }
+    ): AppResult<Unit> =
+        safeApiCall {
+            val request = LoginRequest(idToken)
+            val response =
+                when (type) {
+                    LoginType.GOOGLE -> service.googleLogin(request)
+                    LoginType.KAKAO -> service.kakaoLogin(request)
+                }
 
-        tokenProvider.saveToken(response.accessToken, response.refreshToken)
-    }
+            tokenProvider.saveToken(response.accessToken, response.refreshToken)
+        }
 
     override suspend fun logout(): AppResult<Unit> =
         safeApiCall {

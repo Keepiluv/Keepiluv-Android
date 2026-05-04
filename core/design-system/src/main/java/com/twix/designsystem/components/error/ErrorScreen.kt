@@ -28,9 +28,9 @@ import com.twix.domain.model.enums.AppTextStyle
 
 @Composable
 fun ErrorScreen(
-    onClickBack: () -> Unit,
     onClickRetry: () -> Unit,
     modifier: Modifier = Modifier,
+    onClickBack: () -> Unit = {},
     showBackButton: Boolean = true,
     title: String = stringResource(R.string.error_load_failed_title),
     message: String = stringResource(R.string.error_load_failed_message),

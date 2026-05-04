@@ -70,16 +70,14 @@ fun LoginRoute(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (isLoading) {
-            TwixLoadingOverlay()
-        } else {
-            LoginScreen { type ->
-                coroutineScope.launch {
-                    viewModel.dispatch(LoginIntent.Login(loginProvider[type].login()))
-                }
-            }
+    LoginScreen { type ->
+        coroutineScope.launch {
+            viewModel.dispatch(LoginIntent.Login(loginProvider[type].login()))
         }
+    }
+
+    if (isLoading) {
+        TwixLoadingOverlay()
     }
 }
 

@@ -30,14 +30,14 @@ class OnBoardingViewModel(
         fetchMyInviteCode()
     }
 
-    private fun fetchMyInviteCode() {
+    fun fetchMyInviteCode() {
         launchResult(
             block = { onBoardingRepository.fetchInviteCode() },
-            onSuccess = ::updateMyInviteCode,
+            onSuccess = ::reduceMyInviteCode,
         )
     }
 
-    private fun updateMyInviteCode(fetchedInviteCode: InviteCode) {
+    private fun reduceMyInviteCode(fetchedInviteCode: InviteCode) {
         reduce {
             copy(
                 inviteCode =
@@ -190,7 +190,6 @@ class OnBoardingViewModel(
             block = { onBoardingRepository.profileSetup(currentState.profile.nickname) },
             onSuccess = { fetchOnboardingStatus() },
             onError = { showToast(R.string.onboarding_profile_setup_fail, ToastType.ERROR) },
-            showLoading = false,
             showException = false,
         )
     }
@@ -227,9 +226,7 @@ class OnBoardingViewModel(
             showException = false,
             block = { onBoardingRepository.anniversarySetup(currentState.dDay.anniversaryDate.toString()) },
             onSuccess = { tryEmitSideEffect(OnBoardingSideEffect.DdaySetting.NavigateToHome) },
-            onError = {
-                showToast(R.string.onboarding_dday_setup_fail, ToastType.ERROR)
-            },
+            onError = { showToast(R.string.onboarding_dday_setup_fail, ToastType.ERROR) },
         )
     }
 
@@ -239,6 +236,8 @@ class OnBoardingViewModel(
         isNightMarketingEnabled: Boolean,
     ) {
         launchResult(
+            showLoading = false,
+            showException = false,
             block = {
                 notificationRepository.initNotificationSettings(
                     isPushEnabled,
@@ -247,8 +246,6 @@ class OnBoardingViewModel(
                 )
             },
             onSuccess = {},
-            showLoading = false,
-            showException = false,
         )
     }
 

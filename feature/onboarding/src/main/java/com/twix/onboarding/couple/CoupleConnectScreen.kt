@@ -36,10 +36,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.bottomsheet.CommonBottomSheet
 import com.twix.designsystem.components.bottomsheet.model.CommonBottomSheetConfig
 import com.twix.designsystem.components.dialog.MarketingDialog
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -67,6 +70,8 @@ fun CoupleConnectRoute(
     navigateToNext: () -> Unit,
     navigateToBack: () -> Unit,
 ) {
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val hasException by viewModel.hasException.collectAsStateWithLifecycle()
     var showMarketingDialog by rememberSaveable { mutableStateOf(true) }
     var showRestoreSheet by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
@@ -104,30 +109,38 @@ fun CoupleConnectRoute(
         }
     }
 
-    Box {
-        CoupleConnectScreen(
-            showRestoreSheet = showRestoreSheet,
-            onClickSend = { viewModel.dispatch(OnBoardingIntent.ShareInviteLink) },
-            onClickConnect = navigateToNext,
-            onClickRestore = { showRestoreSheet = true },
-            onDismissSheet = { showRestoreSheet = false },
-            onClickBack = navigateToBack,
-        )
+    when {
+        isLoading -> TwixLoadingOverlay()
+        hasException ->
+            ErrorScreen(
+                onClickRetry = { viewModel.fetchMyInviteCode() },
+                onClickBack = navigateToBack,
+            )
+        else -> {
+            CoupleConnectScreen(
+                showRestoreSheet = showRestoreSheet,
+                onClickSend = { viewModel.dispatch(OnBoardingIntent.ShareInviteLink) },
+                onClickConnect = navigateToNext,
+                onClickRestore = { showRestoreSheet = true },
+                onDismissSheet = { showRestoreSheet = false },
+                onClickBack = navigateToBack,
+            )
 
-        MarketingDialog(
-            visible = showMarketingDialog,
-            onConfirm = { marketing, nightMarketing ->
-                showMarketingDialog = false
-                val isPushEnabled = isNotificationPermissionGranted(context)
-                viewModel.dispatch(
-                    OnBoardingIntent.SubmitMarketingConsent(
-                        isPushEnabled = isPushEnabled,
-                        isMarketingEnabled = marketing,
-                        isNightMarketingEnabled = nightMarketing,
-                    ),
-                )
-            },
-        )
+            MarketingDialog(
+                visible = showMarketingDialog,
+                onConfirm = { marketing, nightMarketing ->
+                    showMarketingDialog = false
+                    val isPushEnabled = isNotificationPermissionGranted(context)
+                    viewModel.dispatch(
+                        OnBoardingIntent.SubmitMarketingConsent(
+                            isPushEnabled = isPushEnabled,
+                            isMarketingEnabled = marketing,
+                            isNightMarketingEnabled = nightMarketing,
+                        ),
+                    )
+                },
+            )
+        }
     }
 }
 

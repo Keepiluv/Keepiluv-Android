@@ -50,6 +50,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.button.AppButton
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -78,6 +80,8 @@ internal fun InviteCodeRoute(
     toastManager: ToastManager = koinInject(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val hasException by viewModel.hasException.collectAsStateWithLifecycle()
 
     LaunchedEffect(initialInviteCode) {
         if (!initialInviteCode.isNullOrBlank()) {
@@ -138,14 +142,23 @@ internal fun InviteCodeRoute(
         }
     }
 
-    InviteCodeScreen(
-        uiModel = uiState.inviteCode,
-        keyboardState = keyboardState,
-        navigateToBack = navigateToBack,
-        onChangeInviteCode = { viewModel.dispatch(OnBoardingIntent.WriteInviteCode(it)) },
-        onComplete = { viewModel.dispatch(OnBoardingIntent.ConnectCouple) },
-        onCopyInviteCode = { viewModel.dispatch(OnBoardingIntent.CopyInviteCode) },
-    )
+    when {
+        isLoading -> TwixLoadingOverlay()
+        hasException ->
+            ErrorScreen(
+                onClickBack = navigateToBack,
+                onClickRetry = { viewModel.fetchMyInviteCode() },
+            )
+        else ->
+            InviteCodeScreen(
+                uiModel = uiState.inviteCode,
+                keyboardState = keyboardState,
+                navigateToBack = navigateToBack,
+                onChangeInviteCode = { viewModel.dispatch(OnBoardingIntent.WriteInviteCode(it)) },
+                onComplete = { viewModel.dispatch(OnBoardingIntent.ConnectCouple) },
+                onCopyInviteCode = { viewModel.dispatch(OnBoardingIntent.CopyInviteCode) },
+            )
+    }
 }
 
 @Composable

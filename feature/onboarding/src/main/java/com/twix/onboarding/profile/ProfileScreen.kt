@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.button.AppButton
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.text_field.UnderlineTextField
 import com.twix.designsystem.components.toast.ToastManager
@@ -57,6 +58,7 @@ fun ProfileRoute(
     toastManager: ToastManager = koinInject(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
 
@@ -84,6 +86,10 @@ fun ProfileRoute(
         },
         onChangeNickName = { viewModel.dispatch(OnBoardingIntent.WriteNickName(it)) },
     )
+
+    if (isLoading) {
+        TwixLoadingOverlay()
+    }
 }
 
 @Composable

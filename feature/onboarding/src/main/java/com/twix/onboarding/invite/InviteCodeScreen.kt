@@ -147,7 +147,7 @@ internal fun InviteCodeRoute(
         hasException ->
             ErrorScreen(
                 onClickBack = navigateToBack,
-                onClickRetry = { viewModel.fetchMyInviteCode() },
+                onClickRetry = { viewModel.dispatch(OnBoardingIntent.FetchMyInviteCode) },
             )
         else ->
             InviteCodeScreen(

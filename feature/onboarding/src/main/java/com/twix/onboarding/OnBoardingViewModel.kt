@@ -30,7 +30,7 @@ class OnBoardingViewModel(
         fetchMyInviteCode()
     }
 
-    fun fetchMyInviteCode() {
+    private fun fetchMyInviteCode() {
         launchResult(
             block = { onBoardingRepository.fetchInviteCode() },
             onSuccess = ::reduceMyInviteCode,
@@ -57,6 +57,7 @@ class OnBoardingViewModel(
                 emitSideEffect(OnBoardingSideEffect.InviteCode.CopyInviteCode(currentState.inviteCode.myInviteCode))
             OnBoardingIntent.ShareInviteLink ->
                 emitSideEffect(OnBoardingSideEffect.InviteCode.ShareInviteLink(currentState.inviteCode.myInviteCode))
+            OnBoardingIntent.RetryFetchMyInviteCode -> fetchMyInviteCode()
 
             // 초대 코드 화면
             OnBoardingIntent.StartPollingStatus -> startPolling()

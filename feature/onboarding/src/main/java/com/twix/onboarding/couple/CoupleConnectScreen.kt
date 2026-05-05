@@ -113,7 +113,7 @@ fun CoupleConnectRoute(
         isLoading -> TwixLoadingOverlay()
         hasException ->
             ErrorScreen(
-                onClickRetry = { viewModel.fetchMyInviteCode() },
+                onClickRetry = { viewModel.dispatch(OnBoardingIntent.FetchMyInviteCode) },
                 onClickBack = navigateToBack,
             )
         else -> {

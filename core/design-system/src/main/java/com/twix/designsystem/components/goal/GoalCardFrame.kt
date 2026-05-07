@@ -27,11 +27,12 @@ import com.twix.designsystem.theme.GrayColor
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.domain.model.enums.GoalIconType
 
+// 도메인 enum과 무관하게 사용가능하도록 확장
 @Composable
 fun GoalCardFrame(
     modifier: Modifier = Modifier,
     goalName: String,
-    goalIcon: GoalIconType,
+    icon: @Composable () -> Unit,
     right: @Composable RowScope.() -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -53,11 +54,7 @@ fun GoalCardFrame(
                     .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Image(
-                painter = painterResource(goalIcon.toRes()),
-                contentDescription = null,
-                modifier = Modifier.size(32.dp),
-            )
+            icon()
 
             Spacer(Modifier.width(10.dp))
 
@@ -78,4 +75,28 @@ fun GoalCardFrame(
 
         content()
     }
+}
+
+// 기존에 GoalIconType을 넘겨서 사용했던 Legacy도 오버로드를 통해 사용가능하도록 변경
+@Composable
+fun GoalCardFrame(
+    modifier: Modifier = Modifier,
+    goalName: String,
+    goalIcon: GoalIconType,
+    right: @Composable RowScope.() -> Unit,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    GoalCardFrame(
+        modifier = modifier,
+        goalName = goalName,
+        icon = {
+            Image(
+                painter = painterResource(goalIcon.toRes()),
+                contentDescription = null,
+                modifier = Modifier.size(32.dp),
+            )
+        },
+        right = right,
+        content = content,
+    )
 }

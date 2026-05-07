@@ -82,7 +82,7 @@ fun HomeRoute(
     viewModel: HomeViewModel = koinViewModel(),
     toastManager: ToastManager = koinInject(),
     onShowCalendarBottomSheet: () -> Unit,
-    navigateToGoalEditor: () -> Unit,
+    onShowCreateGoalBottomSheet: () -> Unit,
     navigateToGoalManage: (LocalDate) -> Unit,
     navigateToSettings: () -> Unit,
     navigateToCertification: (Long, LocalDate) -> Unit,
@@ -159,7 +159,7 @@ fun HomeRoute(
         onUpdateVisibleDate = { viewModel.dispatch(HomeIntent.UpdateVisibleDate(it)) },
         onMoveToToday = { viewModel.dispatch(HomeIntent.MoveToToday) },
         onShowCalendarBottomSheet = onShowCalendarBottomSheet,
-        onAddNewGoal = navigateToGoalEditor,
+        onAddNewGoal = onShowCreateGoalBottomSheet,
         onEditClick = { navigateToGoalManage(uiState.selectedDate) },
         onVerificationClick = { goalId, goalCheckState ->
             viewModel.dispatch(HomeIntent.Verification(goalId, goalCheckState))

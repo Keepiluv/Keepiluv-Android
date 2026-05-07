@@ -11,15 +11,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.components.bottomsheet.CommonBottomSheet
 import com.twix.designsystem.components.bottomsheet.model.CommonBottomSheetConfig
 import com.twix.designsystem.components.calendar.Calendar
+import com.twix.designsystem.extension.stringResId
 import com.twix.designsystem.theme.CommonColor
 import com.twix.domain.model.enums.BetweenUs
+import com.twix.domain.model.goal.RecommendedGoalPresets
 import com.twix.home.HomeIntent
 import com.twix.home.HomeRoute
 import com.twix.home.HomeViewModel
+import com.twix.home.component.CreateGoalBottomSheet
+import com.twix.home.model.CreateGoalSheetItem
 import com.twix.main.component.MainBottomBar
 import com.twix.main.model.MainTab
 import com.twix.stats.StatsRoute
@@ -30,6 +35,7 @@ import java.time.LocalDate
 fun MainRoute(
     viewModel: MainViewModel = koinViewModel(),
     navigateToGoalEditor: () -> Unit,
+    navigateToGoalEditorWithPreset: (String) -> Unit,
     navigateToGoalManage: (LocalDate) -> Unit,
     navigateToSettings: () -> Unit,
     navigateToCertification: (Long, LocalDate) -> Unit,
@@ -45,6 +51,7 @@ fun MainRoute(
         selectedTab = uiState.selectedTab,
         onTabClick = { tab -> viewModel.dispatch(MainIntent.SelectTab(tab)) },
         navigateToGoalEditor = navigateToGoalEditor,
+        navigateToGoalEditorWithPreset = navigateToGoalEditorWithPreset,
         navigateToGoalManage = navigateToGoalManage,
         navigateToCertificationDetail = navigateToCertificationDetail,
         navigateToCertification = navigateToCertification,
@@ -60,6 +67,7 @@ private fun MainScreen(
     selectedTab: MainTab,
     onTabClick: (MainTab) -> Unit,
     navigateToGoalEditor: () -> Unit,
+    navigateToGoalEditorWithPreset: (String) -> Unit,
     navigateToGoalManage: (LocalDate) -> Unit,
     navigateToSettings: () -> Unit,
     navigateToCertification: (Long, LocalDate) -> Unit,
@@ -69,6 +77,16 @@ private fun MainScreen(
 ) {
     val calendarState by homeViewModel.calendarState.collectAsStateWithLifecycle()
     var showCalendarBottomSheet by remember { mutableStateOf(false) }
+    var showCreateGoalBottomSheet by remember { mutableStateOf(false) }
+    val createGoalSheetItems =
+        listOf<CreateGoalSheetItem>(CreateGoalSheetItem.DirectAdd) +
+            RecommendedGoalPresets.items.map { preset ->
+                CreateGoalSheetItem.Preset(
+                    presetId = preset.id,
+                    title = stringResource(preset.titleKey.stringResId()),
+                    icon = preset.icon,
+                )
+            }
 
     Box(
         modifier =
@@ -99,7 +117,7 @@ private fun MainScreen(
                         HomeRoute(
                             viewModel = homeViewModel,
                             onShowCalendarBottomSheet = { showCalendarBottomSheet = true },
-                            navigateToGoalEditor = navigateToGoalEditor,
+                            onShowCreateGoalBottomSheet = { showCreateGoalBottomSheet = true },
                             navigateToGoalManage = navigateToGoalManage,
                             navigateToCertificationDetail = navigateToCertificationDetail,
                             navigateToSettings = navigateToSettings,
@@ -123,6 +141,24 @@ private fun MainScreen(
                     onComplete = {
                         homeViewModel.dispatch(HomeIntent.SelectDate(it))
                         showCalendarBottomSheet = false
+                    },
+                )
+            },
+        )
+
+        CommonBottomSheet(
+            visible = showCreateGoalBottomSheet,
+            onDismissRequest = { showCreateGoalBottomSheet = false },
+            content = {
+                CreateGoalBottomSheet(
+                    items = createGoalSheetItems,
+                    onDirectAddClick = {
+                        showCreateGoalBottomSheet = false
+                        navigateToGoalEditor()
+                    },
+                    onPresetClick = {
+                        showCreateGoalBottomSheet = false
+                        navigateToGoalEditorWithPreset(it.presetId)
                     },
                 )
             },

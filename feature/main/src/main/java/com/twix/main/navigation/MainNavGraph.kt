@@ -27,6 +27,11 @@ object MainNavGraph : NavGraphContributor {
                             launchSingleTop = true
                         }
                     },
+                    navigateToGoalEditorWithPreset = { presetId ->
+                        navController.navigate(NavRoutes.GoalEditorRoute.createRoute(-1L, presetId)) {
+                            launchSingleTop = true
+                        }
+                    },
                     navigateToGoalManage = {
                         navController.navigate(NavRoutes.GoalManageRoute.createRoute(it)) {
                             launchSingleTop = true

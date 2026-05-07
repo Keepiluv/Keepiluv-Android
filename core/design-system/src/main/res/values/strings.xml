@@ -56,6 +56,17 @@
     <string name="home_today_goal">오늘 우리 목표</string>
     <string name="home_empty_goal_guide">첫 목표를 세워볼까요?</string>
     <string name="home_empty_goal_content">+ 버튼을 눌러 목표를 추가해보세요</string>
+    
+    <!-- 추천 목표 바텀시트 -->
+    <string name="create_goal_header">새로운 목표 추가</string>
+    <string name="create_goal_content">함께하는 목표를 추가해 보세요!</string>
+    <string name="action_create_goal">직접 만들기</string>
+    <string name="recommended_goal_workout">헬스하기</string>
+    <string name="recommended_goal_vitamin">매일 비타민 챙겨먹기</string>
+    <string name="recommended_goal_walk">집 앞 산책</string>
+    <string name="recommended_goal_reading">책 읽기!</string>
+    <string name="recommended_goal_cleaning">집 대청소</string>
+    <string name="recommended_goal_call_on_way_home">집 가는 길에 전화걸기</string>
 
     <!-- 코멘트 입력 -->
     <string name="comment_text_field_placeholder">코멘트추가</string>

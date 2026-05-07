@@ -16,7 +16,5 @@ interface Camera {
 
     fun unbind()
 
-    suspend fun takePicture(): Result<Uri>
-
-    fun toggleTorch(torch: TorchStatus)
+    suspend fun takePicture(torch: TorchStatus): Result<Uri>
 }

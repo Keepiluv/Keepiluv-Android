@@ -11,7 +11,11 @@ import com.twix.onboarding.contract.OnBoardingIntent
 import com.twix.onboarding.contract.OnBoardingSideEffect
 import com.twix.onboarding.contract.OnBoardingUiState
 import com.twix.result.AppError
+import com.twix.result.AppResult
 import com.twix.ui.base.BaseViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
@@ -19,6 +23,9 @@ class OnBoardingViewModel(
     private val onBoardingRepository: OnBoardingRepository,
     private val notificationRepository: NotificationRepository,
 ) : BaseViewModel<OnBoardingUiState, OnBoardingIntent, OnBoardingSideEffect>(OnBoardingUiState()) {
+    private var pollingJob: Job? = null
+    private var connectCoupleJob: Job? = null
+
     init {
         fetchMyInviteCode()
     }
@@ -49,6 +56,13 @@ class OnBoardingViewModel(
             OnBoardingIntent.ConnectCouple -> connectCouple()
             OnBoardingIntent.CopyInviteCode ->
                 emitSideEffect(OnBoardingSideEffect.InviteCode.CopyInviteCode(currentState.inviteCode.myInviteCode))
+            OnBoardingIntent.ShareInviteLink ->
+                emitSideEffect(OnBoardingSideEffect.InviteCode.ShareInviteLink(currentState.inviteCode.myInviteCode))
+
+            // 초대 코드 화면
+            OnBoardingIntent.StartPollingStatus -> startPolling()
+            OnBoardingIntent.StopPollingStatus -> stopPolling()
+
             // 프로필 설정 화면
             is OnBoardingIntent.WriteNickName -> reduceNickName(intent.value)
             OnBoardingIntent.SubmitNickName -> handleSubmitNickname()
@@ -66,6 +80,45 @@ class OnBoardingViewModel(
         }
     }
 
+    private fun startPolling() {
+        if (pollingJob?.isActive == true) return
+        pollingJob =
+            viewModelScope.launch {
+                /**
+                 * 네트워크 오류 등으로 API 호출이 연속으로 실패한 횟수
+                 * 성공 응답을 받으면 0으로 리셋되며, MAX_POLLING_FAILURE_COUNT에 도달하면 폴링을 중단한다.
+                 * 일시적인 오류에는 폴링을 유지하되, 지속적인 오류 상황에서 무한 루프를 방지하기 위해 사용한다.
+                 * **/
+                var consecutiveFailureCount = 0
+
+                while (isActive) {
+                    delay(POLLING_INTERVAL_MS)
+                    when (val result = onBoardingRepository.fetchOnboardingStatus()) {
+                        is AppResult.Success -> {
+                            consecutiveFailureCount = 0
+                            if (result.data != OnboardingStatus.COUPLE_CONNECTION) {
+                                stopPolling()
+                                emitSideEffect(OnBoardingSideEffect.CoupleConnection.NavigateToNext)
+                                break
+                            }
+                        }
+
+                        is AppResult.Error -> {
+                            if (++consecutiveFailureCount >= MAX_POLLING_FAILURE_COUNT) {
+                                stopPolling()
+                                break
+                            }
+                        }
+                    }
+                }
+            }
+    }
+
+    private fun stopPolling() {
+        pollingJob?.cancel()
+        pollingJob = null
+    }
+
     private fun reduceInviteCode(value: String) {
         val isValidInviteCode = InviteCode.create(value).isSuccess
 
@@ -78,38 +131,46 @@ class OnBoardingViewModel(
                     ),
             )
         }
+        if (isValidInviteCode) connectCouple()
     }
 
     private fun connectCouple() {
         val currentUiState = currentState.inviteCode
-        if (!currentUiState.isValid) return
+        if (!currentState.inviteCode.isValid) return
+        if (connectCoupleJob?.isActive == true) return
 
-        launchResult(
-            block = { onBoardingRepository.coupleConnection(currentUiState.partnerInviteCode) },
-            onSuccess = {
-                viewModelScope.launch {
-                    emitSideEffect(OnBoardingSideEffect.InviteCode.NavigateToNext)
-                }
-            },
-            onError = { error -> handleCoupleConnectException(error) },
-        )
+        connectCoupleJob =
+            launchResult(
+                block = { onBoardingRepository.coupleConnection(currentUiState.partnerInviteCode) },
+                onSuccess = {
+                    stopPolling()
+                    tryEmitSideEffect(OnBoardingSideEffect.InviteCode.NavigateToNext)
+                },
+                onError = { error -> handleCoupleConnectException(error) },
+            )
     }
 
     private suspend fun handleCoupleConnectException(error: AppError) {
-        if (error is AppError.Http && error.status == 404) {
-            /**
-             * 초대 코드를 잘못 입력한 경우
-             * */
-            if (error.message == INVALID_INVITE_CODE_MESSAGE) {
-                showToast(R.string.toast_invalid_invite_code, ToastType.ERROR)
-            } else if (error.message == ALREADY_USED_INVITE_CODE_MESSAGE) {
-                /**
-                 * 상대방이 이미 연결한 경우
-                 * */
-                emitSideEffect(OnBoardingSideEffect.InviteCode.NavigateToNext)
-            } else {
-                showToast(R.string.onboarding_couple_connection_fail, ToastType.ERROR)
+        when {
+            error is AppError.Http && error.status == 400 && error.code == SELF_INVITE_CODE_ERROR_CODE -> {
+                /** 자신의 초대 코드를 입력한 경우 */
+                showToast(R.string.toast_self_invite_code, ToastType.ERROR)
             }
+            error is AppError.Http && error.status == 404 -> {
+                when (error.message) {
+                    INVALID_INVITE_CODE_MESSAGE -> {
+                        /** 초대 코드를 잘못 입력한 경우 */
+                        showToast(R.string.toast_invalid_invite_code, ToastType.ERROR)
+                    }
+                    ALREADY_USED_INVITE_CODE_MESSAGE -> {
+                        /** 상대방이 이미 연결한 경우 */
+                        stopPolling()
+                        emitSideEffect(OnBoardingSideEffect.InviteCode.NavigateToNext)
+                    }
+                    else -> showToast(R.string.onboarding_couple_connection_fail, ToastType.ERROR)
+                }
+            }
+            else -> showToast(R.string.onboarding_couple_connection_fail, ToastType.ERROR)
         }
     }
 
@@ -117,13 +178,11 @@ class OnBoardingViewModel(
         reduce { copy(profile = profile.updateNickname(value)) }
     }
 
-    private fun handleSubmitNickname() {
+    private suspend fun handleSubmitNickname() {
         if (currentState.isValidNickName) {
             profileSetup()
         } else {
-            viewModelScope.launch {
-                showToast(R.string.onboarding_profile_invalid_name_length_toast, ToastType.ERROR)
-            }
+            showToast(R.string.onboarding_profile_invalid_name_length_toast, ToastType.DEFAULT)
         }
     }
 
@@ -139,19 +198,17 @@ class OnBoardingViewModel(
         launchResult(
             block = { onBoardingRepository.fetchOnboardingStatus() },
             onSuccess = { onboardingStatus ->
-                viewModelScope.launch {
-                    val sideEffect =
-                        when (onboardingStatus) {
-                            OnboardingStatus.ANNIVERSARY_SETUP ->
-                                OnBoardingSideEffect.ProfileSetting.NavigateToNext
+                val sideEffect =
+                    when (onboardingStatus) {
+                        OnboardingStatus.ANNIVERSARY_SETUP ->
+                            OnBoardingSideEffect.ProfileSetting.NavigateToNext
 
-                            OnboardingStatus.COMPLETED ->
-                                OnBoardingSideEffect.ProfileSetting.NavigateToHome
+                        OnboardingStatus.COMPLETED ->
+                            OnBoardingSideEffect.ProfileSetting.NavigateToHome
 
-                            else -> return@launch
-                        }
-                    emitSideEffect(sideEffect)
-                }
+                        else -> return@launchResult
+                    }
+                tryEmitSideEffect(sideEffect)
             },
         )
     }
@@ -167,9 +224,7 @@ class OnBoardingViewModel(
     private fun anniversarySetup() {
         launchResult(
             block = { onBoardingRepository.anniversarySetup(currentState.dDay.anniversaryDate.toString()) },
-            onSuccess = {
-                viewModelScope.launch { emitSideEffect(OnBoardingSideEffect.DdaySetting.NavigateToHome) }
-            },
+            onSuccess = { tryEmitSideEffect(OnBoardingSideEffect.DdaySetting.NavigateToHome) },
             onError = {
                 showToast(R.string.onboarding_dday_setup_fail, ToastType.ERROR)
             },
@@ -203,5 +258,8 @@ class OnBoardingViewModel(
     companion object {
         private const val ALREADY_USED_INVITE_CODE_MESSAGE = "이미 사용된 초대 코드입니다."
         private const val INVALID_INVITE_CODE_MESSAGE = "유효하지 않은 초대 코드입니다."
+        private const val POLLING_INTERVAL_MS = 3_000L
+        private const val MAX_POLLING_FAILURE_COUNT = 5
+        private const val SELF_INVITE_CODE_ERROR_CODE = "G4000"
     }
 }

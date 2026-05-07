@@ -78,7 +78,6 @@ class PhotologCaptureViewModel(
         reduce {
             copy(
                 capture = CaptureStatus.Captured(uri),
-                torch = TorchStatus.Off,
             )
         }
         if (uiState.value.hasMaxCommentLength.not()) {

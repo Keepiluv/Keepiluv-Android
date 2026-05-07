@@ -2,6 +2,7 @@ package com.twix.onboarding.couple
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.foundation.Image
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -45,6 +47,7 @@ import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
+import com.twix.navigation_contract.Constants
 import com.twix.onboarding.OnBoardingViewModel
 import com.twix.onboarding.contract.OnBoardingIntent
 import com.twix.onboarding.contract.OnBoardingSideEffect
@@ -52,6 +55,7 @@ import com.twix.onboarding.couple.component.ConnectButton
 import com.twix.onboarding.couple.component.CoupleConnectTopbar
 import com.twix.onboarding.couple.component.InvitationButton
 import com.twix.onboarding.couple.component.RestoreCoupleBottomSheetContent
+import com.twix.share.InviteLaunchDispatcher
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.noRippleClickable
 import org.koin.compose.koinInject
@@ -79,6 +83,23 @@ fun CoupleConnectRoute(
                 )
             }
 
+            is OnBoardingSideEffect.InviteCode.ShareInviteLink -> {
+                val deepLink = InviteLaunchDispatcher.buildInviteDeepLink(sideEffect.inviteCode)
+                val shareText =
+                    currentContext.getString(
+                        R.string.onboarding_invite_share_message,
+                        sideEffect.inviteCode,
+                        deepLink,
+                        Constants.PLAY_STORE_URL,
+                    )
+                val sendIntent =
+                    Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, shareText)
+                    }
+                currentContext.startActivity(Intent.createChooser(sendIntent, null))
+            }
+
             else -> Unit
         }
     }
@@ -86,7 +107,7 @@ fun CoupleConnectRoute(
     Box {
         CoupleConnectScreen(
             showRestoreSheet = showRestoreSheet,
-            onClickSend = { },
+            onClickSend = { viewModel.dispatch(OnBoardingIntent.ShareInviteLink) },
             onClickConnect = navigateToNext,
             onClickRestore = { showRestoreSheet = true },
             onDismissSheet = { showRestoreSheet = false },
@@ -125,7 +146,8 @@ fun CoupleConnectScreen(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(color = CommonColor.White),
+                .background(color = CommonColor.White)
+                .statusBarsPadding(),
     ) {
         Column(
             Modifier.verticalScroll(scrollState),
@@ -146,7 +168,10 @@ fun CoupleConnectScreen(
             Image(
                 imageVector = ImageVector.vectorResource(R.drawable.ic_invite),
                 contentDescription = null,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
+                modifier =
+                    Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(35.dp),
             )
 
             Spacer(modifier = Modifier.height(2.dp))

@@ -2,7 +2,9 @@ package com.twix.onboarding.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.twix.navigation.NavRoutes
 import com.twix.navigation.base.NavGraphContributor
@@ -32,21 +34,35 @@ object OnboardingNavGraph : NavGraphContributor {
 
                 CoupleConnectRoute(
                     navigateToNext = {
-                        navController.navigate(NavRoutes.InviteRoute.route)
+                        navController.navigate(NavRoutes.InviteRoute.createRoute())
                     },
                     navigateToBack = navController::popBackStack,
                     viewModel = vm,
                 )
             }
-            composable(NavRoutes.InviteRoute.route) { backStackEntry ->
+            composable(
+                route = NavRoutes.InviteRoute.route,
+                arguments =
+                    listOf(
+                        navArgument(NavRoutes.InviteRoute.ARG_CODE) {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        },
+                    ),
+            ) { backStackEntry ->
                 val vm: OnBoardingViewModel = backStackEntry.graphViewModel(navController, graphRoute.route)
+                val inviteCode = backStackEntry.arguments?.getString(NavRoutes.InviteRoute.ARG_CODE)
 
                 InviteCodeRoute(
                     navigateToNext = {
-                        navController.navigate(NavRoutes.ProfileRoute.route)
+                        navController.navigate(NavRoutes.ProfileRoute.route) {
+                            popUpTo(NavRoutes.InviteRoute.route) { inclusive = true }
+                        }
                     },
                     navigateToBack = navController::popBackStack,
                     viewModel = vm,
+                    initialInviteCode = inviteCode,
                 )
             }
             composable(NavRoutes.ProfileRoute.route) { backStackEntry ->

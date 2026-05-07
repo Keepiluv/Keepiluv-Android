@@ -16,6 +16,14 @@ sealed interface OnBoardingSideEffect : SideEffect {
         data class CopyInviteCode(
             val inviteCode: String,
         ) : InviteCode
+
+        data class ShareInviteLink(
+            val inviteCode: String,
+        ) : InviteCode
+    }
+
+    sealed interface CoupleConnection : OnBoardingSideEffect {
+        data object NavigateToNext : CoupleConnection
     }
 
     sealed interface DdaySetting : OnBoardingSideEffect {

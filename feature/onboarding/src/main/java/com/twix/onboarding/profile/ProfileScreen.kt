@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,6 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -100,6 +103,7 @@ private fun ProfileScreen(
             Modifier
                 .fillMaxSize()
                 .background(color = CommonColor.White)
+                .statusBarsPadding()
                 .imePadding(),
     ) {
         Spacer(modifier = Modifier.height(80.dp))
@@ -118,6 +122,7 @@ private fun ProfileScreen(
             placeHolder = stringResource(R.string.onboarding_name_placeholder),
             showTrailing = true,
             onValueChange = onChangeNickName,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
             trailing = {
                 Image(
                     imageVector = ImageVector.vectorResource(R.drawable.ic_clear_text),
@@ -162,8 +167,7 @@ private fun ProfileScreen(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .padding(bottom = 20.dp),
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
         )
     }
 }

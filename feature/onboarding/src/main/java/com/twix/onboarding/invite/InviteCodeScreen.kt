@@ -20,11 +20,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.toClipEntry
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -70,14 +74,28 @@ internal fun InviteCodeRoute(
     viewModel: OnBoardingViewModel,
     navigateToNext: () -> Unit,
     navigateToBack: () -> Unit,
+    initialInviteCode: String? = null,
     toastManager: ToastManager = koinInject(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(initialInviteCode) {
+        if (!initialInviteCode.isNullOrBlank()) {
+            viewModel.dispatch(OnBoardingIntent.WriteInviteCode(initialInviteCode))
+        }
+    }
     val coroutineScope = rememberCoroutineScope()
     val keyboardState by keyboardAsState()
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
     val clipboard = LocalClipboard.current
+
+    DisposableEffect(Unit) {
+        viewModel.dispatch(OnBoardingIntent.StartPollingStatus)
+        onDispose {
+            viewModel.dispatch(OnBoardingIntent.StopPollingStatus)
+        }
+    }
 
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
@@ -91,6 +109,7 @@ internal fun InviteCodeRoute(
             }
 
             OnBoardingSideEffect.InviteCode.NavigateToNext -> navigateToNext()
+            OnBoardingSideEffect.CoupleConnection.NavigateToNext -> navigateToNext()
             is OnBoardingSideEffect.InviteCode.CopyInviteCode -> {
                 coroutineScope.launch {
                     val clipData =
@@ -139,18 +158,21 @@ private fun InviteCodeScreen(
     onCopyInviteCode: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
+    val focusManager = LocalFocusManager.current
 
     Box(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(CommonColor.White),
+                .background(CommonColor.White)
+                .statusBarsPadding(),
     ) {
         Column(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .verticalScroll(scrollState),
+                    .verticalScroll(scrollState)
+                    .noRippleClickable { focusManager.clearFocus() },
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -281,8 +303,7 @@ private fun InviteCodeScreen(
                 Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-                    .padding(bottom = 20.dp)
+                    .padding(horizontal = 20.dp, vertical = 8.dp)
                     .imePadding(),
         )
     }

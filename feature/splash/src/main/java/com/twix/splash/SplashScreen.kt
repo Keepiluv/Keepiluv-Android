@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.twix.designsystem.R
 import com.twix.designsystem.theme.CommonColor
+import com.twix.domain.model.OnboardingStatus
 import com.twix.splash.contract.SplashSideEffect
 import com.twix.ui.base.ObserveAsEvents
 import org.koin.androidx.compose.koinViewModel
@@ -19,11 +20,13 @@ fun SplashRoute(
     viewModel: SplashViewModel = koinViewModel(),
     navigateToMain: () -> Unit,
     navigateToLogin: () -> Unit,
+    navigateToOnBoarding: (OnboardingStatus) -> Unit,
 ) {
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
             SplashSideEffect.NavigateToMain -> navigateToMain()
             SplashSideEffect.NavigateToLogin -> navigateToLogin()
+            is SplashSideEffect.NavigateToOnBoarding -> navigateToOnBoarding(sideEffect.status)
         }
     }
 

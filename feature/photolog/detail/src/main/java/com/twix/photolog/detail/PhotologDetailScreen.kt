@@ -1,6 +1,7 @@
 package com.twix.photolog.detail
 
 import android.Manifest
+import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -33,6 +34,7 @@ import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalReactionType
+import com.twix.domain.model.time.CooldownTime
 import com.twix.photolog.detail.component.PhotologCardContent
 import com.twix.photolog.detail.component.PhotologDetailTopBar
 import com.twix.photolog.detail.component.reaction.ReactionContent
@@ -62,6 +64,7 @@ fun PhotologDetailRoute(
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
     val coroutineScope = rememberCoroutineScope()
+    val density = LocalDensity.current
 
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
@@ -71,9 +74,23 @@ fun PhotologDetailRoute(
                 )
             }
 
-            is PhotologDetailSideEffect.ShowPokeToast -> {
+            PhotologDetailSideEffect.ShowPokeToast -> {
                 toastManager.tryShow(
-                    ToastData(sideEffect.message, ToastType.SUCCESS),
+                    ToastData(
+                        currentContext.getString(R.string.toast_poke_goal_success),
+                        ToastType.LIKE,
+                    ),
+                )
+            }
+
+            is PhotologDetailSideEffect.ShowPokeCooldownToast -> {
+                val cooldownTime = CooldownTime.from(sideEffect.remainingMs)
+                val timeLabel = formatCooldownTime(context, cooldownTime)
+                toastManager.tryShow(
+                    ToastData(
+                        currentContext.getString(R.string.toast_poke_cooldown, timeLabel),
+                        ToastType.ERROR,
+                    ),
                 )
             }
         }
@@ -111,11 +128,11 @@ fun PhotologDetailRoute(
         }
 
     BoxWithConstraints {
-        val density = LocalDensity.current
         val screenHeightPx = with(density) { maxHeight.toPx() }
 
         PhotologDetailScreen(
             uiState = uiState,
+            screenHeightPx = screenHeightPx,
             onBack = navigateToBack,
             onClickModify = {
                 navigateToEditor(
@@ -135,15 +152,14 @@ fun PhotologDetailRoute(
             onSwipe = { viewModel.dispatch(PhotologDetailIntent.SwipeCard) },
         )
         if (!uiState.hasShownMyReaction && uiState.isDisplayedMyPhotolog) {
-            val model = uiState.myReaction
-            if (model != null) {
+            val reaction = uiState.myReaction
+            if (reaction != null) {
                 ReactionEffect(
-                    targetReaction = model,
+                    targetReaction = reaction,
                     spec =
                         ReactionEffectSpec(
                             particleCount = 10,
                             durationRange = 500..800,
-                            // 전체 화면 높이까지 퍼짐
                             travelDistanceRange = 500..screenHeightPx.toInt(),
                         ),
                     onFinished = {
@@ -158,6 +174,7 @@ fun PhotologDetailRoute(
 @Composable
 fun PhotologDetailScreen(
     uiState: PhotologDetailUiState,
+    screenHeightPx: Float,
     onBack: () -> Unit,
     onClickModify: () -> Unit,
     onClickReaction: (GoalReactionType) -> Unit,
@@ -181,6 +198,7 @@ fun PhotologDetailScreen(
         if (uiState.isLoading) {
             PhotologCardContent(
                 uiState = uiState,
+                isPokeDisabled = uiState.isPokeDisabled,
                 onSwipe = onSwipe,
                 onClickUpload = onClickUpload,
                 onPoke = onPoke,
@@ -188,6 +206,7 @@ fun PhotologDetailScreen(
 
             if (uiState.canReaction) {
                 ReactionContent(
+                    screenHeightPx = screenHeightPx,
                     reaction = uiState.partnerPhotolog?.reaction,
                     onClickReaction = onClickReaction,
                 )
@@ -195,6 +214,31 @@ fun PhotologDetailScreen(
         }
     }
 }
+
+private fun formatCooldownTime(
+    context: Context,
+    cooldownTime: CooldownTime,
+): String =
+    when (cooldownTime) {
+        is CooldownTime.Hours ->
+            context.getString(
+                R.string.hours_only,
+                cooldownTime.value,
+            )
+
+        is CooldownTime.HoursAndMinutes ->
+            context.getString(
+                R.string.hours_minutes,
+                cooldownTime.hours,
+                cooldownTime.minutes,
+            )
+
+        is CooldownTime.Minutes ->
+            context.getString(
+                R.string.minutes_only,
+                cooldownTime.value,
+            )
+    }
 
 @Preview(showBackground = true)
 @Composable
@@ -206,6 +250,7 @@ private fun PhotologDetailScreenPreview(
         var previewState by remember { mutableStateOf(uiState) }
         PhotologDetailScreen(
             uiState = previewState,
+            screenHeightPx = 0f,
             onBack = {},
             onClickModify = {},
             onClickReaction = {},

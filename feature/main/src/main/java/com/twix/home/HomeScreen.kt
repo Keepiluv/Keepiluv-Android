@@ -1,6 +1,7 @@
 package com.twix.home
 
 import android.Manifest
+import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
@@ -65,6 +66,7 @@ import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalCheckState
 import com.twix.domain.model.goal.Goal
 import com.twix.domain.model.goal.checkState
+import com.twix.domain.model.time.CooldownTime
 import com.twix.home.component.GoalVerifications
 import com.twix.home.component.HomeTopBar
 import com.twix.home.model.HomeUiState
@@ -141,13 +143,24 @@ fun HomeRoute(
                 )
 
             HomeSideEffect.ShowMonthPickerBottomSheet -> Unit
-            is HomeSideEffect.ShowPokeToast ->
+            HomeSideEffect.ShowPokeToast ->
                 toastManager.show(
                     ToastData(
-                        sideEffect.message,
-                        ToastType.SUCCESS,
+                        currentContext.getString(R.string.toast_poke_goal_success),
+                        ToastType.LIKE,
                     ),
                 )
+
+            is HomeSideEffect.ShowPokeCooldownToast -> {
+                val cooldownTime = CooldownTime.from(sideEffect.remainingMs)
+                val timeLabel = formatCooldownTime(context, cooldownTime)
+                toastManager.show(
+                    ToastData(
+                        currentContext.getString(R.string.toast_poke_cooldown, timeLabel),
+                        ToastType.ERROR,
+                    ),
+                )
+            }
         }
     }
 
@@ -480,3 +493,28 @@ private fun AddGoalButton(
         )
     }
 }
+
+private fun formatCooldownTime(
+    context: Context,
+    cooldownTime: CooldownTime,
+): String =
+    when (cooldownTime) {
+        is CooldownTime.Hours ->
+            context.getString(
+                R.string.hours_only,
+                cooldownTime.value,
+            )
+
+        is CooldownTime.HoursAndMinutes ->
+            context.getString(
+                R.string.hours_minutes,
+                cooldownTime.hours,
+                cooldownTime.minutes,
+            )
+
+        is CooldownTime.Minutes ->
+            context.getString(
+                R.string.minutes_only,
+                cooldownTime.value,
+            )
+    }

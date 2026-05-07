@@ -85,7 +85,11 @@ sealed class NavRoutes(
 
     object CoupleConnectionRoute : NavRoutes("couple_connect")
 
-    object InviteRoute : NavRoutes("invite")
+    object InviteRoute : NavRoutes("invite?code={code}") {
+        const val ARG_CODE = "code"
+
+        fun createRoute(code: String? = null) = code?.let { "invite?code=$code" } ?: "invite?code="
+    }
 
     object ProfileRoute : NavRoutes("profile")
 

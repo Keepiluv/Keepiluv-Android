@@ -8,4 +8,5 @@ enum class ToastType {
     DELETE,
     LIKE,
     ERROR,
+    DEFAULT,
 }

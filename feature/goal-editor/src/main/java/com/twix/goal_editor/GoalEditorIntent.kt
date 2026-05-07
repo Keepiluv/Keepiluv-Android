@@ -41,4 +41,11 @@ sealed interface GoalEditorIntent : Intent {
     data class InitGoal(
         val id: Long,
     ) : GoalEditorIntent
+
+    data class InitPreset(
+        val title: String,
+        val icon: GoalIconType,
+        val repeatCycle: RepeatCycle,
+        val repeatCount: Int,
+    ) : GoalEditorIntent
 }

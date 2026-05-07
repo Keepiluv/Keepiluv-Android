@@ -51,6 +51,7 @@ import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.components.topbar.CommonTopBar
 import com.twix.designsystem.extension.label
+import com.twix.designsystem.extension.stringResId
 import com.twix.designsystem.extension.toRes
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
@@ -58,6 +59,7 @@ import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.domain.model.enums.GoalIconType
 import com.twix.domain.model.enums.RepeatCycle
+import com.twix.domain.model.goal.RecommendedGoalPresets
 import com.twix.goal_editor.component.EmojiPicker
 import com.twix.goal_editor.component.GoalInfoCard
 import com.twix.goal_editor.component.GoalTextField
@@ -73,6 +75,7 @@ fun GoalEditorRoute(
     viewModel: GoalEditorViewModel = koinViewModel(),
     toastManager: ToastManager = koinInject(),
     goalId: Long,
+    presetId: String? = null, // 바텀시트 추천 목표에 사용되는 식별자
     navigateToBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -93,8 +96,21 @@ fun GoalEditorRoute(
         }
     }
 
-    LaunchedEffect(goalId) {
-        if (goalId != -1L) viewModel.dispatch(GoalEditorIntent.InitGoal(goalId))
+    LaunchedEffect(goalId, presetId) {
+        when {
+            goalId != -1L -> viewModel.dispatch(GoalEditorIntent.InitGoal(goalId))
+            presetId != null -> {
+                val preset = RecommendedGoalPresets.findById(presetId) ?: return@LaunchedEffect
+                viewModel.dispatch(
+                    GoalEditorIntent.InitPreset(
+                        title = currentContext.getString(preset.titleKey.stringResId()),
+                        icon = preset.icon,
+                        repeatCycle = preset.repeatCycle,
+                        repeatCount = preset.repeatCount,
+                    ),
+                )
+            }
+        }
     }
 
     GoalEditorScreen(
@@ -140,6 +156,10 @@ fun GoalEditorScreen(
         } else {
             maxOf(uiState.startDate, calendarMinDate)
         }
+
+    LaunchedEffect(uiState.selectedIcon) {
+        internalSelectedIcon = uiState.selectedIcon
+    }
 
     Box {
         Column(
@@ -305,8 +325,11 @@ private fun IconEditorDialogContent(
                         Modifier
                             .size(64.dp)
                             .clip(CircleShape)
-                            .border(1.dp, if (isSelected) GrayColor.C500 else GrayColor.C100, CircleShape)
-                            .noRippleClickable(onClick = { onClick(it) }),
+                            .border(
+                                1.dp,
+                                if (isSelected) GrayColor.C500 else GrayColor.C100,
+                                CircleShape,
+                            ).noRippleClickable(onClick = { onClick(it) }),
                     contentAlignment = Alignment.Center,
                 ) {
                     Image(
@@ -374,8 +397,10 @@ private fun RepeatCountBottomSheetContent(
                 colorFilter = ColorFilter.tint(if (minusEnabled) CommonColor.White else GrayColor.C300),
                 modifier =
                     Modifier
-                        .background(if (minusEnabled) GrayColor.C500 else GrayColor.C100, CircleShape)
-                        .padding(4.dp)
+                        .background(
+                            if (minusEnabled) GrayColor.C500 else GrayColor.C100,
+                            CircleShape,
+                        ).padding(4.dp)
                         .size(28.dp)
                         .noRippleClickable(onClick = { if (minusEnabled) internalRepeatCount-- }),
             )
@@ -426,8 +451,10 @@ private fun RepeatCountBottomSheetContent(
                 colorFilter = ColorFilter.tint(if (plusEnabled) CommonColor.White else GrayColor.C300),
                 modifier =
                     Modifier
-                        .background(if (plusEnabled) GrayColor.C500 else GrayColor.C100, CircleShape)
-                        .padding(4.dp)
+                        .background(
+                            if (plusEnabled) GrayColor.C500 else GrayColor.C100,
+                            CircleShape,
+                        ).padding(4.dp)
                         .size(28.dp)
                         .noRippleClickable(onClick = { if (plusEnabled) internalRepeatCount++ }),
             )

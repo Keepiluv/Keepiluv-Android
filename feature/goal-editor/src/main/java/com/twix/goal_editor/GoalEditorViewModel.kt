@@ -23,6 +23,9 @@ class GoalEditorViewModel(
 ) : BaseViewModel<GoalEditorUiState, GoalEditorIntent, GoalEditorSideEffect>(
         GoalEditorUiState(),
     ) {
+    private var initializedGoalId: Long? = null
+    private var initializedPresetKey: String? = null
+
     override suspend fun handleIntent(intent: GoalEditorIntent) {
         when (intent) {
             is GoalEditorIntent.Save -> save(intent.id)
@@ -34,6 +37,13 @@ class GoalEditorViewModel(
             is GoalEditorIntent.SetTitle -> setTitle(intent.title)
             is GoalEditorIntent.SetEndDateEnabled -> setEndDateEnabled(intent.enabled)
             is GoalEditorIntent.InitGoal -> initGoal(intent.id)
+            is GoalEditorIntent.InitPreset ->
+                initPreset(
+                    title = intent.title,
+                    icon = intent.icon,
+                    repeatCycle = intent.repeatCycle,
+                    repeatCount = intent.repeatCount,
+                )
         }
     }
 
@@ -174,10 +184,14 @@ class GoalEditorViewModel(
     }
 
     private fun initGoal(id: Long) {
+        if (initializedGoalId == id) return
+        initializedGoalId = id
+
         launchResult(
             block = { goalRepository.fetchGoalDetail(id) },
             onSuccess = { setGoal(it) },
             onError = {
+                initializedGoalId = null
                 emitSideEffect(
                     GoalEditorSideEffect.ShowToast(
                         R.string.toast_goal_fetch_failed,
@@ -186,6 +200,26 @@ class GoalEditorViewModel(
                 )
             },
         )
+    }
+
+    private fun initPreset(
+        title: String,
+        icon: GoalIconType,
+        repeatCycle: RepeatCycle,
+        repeatCount: Int,
+    ) {
+        val presetKey = "$title|$icon|$repeatCycle|$repeatCount"
+        if (initializedPresetKey == presetKey) return
+        initializedPresetKey = presetKey
+
+        reduce {
+            copy(
+                goalTitle = title,
+                selectedIcon = icon,
+                selectedRepeatCycle = repeatCycle,
+                repeatCount = repeatCount,
+            )
+        }
     }
 
     private fun GoalEditorUiState.toCreateParam(): CreateGoalParam =

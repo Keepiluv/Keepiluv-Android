@@ -34,7 +34,7 @@ fun GoalCardFrame(
     goalName: String,
     icon: @Composable () -> Unit,
     right: @Composable RowScope.() -> Unit,
-    content: @Composable ColumnScope.() -> Unit,
+    content: @Composable ColumnScope.() -> Unit = {},
 ) {
     val shape = RoundedCornerShape(12.dp)
 

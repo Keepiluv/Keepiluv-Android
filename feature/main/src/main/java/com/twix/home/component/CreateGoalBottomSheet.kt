@@ -22,7 +22,7 @@ import com.twix.designsystem.R
 import com.twix.designsystem.components.bottomsheet.AdaptiveSheetList
 import com.twix.designsystem.components.goal.GoalCardFrame
 import com.twix.designsystem.components.text.AppText
-import com.twix.designsystem.extension.stringResId
+import com.twix.designsystem.extension.toResId
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
@@ -138,7 +138,7 @@ private fun Preview() {
                 RecommendedGoalPresets.items.map { preset ->
                     CreateGoalSheetItem.Preset(
                         presetId = preset.id,
-                        title = stringResource(preset.titleKey.stringResId()),
+                        title = stringResource(preset.titleKey.toResId()),
                         icon = preset.icon,
                     )
                 }

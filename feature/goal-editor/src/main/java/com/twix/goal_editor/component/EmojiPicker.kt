@@ -14,7 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.R
-import com.twix.designsystem.extension.toRes
+import com.twix.designsystem.extension.toResId
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.GoalIconType
@@ -37,7 +37,7 @@ fun EmojiPicker(
             contentAlignment = Alignment.Center,
         ) {
             Image(
-                painter = painterResource(icon.toRes()),
+                painter = painterResource(icon.toResId()),
                 contentDescription = "emoji",
                 modifier =
                     Modifier

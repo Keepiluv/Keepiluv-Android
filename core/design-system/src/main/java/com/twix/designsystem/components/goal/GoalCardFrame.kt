@@ -21,7 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.components.text.AppText
-import com.twix.designsystem.extension.toRes
+import com.twix.designsystem.extension.toResId
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.domain.model.enums.AppTextStyle
@@ -91,7 +91,7 @@ fun GoalCardFrame(
         goalName = goalName,
         icon = {
             Image(
-                painter = painterResource(goalIcon.toRes()),
+                painter = painterResource(goalIcon.toResId()),
                 contentDescription = null,
                 modifier = Modifier.size(32.dp),
             )

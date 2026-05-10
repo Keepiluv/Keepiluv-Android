@@ -16,7 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.components.bottomsheet.CommonBottomSheet
 import com.twix.designsystem.components.bottomsheet.model.CommonBottomSheetConfig
 import com.twix.designsystem.components.calendar.Calendar
-import com.twix.designsystem.extension.stringResId
+import com.twix.designsystem.extension.toResId
 import com.twix.designsystem.theme.CommonColor
 import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.goal.RecommendedGoalPresets
@@ -83,7 +83,7 @@ private fun MainScreen(
             RecommendedGoalPresets.items.map { preset ->
                 CreateGoalSheetItem.Preset(
                     presetId = preset.id,
-                    title = stringResource(preset.titleKey.stringResId()),
+                    title = stringResource(preset.titleKey.toResId()),
                     icon = preset.icon,
                 )
             }

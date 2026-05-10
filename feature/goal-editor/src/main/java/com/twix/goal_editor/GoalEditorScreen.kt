@@ -51,8 +51,7 @@ import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.components.topbar.CommonTopBar
 import com.twix.designsystem.extension.label
-import com.twix.designsystem.extension.stringResId
-import com.twix.designsystem.extension.toRes
+import com.twix.designsystem.extension.toResId
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
@@ -103,7 +102,7 @@ fun GoalEditorRoute(
                 val preset = RecommendedGoalPresets.findById(presetId) ?: return@LaunchedEffect
                 viewModel.dispatch(
                     GoalEditorIntent.InitPreset(
-                        title = currentContext.getString(preset.titleKey.stringResId()),
+                        title = currentContext.getString(preset.titleKey.toResId()),
                         icon = preset.icon,
                         repeatCycle = preset.repeatCycle,
                         repeatCount = preset.repeatCount,
@@ -333,7 +332,7 @@ private fun IconEditorDialogContent(
                     contentAlignment = Alignment.Center,
                 ) {
                     Image(
-                        painter = painterResource(it.toRes()),
+                        painter = painterResource(it.toResId()),
                         contentDescription = "emoji",
                         modifier =
                             Modifier

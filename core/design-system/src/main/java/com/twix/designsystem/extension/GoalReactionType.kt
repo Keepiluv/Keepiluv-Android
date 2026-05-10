@@ -3,7 +3,7 @@ package com.twix.designsystem.extension
 import com.twix.designsystem.R
 import com.twix.domain.model.enums.GoalReactionType
 
-fun GoalReactionType.toRes(): Int =
+fun GoalReactionType.toResId(): Int =
     when (this) {
         GoalReactionType.HAPPY -> R.drawable.ic_happy
         GoalReactionType.TROUBLE -> R.drawable.ic_trouble

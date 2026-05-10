@@ -57,7 +57,6 @@
 <br/>
 
 ## 🧑‍💻 Contributors
-
 <div align="center">
 
 ### 함께이기에 더 강한, 키피럽을 만든 두 사람 💘

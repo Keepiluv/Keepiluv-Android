@@ -12,7 +12,7 @@
 
 <br/>
 
-<img src="https://github.com/user-attachments/assets/6740fce9-7cda-44dc-87d1-2caeed53dd73" width="700"/>
+<img src="https://github.com/user-attachments/assets/136b405a-b04b-4275-a9b7-fd91c667c50d" width="700"/>
 
 <br/>
 
@@ -31,7 +31,9 @@
 > 키피럽은 연인 사이의 긍정적인 에너지가 어떻게 **'시너지'** 로 폭발하는지 보여줍니다.
 
 <div align="center">
-<img src="https://github.com/user-attachments/assets/bf40b2d6-f1d1-406d-9e2b-7866bf11cf87" width="700"/>
+<img src="https://github.com/user-attachments/assets/fdf07fdc-f007-4863-aaa7-eb84ac96a044" width="800"/>
+<img src="https://github.com/user-attachments/assets/7ce1b511-43e6-42d9-920a-67a5d088303f" width="800"/>  
+
 </div>
 
 <br/>

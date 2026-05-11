@@ -43,7 +43,7 @@ class KakaoLoginProvider {
                     }
 
                     else -> {
-                        resumeWithAccountLogin(context, continuation)
+                        loginWithKakaoAccount(context, continuation)
                     }
                 }
             }
@@ -51,26 +51,40 @@ class KakaoLoginProvider {
 
     private suspend fun loginWithAccount(context: Context): LoginResult =
         suspendCancellableCoroutine { continuation ->
-            UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
-                when {
-                    token != null -> {
-                        continuation.resume(success(token))
-                    }
-                    error != null -> {
-                        continuation.resume(LoginResult.Failure(error))
-                    }
-                    else -> {
-                        continuation.resume(
-                            LoginResult.Failure(
-                                IllegalStateException(
-                                    UNEXPECTED_STATE_ERROR_MESSAGE,
-                                ),
-                            ),
-                        )
-                    }
-                }
+            loginWithKakaoAccount(context, continuation)
+        }
+
+    private fun loginWithKakaoAccount(
+        context: Context,
+        continuation: CancellableContinuation<LoginResult>,
+    ) {
+        UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
+            if (!continuation.isActive) return@loginWithKakaoAccount
+            handleLoginCallback(token, error, continuation)
+        }
+    }
+
+    private fun handleLoginCallback(
+        token: OAuthToken?,
+        error: Throwable?,
+        continuation: CancellableContinuation<LoginResult>,
+    ) {
+        when {
+            token != null -> {
+                continuation.resume(success(token))
+            }
+            error != null -> {
+                continuation.resume(LoginResult.Failure(error))
+            }
+            else -> {
+                continuation.resume(
+                    LoginResult.Failure(
+                        IllegalStateException(UNEXPECTED_STATE_ERROR_MESSAGE),
+                    ),
+                )
             }
         }
+    }
 
     private fun success(token: OAuthToken): LoginResult {
         val idToken =
@@ -78,26 +92,6 @@ class KakaoLoginProvider {
                 return LoginResult.Failure(IllegalStateException(ID_TOKEN_NULL_ERROR_MESSAGE))
             }
         return LoginResult.Success(idToken, LoginType.KAKAO)
-    }
-
-    private fun resumeWithAccountLogin(
-        context: Context,
-        continuation: CancellableContinuation<LoginResult>,
-    ) {
-        UserApiClient.instance.loginWithKakaoAccount(context) { token, error ->
-            if (!continuation.isActive) {
-                return@loginWithKakaoAccount
-            }
-
-            when {
-                token != null -> {
-                    continuation.resume(success(token))
-                }
-                error != null -> {
-                    continuation.resume(LoginResult.Failure(error))
-                }
-            }
-        }
     }
 
     companion object {

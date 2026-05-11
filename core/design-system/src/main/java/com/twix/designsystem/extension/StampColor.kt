@@ -4,7 +4,7 @@ import androidx.compose.ui.graphics.Color
 import com.twix.designsystem.theme.ChromaticColor
 import com.twix.domain.model.enums.StampColor
 
-fun StampColor.toRes(): Color =
+fun StampColor.toResId(): Color =
     when (this) {
         StampColor.GREEN400 -> ChromaticColor.Green400
         StampColor.BLUE400 -> ChromaticColor.Blue400

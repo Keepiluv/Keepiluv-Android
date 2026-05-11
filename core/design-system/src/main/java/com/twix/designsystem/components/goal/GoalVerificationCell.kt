@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.twix.designsystem.extension.toRes
+import com.twix.designsystem.extension.toResId
 import com.twix.designsystem.theme.GrayColor
 import com.twix.domain.model.goal.GoalVerification
 import com.twix.ui.extension.noRippleClickable
@@ -63,7 +63,7 @@ fun GoalVerificationCell(
             ) {
                 verification.reaction?.let {
                     Image(
-                        painter = painterResource(it.toRes()),
+                        painter = painterResource(it.toResId()),
                         contentDescription = null,
                         modifier = Modifier.size(40.dp),
                     )

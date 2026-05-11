@@ -119,7 +119,7 @@ private fun DialogContent(
                 modifier =
                     Modifier
                         .padding(horizontal = 20.dp)
-                        .padding(top = 28.dp, bottom = 20.dp),
+                        .padding(top = 28.dp, bottom = 12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 content()
@@ -129,7 +129,8 @@ private fun DialogContent(
                 Row(
                     modifier =
                         Modifier
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                 ) {
                     if (dismissText != null && onDismiss != null) {
                         AppButton(

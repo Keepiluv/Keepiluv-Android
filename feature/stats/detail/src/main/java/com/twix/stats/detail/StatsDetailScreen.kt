@@ -39,7 +39,7 @@ import com.twix.designsystem.components.stats.StatsCalendar
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
-import com.twix.designsystem.extension.toRes
+import com.twix.designsystem.extension.toResId
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
@@ -257,7 +257,7 @@ private fun StatsDeleteDialogContent(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
-            painter = painterResource(icon.toRes()),
+            painter = painterResource(icon.toResId()),
             contentDescription = "emoji",
             modifier =
                 Modifier

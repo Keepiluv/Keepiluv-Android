@@ -29,6 +29,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -49,7 +50,7 @@ import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.components.topbar.CommonTopBar
 import com.twix.designsystem.extension.label
-import com.twix.designsystem.extension.toRes
+import com.twix.designsystem.extension.toResId
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.domain.model.enums.AppTextStyle
@@ -288,6 +289,7 @@ private fun GoalSummaryItem(
     isPending: Boolean,
 ) {
     val menuVisible = openedMenuGoalId == item.goalId
+    val shape = RoundedCornerShape(8.dp)
 
     GoalCardFrame(
         goalName = item.name,
@@ -314,8 +316,12 @@ private fun GoalSummaryItem(
                         modifier =
                             Modifier
                                 .width(88.dp)
-                                .background(CommonColor.White, RoundedCornerShape(12.dp))
-                                .border(1.dp, GrayColor.C500, RoundedCornerShape(12.dp)),
+                                .shadow(
+                                    elevation = 8.dp,
+                                    shape = shape,
+                                    clip = false,
+                                ).background(CommonColor.White, shape)
+                                .border(1.dp, GrayColor.C500, shape),
                     ) {
                         CommonPopupItem(
                             text = stringResource(R.string.action_edit),
@@ -421,7 +427,7 @@ private fun GoalSummaryDialogContent(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
-            painter = painterResource(icon.toRes()),
+            painter = painterResource(icon.toResId()),
             contentDescription = "emoji",
             modifier =
                 Modifier

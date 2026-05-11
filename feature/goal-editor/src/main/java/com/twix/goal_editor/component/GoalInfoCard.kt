@@ -10,9 +10,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.R
 import com.twix.designsystem.components.common.CommonSwitch
@@ -37,6 +40,8 @@ import com.twix.domain.model.enums.AppTextStyle
 import com.twix.domain.model.enums.RepeatCycle
 import com.twix.ui.extension.noRippleClickable
 import java.time.LocalDate
+
+private val frameHeight = 64.dp
 
 @Composable
 fun GoalInfoCard(
@@ -111,6 +116,7 @@ private fun RepeatTypeSettings(
     Column(
         modifier =
             Modifier
+                .aspectRatio(350 / 97f)
                 .padding(16.dp),
     ) {
         HeaderText(stringResource(R.string.word_repeat_type))
@@ -126,18 +132,24 @@ private fun RepeatTypeSettings(
             RepeatCycle.entries.forEachIndexed { index, type ->
                 val isSelected = selectedRepeatCycle == type
 
-                AppText(
-                    text = type.label(),
-                    style = AppTextStyle.B2,
-                    color = if (isSelected) CommonColor.White else GrayColor.C500,
+                Box(
                     modifier =
                         Modifier
+                            .size(width = 56.dp, height = 32.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .background(if (isSelected) GrayColor.C500 else CommonColor.White)
                             .border(1.dp, GrayColor.C500, RoundedCornerShape(8.dp))
-                            .padding(horizontal = 12.dp, vertical = 5.5.dp)
+                            .padding(horizontal = 12.dp)
                             .noRippleClickable(onClick = { onSelectedRepeatType(type) }),
-                )
+                    contentAlignment = Alignment.Center,
+                ) {
+                    AppText(
+                        text = type.label(),
+                        style = AppTextStyle.B2,
+                        color = if (isSelected) CommonColor.White else GrayColor.C500,
+                        textAlign = TextAlign.Center,
+                    )
+                }
 
                 if (index != RepeatCycle.entries.lastIndex) Spacer(Modifier.width(8.dp))
             }
@@ -184,7 +196,8 @@ private fun DateSettings(
     Row(
         modifier =
             Modifier
-                .padding(16.dp)
+                .height(frameHeight)
+                .padding(horizontal = 16.dp)
                 .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -225,7 +238,8 @@ private fun EndDateOption(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .height(frameHeight)
+                .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         HeaderText(stringResource(R.string.header_end_date_option))

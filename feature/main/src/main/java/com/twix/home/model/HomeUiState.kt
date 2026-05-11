@@ -2,7 +2,8 @@ package com.twix.home.model
 
 import androidx.compose.runtime.Immutable
 import com.twix.domain.model.goal.GoalList
-import com.twix.ui.base.State
+import com.twix.result.AppError
+import com.twix.ui.base.LoadableState
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -14,9 +15,21 @@ data class HomeUiState(
     val referenceDate: LocalDate = LocalDate.now(), // 7일 달력을 생성하기 위한 레퍼런스 날짜
     val goalList: GoalList = GoalList(),
     val selectedGoalId: Long = -1,
-    val isInitialLoading: Boolean = false,
     val isRefreshing: Boolean = false, // 당겨서 리프레시에 사용
-) : State {
+    override val isLoading: Boolean = false,
+    override val error: AppError? = null,
+) : LoadableState {
     val monthYear: String
         get() = "${visibleDate.month.value}월 ${visibleDate.year}"
+
+    val showLoading get() = isLoading && goalList.goals.isEmpty()
+
+    val showError get() = error != null
+
+    val showEmpty get() = goalList.goals.isEmpty() && !isLoading && error == null
+
+    override fun copyLoadableState(
+        isLoading: Boolean,
+        error: AppError?,
+    ): LoadableState = copy(isLoading = isLoading, error = error)
 }

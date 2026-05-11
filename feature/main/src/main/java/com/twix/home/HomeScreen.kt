@@ -51,9 +51,11 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.calendar.WeeklyCalendar
+import com.twix.designsystem.components.error.ErrorScreen
 import com.twix.designsystem.components.goal.EmptyGoalGuide
 import com.twix.designsystem.components.goal.GoalCardFrame
 import com.twix.designsystem.components.goal.GoalCheckIndicator
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -182,6 +184,7 @@ fun HomeRoute(
         onNotificationClick = navigateToNotification,
         onPokeGoal = { viewModel.dispatch(HomeIntent.PokeGoal(it)) },
         onRefresh = { viewModel.dispatch(HomeIntent.Refresh) },
+        onRetry = { viewModel.dispatch(HomeIntent.Retry) },
     )
 }
 
@@ -202,6 +205,7 @@ fun HomeScreen(
     onNotificationClick: () -> Unit,
     onPokeGoal: (Long) -> Unit,
     onRefresh: () -> Unit,
+    onRetry: () -> Unit,
 ) {
     Box(
         modifier =
@@ -230,26 +234,42 @@ fun HomeScreen(
                 onUpdateVisibleDate = onUpdateVisibleDate,
             )
 
-            if (uiState.goalList.goals.isEmpty()) {
-                EmptyGoalGuide(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(R.string.home_empty_goal_guide),
-                )
-            } else {
-                GoalList(
-                    modifier =
-                        Modifier
-                            .padding(horizontal = 20.dp)
-                            .weight(1f),
-                    goals = uiState.goalList.goals,
-                    selectedDate = uiState.selectedDate,
-                    isRefreshing = uiState.isRefreshing,
-                    onVerificationClick = onVerificationClick,
-                    onEditClick = onEditClick,
-                    onClickGoalCard = onClickCard,
-                    onPokeGoal = onPokeGoal,
-                    onRefresh = onRefresh,
-                )
+            when {
+                uiState.showLoading -> {
+                    TwixLoadingOverlay(modifier = Modifier.weight(1f))
+                }
+
+                uiState.showError -> {
+                    ErrorScreen(
+                        onClickRetry = onRetry,
+                        showBackButton = false,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+
+                uiState.showEmpty -> {
+                    EmptyGoalGuide(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(R.string.home_empty_goal_guide),
+                    )
+                }
+
+                else -> {
+                    GoalList(
+                        modifier =
+                            Modifier
+                                .padding(horizontal = 20.dp)
+                                .weight(1f),
+                        goals = uiState.goalList.goals,
+                        selectedDate = uiState.selectedDate,
+                        isRefreshing = uiState.isRefreshing,
+                        onVerificationClick = onVerificationClick,
+                        onEditClick = onEditClick,
+                        onClickGoalCard = onClickCard,
+                        onPokeGoal = onPokeGoal,
+                        onRefresh = onRefresh,
+                    )
+                }
             }
         }
 

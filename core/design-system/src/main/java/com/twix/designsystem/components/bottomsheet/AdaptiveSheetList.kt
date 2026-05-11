@@ -2,7 +2,9 @@ package com.twix.designsystem.components.bottomsheet
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -10,11 +12,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun <T> AdaptiveSheetList(
     modifier: Modifier = Modifier,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     items: List<T>,
     key: ((T) -> Any)? = null,
     threshold: Int = 12,
@@ -27,7 +31,8 @@ fun <T> AdaptiveSheetList(
             modifier =
                 modifier
                     .fillMaxWidth()
-                    .verticalScroll(scroll),
+                    .verticalScroll(scroll)
+                    .padding(contentPadding),
             verticalArrangement = verticalArrangement,
         ) {
             items.forEach { item ->
@@ -41,6 +46,7 @@ fun <T> AdaptiveSheetList(
             state = state,
             modifier = modifier.fillMaxWidth(),
             verticalArrangement = verticalArrangement,
+            contentPadding = contentPadding,
         ) {
             if (key != null) {
                 items(items, key = { key(it) }) { itemContent(it) }

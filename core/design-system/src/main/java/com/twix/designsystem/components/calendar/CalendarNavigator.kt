@@ -32,8 +32,7 @@ fun CalendarNavigator(
 ) {
     Row(
         modifier =
-            modifier
-                .padding(vertical = 4.5.dp),
+        modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {

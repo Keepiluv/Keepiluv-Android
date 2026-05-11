@@ -3,7 +3,7 @@ package com.twix.designsystem.extension
 import com.twix.designsystem.R
 import com.twix.domain.model.enums.GoalIconType
 
-fun GoalIconType.toRes(): Int =
+fun GoalIconType.toResId(): Int =
     when (this) {
         GoalIconType.DEFAULT -> R.drawable.ic_default
         GoalIconType.CLEAN -> R.drawable.ic_clean

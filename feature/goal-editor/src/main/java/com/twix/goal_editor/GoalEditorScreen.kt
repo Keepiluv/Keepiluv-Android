@@ -17,8 +17,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,6 +36,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,13 +51,14 @@ import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.components.topbar.CommonTopBar
 import com.twix.designsystem.extension.label
-import com.twix.designsystem.extension.toRes
+import com.twix.designsystem.extension.toResId
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.domain.model.enums.GoalIconType
 import com.twix.domain.model.enums.RepeatCycle
+import com.twix.domain.model.goal.RecommendedGoalPresets
 import com.twix.goal_editor.component.EmojiPicker
 import com.twix.goal_editor.component.GoalInfoCard
 import com.twix.goal_editor.component.GoalTextField
@@ -70,6 +74,7 @@ fun GoalEditorRoute(
     viewModel: GoalEditorViewModel = koinViewModel(),
     toastManager: ToastManager = koinInject(),
     goalId: Long,
+    presetId: String? = null, // 바텀시트 추천 목표에 사용되는 식별자
     navigateToBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -90,8 +95,21 @@ fun GoalEditorRoute(
         }
     }
 
-    LaunchedEffect(goalId) {
-        if (goalId != -1L) viewModel.dispatch(GoalEditorIntent.InitGoal(goalId))
+    LaunchedEffect(goalId, presetId) {
+        when {
+            goalId != -1L -> viewModel.dispatch(GoalEditorIntent.InitGoal(goalId))
+            presetId != null -> {
+                val preset = RecommendedGoalPresets.findById(presetId) ?: return@LaunchedEffect
+                viewModel.dispatch(
+                    GoalEditorIntent.InitPreset(
+                        title = currentContext.getString(preset.titleKey.toResId()),
+                        icon = preset.icon,
+                        repeatCycle = preset.repeatCycle,
+                        repeatCount = preset.repeatCount,
+                    ),
+                )
+            }
+        }
     }
 
     GoalEditorScreen(
@@ -128,6 +146,19 @@ fun GoalEditorScreen(
     var showIconEditorDialog by remember { mutableStateOf(false) }
     var isEndDate by remember { mutableStateOf(true) }
     var internalSelectedIcon by remember { mutableStateOf(uiState.selectedIcon) }
+    val scrollState = rememberScrollState()
+    val today = LocalDate.now()
+    val calendarMinDate = if (isEndDate) maxOf(today, uiState.startDate) else today
+    val calendarInitialDate =
+        if (isEndDate) {
+            maxOf(uiState.endDate, calendarMinDate)
+        } else {
+            maxOf(uiState.startDate, calendarMinDate)
+        }
+
+    LaunchedEffect(uiState.selectedIcon) {
+        internalSelectedIcon = uiState.selectedIcon
+    }
 
     Box {
         Column(
@@ -155,40 +186,47 @@ fun GoalEditorScreen(
 
             Spacer(Modifier.height(52.dp))
 
-            EmojiPicker(
-                icon = uiState.selectedIcon,
-                onClick = { showIconEditorDialog = true },
-            )
+            Column(
+                modifier =
+                    Modifier
+                        .verticalScroll(scrollState)
+                        .weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                EmojiPicker(
+                    icon = uiState.selectedIcon,
+                    onClick = { showIconEditorDialog = true },
+                )
 
-            Spacer(Modifier.height(44.dp))
+                Spacer(Modifier.height(44.dp))
 
-            GoalTextField(
-                value = uiState.goalTitle,
-                onCommitTitle = onCommitTitle,
-            )
+                GoalTextField(
+                    value = uiState.goalTitle,
+                    onCommitTitle = onCommitTitle,
+                )
 
-            Spacer(Modifier.height(44.dp))
-
-            GoalInfoCard(
-                selectedRepeatCycle = uiState.selectedRepeatCycle,
-                repeatCount = uiState.repeatCount,
-                startDate = uiState.startDate,
-                endDateEnabled = uiState.endDateEnabled,
-                endDate = uiState.endDate,
-                isEdit = isEdit,
-                onSelectedRepeatType = onSelectRepeatType,
-                onShowRepeatCountBottomSheet = { showRepeatCountBottomSheet = true },
-                onShowCalendarBottomSheet = {
-                    isEndDate = it
-                    showCalendarBottomSheet = true
-                },
-                onToggleEndDateEnabled = onToggleEndDateEnabled,
-            )
-
-            Spacer(Modifier.weight(1f))
+                GoalInfoCard(
+                    selectedRepeatCycle = uiState.selectedRepeatCycle,
+                    repeatCount = uiState.repeatCount,
+                    startDate = uiState.startDate,
+                    endDateEnabled = uiState.endDateEnabled,
+                    endDate = uiState.endDate,
+                    isEdit = isEdit,
+                    onSelectedRepeatType = onSelectRepeatType,
+                    onShowRepeatCountBottomSheet = { showRepeatCountBottomSheet = true },
+                    onShowCalendarBottomSheet = {
+                        isEndDate = it
+                        showCalendarBottomSheet = true
+                    },
+                    onToggleEndDateEnabled = onToggleEndDateEnabled,
+                )
+            }
 
             AppButton(
                 onClick = onComplete,
+                textColor = if (uiState.canSave) CommonColor.White else GrayColor.C300,
+                backgroundColor = if (uiState.canSave) GrayColor.C500 else GrayColor.C100,
+                enabled = uiState.canSave,
                 modifier =
                     Modifier
                         .padding(horizontal = 20.dp)
@@ -204,7 +242,8 @@ fun GoalEditorScreen(
             onDismissRequest = { showCalendarBottomSheet = false },
             content = {
                 Calendar(
-                    initialDate = if (isEndDate) uiState.endDate else uiState.startDate,
+                    initialDate = calendarInitialDate,
+                    isDateSelectable = { !it.isBefore(calendarMinDate) },
                     onComplete = {
                         if (isEndDate) onCommitEndDate(it) else onCommitStartDate(it)
                         showCalendarBottomSheet = false
@@ -285,16 +324,19 @@ private fun IconEditorDialogContent(
                         Modifier
                             .size(64.dp)
                             .clip(CircleShape)
-                            .border(1.dp, if (isSelected) GrayColor.C500 else GrayColor.C100, CircleShape)
-                            .noRippleClickable(onClick = { onClick(it) }),
+                            .border(
+                                1.dp,
+                                if (isSelected) GrayColor.C500 else GrayColor.C100,
+                                CircleShape,
+                            ).noRippleClickable(onClick = { onClick(it) }),
                     contentAlignment = Alignment.Center,
                 ) {
                     Image(
-                        painter = painterResource(it.toRes()),
+                        painter = painterResource(it.toResId()),
                         contentDescription = "emoji",
                         modifier =
                             Modifier
-                                .size(42.dp),
+                                .size(32.dp),
                     )
                 }
             }
@@ -311,6 +353,8 @@ private fun RepeatCountBottomSheetContent(
     var internalRepeatCount by remember { mutableIntStateOf(repeatCount) }
     var internalSelectedRepeatType by remember { mutableStateOf(selectedRepeatCycle) }
     val maxCount = if (internalSelectedRepeatType == RepeatCycle.WEEKLY) 6 else 25
+    val minusEnabled = internalRepeatCount > 1
+    val plusEnabled = internalRepeatCount < maxCount
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -321,36 +365,22 @@ private fun RepeatCountBottomSheetContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            AppText(
+            RepeatCycleChip(
                 text = RepeatCycle.WEEKLY.label(),
-                style = AppTextStyle.B2,
-                color = if (internalSelectedRepeatType == RepeatCycle.WEEKLY) CommonColor.White else GrayColor.C500,
-                modifier =
-                    Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(if (internalSelectedRepeatType == RepeatCycle.WEEKLY) GrayColor.C500 else CommonColor.White)
-                        .border(1.dp, GrayColor.C500, RoundedCornerShape(8.dp))
-                        .padding(horizontal = 12.dp, vertical = 5.5.dp)
-                        .noRippleClickable(onClick = {
-                            internalSelectedRepeatType = RepeatCycle.WEEKLY
-                            internalRepeatCount = 1
-                        }),
+                selected = internalSelectedRepeatType == RepeatCycle.WEEKLY,
+                onClick = {
+                    internalSelectedRepeatType = RepeatCycle.WEEKLY
+                    internalRepeatCount = 1
+                },
             )
 
-            AppText(
+            RepeatCycleChip(
                 text = RepeatCycle.MONTHLY.label(),
-                style = AppTextStyle.B2,
-                color = if (internalSelectedRepeatType == RepeatCycle.MONTHLY) CommonColor.White else GrayColor.C500,
-                modifier =
-                    Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(if (internalSelectedRepeatType == RepeatCycle.MONTHLY) GrayColor.C500 else CommonColor.White)
-                        .border(1.dp, GrayColor.C500, RoundedCornerShape(8.dp))
-                        .padding(horizontal = 12.dp, vertical = 5.5.dp)
-                        .noRippleClickable(onClick = {
-                            internalSelectedRepeatType = RepeatCycle.MONTHLY
-                            internalRepeatCount = 1
-                        }),
+                selected = internalSelectedRepeatType == RepeatCycle.MONTHLY,
+                onClick = {
+                    internalSelectedRepeatType = RepeatCycle.MONTHLY
+                    internalRepeatCount = 1
+                },
             )
         }
 
@@ -363,37 +393,48 @@ private fun RepeatCountBottomSheetContent(
             Image(
                 painter = painterResource(R.drawable.ic_minus),
                 contentDescription = "minus",
-                colorFilter = ColorFilter.tint(CommonColor.White),
+                colorFilter = ColorFilter.tint(if (minusEnabled) CommonColor.White else GrayColor.C300),
                 modifier =
                     Modifier
-                        .background(GrayColor.C500, CircleShape)
-                        .padding(4.dp)
+                        .background(
+                            if (minusEnabled) GrayColor.C500 else GrayColor.C100,
+                            CircleShape,
+                        ).padding(4.dp)
                         .size(28.dp)
-                        .noRippleClickable(onClick = { if (internalRepeatCount > 1) internalRepeatCount-- }),
+                        .noRippleClickable(onClick = { if (minusEnabled) internalRepeatCount-- }),
             )
 
             Row(
                 modifier =
                     Modifier
-                        .width(96.dp)
+                        .size(width = 96.dp, height = 58.dp)
                         .border(1.dp, GrayColor.C300, RoundedCornerShape(12.dp))
-                        .padding(horizontal = 27.5.dp, vertical = 12.dp),
+                        .padding(vertical = 12.dp)
+                        .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
             ) {
-                AppText(
-                    text = internalRepeatCount.toString(),
-                    style = AppTextStyle.H2,
-                    color = GrayColor.C500,
-                )
-
-                Spacer(Modifier.width(8.dp))
-
                 Box(
                     modifier =
                         Modifier
-                            .size(24.dp),
+                            .weight(1f),
                     contentAlignment = Alignment.Center,
+                ) {
+                    Box(
+                        modifier = Modifier.width(35.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        AppText(
+                            text = internalRepeatCount.toString(),
+                            style = AppTextStyle.H2,
+                            color = GrayColor.C500,
+                        )
+                    }
+                }
+
+                Box(
+                    modifier = Modifier.width(16.dp),
+                    contentAlignment = Alignment.CenterStart,
                 ) {
                     AppText(
                         text = stringResource(R.string.word_count),
@@ -406,13 +447,15 @@ private fun RepeatCountBottomSheetContent(
             Image(
                 painter = painterResource(R.drawable.ic_plus),
                 contentDescription = "plus",
-                colorFilter = ColorFilter.tint(CommonColor.White),
+                colorFilter = ColorFilter.tint(if (plusEnabled) CommonColor.White else GrayColor.C300),
                 modifier =
                     Modifier
-                        .background(GrayColor.C500, CircleShape)
-                        .padding(4.dp)
+                        .background(
+                            if (plusEnabled) GrayColor.C500 else GrayColor.C100,
+                            CircleShape,
+                        ).padding(4.dp)
                         .size(28.dp)
-                        .noRippleClickable(onClick = { if (maxCount > internalRepeatCount) internalRepeatCount++ }),
+                        .noRippleClickable(onClick = { if (plusEnabled) internalRepeatCount++ }),
             )
         }
 
@@ -425,6 +468,31 @@ private fun RepeatCountBottomSheetContent(
                     .padding(horizontal = 20.dp, vertical = 8.dp)
                     .fillMaxWidth(),
             text = stringResource(R.string.word_completion),
+        )
+    }
+}
+
+@Composable
+private fun RepeatCycleChip(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier =
+            Modifier
+                .size(width = 56.dp, height = 32.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(if (selected) GrayColor.C500 else CommonColor.White)
+                .border(1.dp, GrayColor.C500, RoundedCornerShape(8.dp))
+                .noRippleClickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        AppText(
+            text = text,
+            style = AppTextStyle.B2,
+            color = if (selected) CommonColor.White else GrayColor.C500,
+            textAlign = TextAlign.Center,
         )
     }
 }

@@ -23,6 +23,9 @@ class GoalEditorViewModel(
 ) : BaseViewModel<GoalEditorUiState, GoalEditorIntent, GoalEditorSideEffect>(
         GoalEditorUiState(),
     ) {
+    private var initializedGoalId: Long? = null
+    private var initializedPresetKey: String? = null
+
     override suspend fun handleIntent(intent: GoalEditorIntent) {
         when (intent) {
             is GoalEditorIntent.Save -> save(intent.id)
@@ -34,6 +37,13 @@ class GoalEditorViewModel(
             is GoalEditorIntent.SetTitle -> setTitle(intent.title)
             is GoalEditorIntent.SetEndDateEnabled -> setEndDateEnabled(intent.enabled)
             is GoalEditorIntent.InitGoal -> initGoal(intent.id)
+            is GoalEditorIntent.InitPreset ->
+                initPreset(
+                    title = intent.title,
+                    icon = intent.icon,
+                    repeatCycle = intent.repeatCycle,
+                    repeatCount = intent.repeatCount,
+                )
         }
     }
 
@@ -58,15 +68,28 @@ class GoalEditorViewModel(
     }
 
     private fun setStartDate(startDate: LocalDate) {
-        reduce { copy(startDate = startDate) }
+        reduce {
+            val validStartDate = startDate.validStartDate()
+            copy(
+                startDate = validStartDate,
+                endDate = endDate.validEndDate(validStartDate),
+            )
+        }
     }
 
     private fun setEndDate(endDate: LocalDate) {
-        reduce { copy(endDate = endDate) }
+        reduce {
+            copy(endDate = endDate.validEndDate(startDate))
+        }
     }
 
     private fun setEndDateEnabled(enabled: Boolean) {
-        reduce { copy(endDateEnabled = enabled) }
+        reduce {
+            copy(
+                endDateEnabled = enabled,
+                endDate = if (enabled) endDate.validEndDate(startDate) else endDate,
+            )
+        }
     }
 
     private fun setGoal(goal: GoalDetail) {
@@ -76,20 +99,24 @@ class GoalEditorViewModel(
                 selectedIcon = goal.icon,
                 selectedRepeatCycle = goal.repeatCycle,
                 repeatCount = goal.repeatCount,
-                endDate = goal.endDate ?: LocalDate.now(),
+                startDate = goal.startDate.validStartDate(),
+                endDate = (goal.endDate ?: LocalDate.now()).validEndDate(goal.startDate.validStartDate()),
                 endDateEnabled = goal.endDate != null,
             )
         }
     }
 
     private suspend fun save(id: Long) {
+        if (currentState.isSaving) return
         if (!validateSaveInput()) return
+
+        reduce { copy(isSaving = true) }
 
         if (id == -1L) createGoal() else updateGoal(id)
     }
 
     private suspend fun validateSaveInput(): Boolean {
-        if (!currentState.isEnabled) {
+        if (!currentState.isSaveEnabled) {
             emitSideEffect(
                 GoalEditorSideEffect.ShowToast(
                     R.string.toast_input_goal_title,
@@ -99,7 +126,7 @@ class GoalEditorViewModel(
             return false
         }
 
-        if (currentState.endDateEnabled && currentState.endDate.isBefore(currentState.startDate)) {
+        if (!currentState.isEndDateValid) {
             emitSideEffect(
                 GoalEditorSideEffect.ShowToast(
                     R.string.toast_end_date_before_start_date,
@@ -115,6 +142,7 @@ class GoalEditorViewModel(
     private fun createGoal() {
         launchResult(
             block = { goalRepository.createGoal(currentState.toCreateParam()) },
+            onFinally = { reduce { copy(isSaving = false) } },
             onSuccess = { onGoalSaveSuccess(isUpdate = false) },
             onError = {
                 emitSideEffect(
@@ -130,6 +158,7 @@ class GoalEditorViewModel(
     private fun updateGoal(id: Long) {
         launchResult(
             block = { goalRepository.updateGoal(currentState.toUpdateParam(id)) },
+            onFinally = { reduce { copy(isSaving = false) } },
             onSuccess = { onGoalSaveSuccess(isUpdate = true) },
             onError = {
                 emitSideEffect(
@@ -155,10 +184,14 @@ class GoalEditorViewModel(
     }
 
     private fun initGoal(id: Long) {
+        if (initializedGoalId == id) return
+        initializedGoalId = id
+
         launchResult(
             block = { goalRepository.fetchGoalDetail(id) },
             onSuccess = { setGoal(it) },
             onError = {
+                initializedGoalId = null
                 emitSideEffect(
                     GoalEditorSideEffect.ShowToast(
                         R.string.toast_goal_fetch_failed,
@@ -167,6 +200,26 @@ class GoalEditorViewModel(
                 )
             },
         )
+    }
+
+    private fun initPreset(
+        title: String,
+        icon: GoalIconType,
+        repeatCycle: RepeatCycle,
+        repeatCount: Int,
+    ) {
+        val presetKey = "$title|$icon|$repeatCycle|$repeatCount"
+        if (initializedPresetKey == presetKey) return
+        initializedPresetKey = presetKey
+
+        reduce {
+            copy(
+                goalTitle = title,
+                selectedIcon = icon,
+                selectedRepeatCycle = repeatCycle,
+                repeatCount = repeatCount,
+            )
+        }
     }
 
     private fun GoalEditorUiState.toCreateParam(): CreateGoalParam =
@@ -188,4 +241,8 @@ class GoalEditorViewModel(
             repeatCount = repeatCount,
             endDate = if (endDateEnabled) endDate else null,
         )
+
+    private fun LocalDate.validStartDate(): LocalDate = maxOf(this, LocalDate.now())
+
+    private fun LocalDate.validEndDate(startDate: LocalDate): LocalDate = maxOf(this, LocalDate.now(), startDate)
 }

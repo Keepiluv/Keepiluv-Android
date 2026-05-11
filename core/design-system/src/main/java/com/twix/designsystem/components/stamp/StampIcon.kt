@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.extension.toBackgroundRes
 import com.twix.designsystem.extension.toBorderRes
-import com.twix.designsystem.extension.toRes
+import com.twix.designsystem.extension.toResId
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.StampColor
@@ -29,7 +29,7 @@ fun StampIcon(
             Icon(
                 imageVector = ImageVector.vectorResource(stamp.toBackgroundRes()),
                 contentDescription = null,
-                tint = stampColor.toRes(),
+                tint = stampColor.toResId(),
             )
             Icon(
                 imageVector = ImageVector.vectorResource(stamp.toBorderRes()),

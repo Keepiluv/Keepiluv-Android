@@ -100,10 +100,17 @@ sealed class NavRoutes(
      * */
     object GoalEditorGraph : NavRoutes("goal_editor_graph")
 
-    object GoalEditorRoute : NavRoutes("goal_editor/{id}") {
+    object GoalEditorRoute : NavRoutes("goal_editor/{id}?presetId={presetId}") {
         const val ARG_ID = "id"
+        const val ARG_PRESET_ID = "presetId"
 
-        fun createRoute(id: Long) = "goal_editor/$id"
+        fun createRoute(
+            id: Long,
+            presetId: String? = null,
+        ): String {
+            val baseRoute = "goal_editor/$id"
+            return presetId?.let { "$baseRoute?presetId=${Uri.encode(it)}" } ?: baseRoute
+        }
     }
 
     /**

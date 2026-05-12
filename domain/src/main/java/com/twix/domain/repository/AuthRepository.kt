@@ -7,7 +7,7 @@ interface AuthRepository {
     suspend fun login(
         idToken: String,
         type: LoginType,
-    )
+    ): AppResult<Unit>
 
     suspend fun logout(): AppResult<Unit>
 

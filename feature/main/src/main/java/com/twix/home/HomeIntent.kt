@@ -29,4 +29,6 @@ sealed interface HomeIntent : Intent {
     ) : HomeIntent
 
     data object Refresh : HomeIntent // 당겨서 리프레시
+
+    data object Retry : HomeIntent
 }

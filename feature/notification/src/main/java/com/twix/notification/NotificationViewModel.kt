@@ -32,8 +32,6 @@ class NotificationViewModel(
         if (currentState.isLoading) return
 
         launchResult(
-            onStart = { reduce { copy(isLoading = true) } },
-            onFinally = { reduce { copy(isLoading = false) } },
             block = { notificationRepository.fetchNotifications() },
             onSuccess = {
                 markAllNotificationAsRead()
@@ -51,8 +49,6 @@ class NotificationViewModel(
                 ?.id
 
         launchResult(
-            onStart = { reduce { copy(isLoading = true) } },
-            onFinally = { reduce { copy(isLoading = false) } },
             block = { notificationRepository.fetchNotifications(lastId = lastId) },
             onSuccess = {
                 reduce {

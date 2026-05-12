@@ -67,6 +67,7 @@ class HomeViewModel(
             is HomeIntent.Verification -> handleGoalVerification(intent)
             is HomeIntent.PokeGoal -> pokeGoal(intent.goalId)
             HomeIntent.Refresh -> fetchGoalList(isUserRefresh = true)
+            HomeIntent.Retry -> fetchGoalList()
         }
     }
 
@@ -147,31 +148,26 @@ class HomeViewModel(
 
         launchResult(
             onStart = {
-                reduce {
-                    copy(
-                        isInitialLoading = !isUserRefresh,
-                        isRefreshing = isUserRefresh,
-                    )
-                }
+                reduce { copy(isRefreshing = isUserRefresh) }
             },
             onFinally = {
-                reduce {
-                    copy(
-                        isInitialLoading = false,
-                        isRefreshing = false,
-                    )
-                }
+                reduce { copy(isRefreshing = false) }
             },
             block = { goalRepository.fetchGoalList(date = date) },
             onSuccess = { goalList -> reduce { copy(goalList = goalList) } },
-            onError = {
-                emitSideEffect(
-                    HomeSideEffect.ShowToast(
-                        R.string.toast_goal_fetch_failed,
-                        ToastType.ERROR,
-                    ),
-                )
-            },
+            onError =
+                if (isUserRefresh) {
+                    {
+                        emitSideEffect(
+                            HomeSideEffect.ShowToast(
+                                R.string.toast_goal_fetch_failed,
+                                ToastType.ERROR,
+                            ),
+                        )
+                    }
+                } else {
+                    null
+                },
         )
     }
 }

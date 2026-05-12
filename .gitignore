@@ -91,4 +91,3 @@ lint/tmp/
 /scripts/uninstall-hooks.sh
 /public/.well-known
 .firebase/
-.claude

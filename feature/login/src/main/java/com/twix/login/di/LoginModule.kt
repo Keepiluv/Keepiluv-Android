@@ -1,8 +1,5 @@
 package com.twix.login.di
 
-import com.twix.domain.login.LoginProvider
-import com.twix.domain.model.enums.LoginType
-import com.twix.login.LoginProviderFactory
 import com.twix.login.LoginViewModel
 import com.twix.login.google.GoogleLoginProvider
 import com.twix.login.kakao.KakaoLoginProvider
@@ -18,22 +15,9 @@ val loginModule =
     module {
         single<NavGraphContributor>(named(NavRoutes.LoginGraph.route)) { LoginNavGraph }
 
-        factory<LoginProvider>(named(LoginType.GOOGLE.name)) {
-            GoogleLoginProvider(androidContext())
-        }
+        factory { GoogleLoginProvider(androidContext()) }
 
-        factory<LoginProvider>(named(LoginType.KAKAO.name)) {
-            KakaoLoginProvider(androidContext())
-        }
-
-        factory {
-            LoginProviderFactory(
-                mapOf(
-                    LoginType.GOOGLE to get<LoginProvider>(named(LoginType.GOOGLE.name)),
-                    LoginType.KAKAO to get<LoginProvider>(named(LoginType.KAKAO.name)),
-                ),
-            )
-        }
+        factory { KakaoLoginProvider() }
 
         viewModelOf(::LoginViewModel)
     }

@@ -34,6 +34,8 @@ import com.twix.domain.model.enums.LoginType
 import com.twix.login.component.LoginButton
 import com.twix.login.contract.LoginIntent
 import com.twix.login.contract.LoginSideEffect
+import com.twix.login.google.GoogleLoginProvider
+import com.twix.login.kakao.KakaoLoginProvider
 import com.twix.ui.base.ObserveAsEvents
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -44,7 +46,8 @@ fun LoginRoute(
     navigateToHome: () -> Unit,
     navigateToOnBoarding: (OnboardingStatus) -> Unit,
     toastManager: ToastManager = koinInject(),
-    loginProvider: LoginProviderFactory = koinInject(),
+    kakaoLoginProvider: KakaoLoginProvider = koinInject(),
+    googleLoginProvider: GoogleLoginProvider = koinInject(),
     viewModel: LoginViewModel = koinViewModel(),
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -68,7 +71,12 @@ fun LoginRoute(
 
     LoginScreen { type ->
         coroutineScope.launch {
-            viewModel.dispatch(LoginIntent.Login(loginProvider[type].login()))
+            val result =
+                when (type) {
+                    LoginType.KAKAO -> kakaoLoginProvider.login(currentContext)
+                    LoginType.GOOGLE -> googleLoginProvider.login()
+                }
+            viewModel.dispatch(LoginIntent.Login(result))
         }
     }
 }

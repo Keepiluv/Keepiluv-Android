@@ -7,11 +7,11 @@ enum class ReactionUiModel(
     val type: GoalReactionType,
     val imageResources: Int,
 ) {
-    HAPPY(GoalReactionType.HAPPY, R.drawable.ic_happy),
-    TROUBLE(GoalReactionType.TROUBLE, R.drawable.ic_trouble),
-    LOVE(GoalReactionType.LOVE, R.drawable.ic_love),
-    DOUBT(GoalReactionType.DOUBT, R.drawable.ic_doubt),
-    FUCK(GoalReactionType.FUCK, R.drawable.ic_fuck),
+    HAPPY(GoalReactionType.HAPPY, R.drawable.ic_emoji_happy),
+    TROUBLE(GoalReactionType.TROUBLE, R.drawable.ic_emoji_trouble),
+    LOVE(GoalReactionType.LOVE, R.drawable.ic_emoji_love),
+    DOUBT(GoalReactionType.DOUBT, R.drawable.ic_emoji_doubt),
+    FUCK(GoalReactionType.FUCK, R.drawable.ic_emoji_fuck),
     ;
 
     companion object {

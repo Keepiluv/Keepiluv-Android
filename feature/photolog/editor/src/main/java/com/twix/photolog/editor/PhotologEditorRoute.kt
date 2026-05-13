@@ -36,6 +36,8 @@ import coil3.request.crossfade
 import com.twix.designsystem.R
 import com.twix.designsystem.components.button.AppRoundButton
 import com.twix.designsystem.components.comment.CommentAnchorFrame
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.photolog.PhotologCard
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
@@ -129,6 +131,7 @@ fun PhotologEditorRoute(
     PhotologEditorScreen(
         uiState = uiState,
         onBack = navigateToBack,
+        onRetry = { viewModel.dispatch(PhotologEditorIntent.Retry) },
         onClickSave = { viewModel.dispatch(PhotologEditorIntent.Save) },
         onFocusChanged = { viewModel.dispatch(PhotologEditorIntent.CommentFocusChanged(it)) },
         onCommentChanged = { viewModel.dispatch(PhotologEditorIntent.ModifyComment(it)) },
@@ -151,6 +154,7 @@ fun PhotologEditorRoute(
 fun PhotologEditorScreen(
     uiState: PhotologEditorUiState,
     onBack: () -> Unit,
+    onRetry: () -> Unit,
     onClickSave: () -> Unit,
     onCommentChanged: (String) -> Unit,
     onFocusChanged: (Boolean) -> Unit,
@@ -166,51 +170,70 @@ fun PhotologEditorScreen(
                 .background(color = CommonColor.White)
                 .noRippleClickable { focusManager.clearFocus() },
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            PhotologEditorTopBar(
-                title = uiState.goalName,
-                onBack = onBack,
-                onClickSave = onClickSave,
-            )
+        when {
+            uiState.showLoading -> {
+                TwixLoadingOverlay()
+            }
 
-            Spacer(Modifier.height(103.dp))
-
-            PhotologCard(
-                modifier =
-                    Modifier
-                        .onGloballyPositioned { coordinates ->
-                            val bottom = coordinates.boundsInParent().bottom
-                            if (photologBottom != bottom) {
-                                photologBottom = bottom
-                            }
-                        },
-            ) {
-                AsyncImage(
-                    model =
-                        ImageRequest
-                            .Builder(LocalContext.current)
-                            .data(uiState.imageUrl)
-                            .crossfade(true)
-                            .build(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
+            uiState.showError -> {
+                ErrorScreen(
+                    onClickRetry = onRetry,
+                    onClickBack = onBack,
                 )
             }
 
-            Spacer(Modifier.height(101.dp))
+            else -> {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    PhotologEditorTopBar(
+                        title = uiState.goalName,
+                        onBack = onBack,
+                        onClickSave = onClickSave,
+                    )
 
-            RetakeButton(onClickRetake = onClickRetake)
+                    Spacer(Modifier.height(103.dp))
+
+                    PhotologCard(
+                        modifier =
+                            Modifier
+                                .onGloballyPositioned { coordinates ->
+                                    val bottom = coordinates.boundsInParent().bottom
+                                    if (photologBottom != bottom) {
+                                        photologBottom = bottom
+                                    }
+                                },
+                    ) {
+                        AsyncImage(
+                            model =
+                                ImageRequest
+                                    .Builder(LocalContext.current)
+                                    .data(uiState.imageUrl)
+                                    .crossfade(true)
+                                    .build(),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                        )
+                    }
+
+                    Spacer(Modifier.height(101.dp))
+
+                    RetakeButton(onClickRetake = onClickRetake)
+                }
+
+                CommentAnchorFrame(
+                    uiModel = uiState.comment,
+                    anchorBottom = photologBottom,
+                    paddingBottom = 24.dp,
+                    onCommentChanged = onCommentChanged,
+                    onFocusChanged = onFocusChanged,
+                )
+
+                if (uiState.isSaving) {
+                    TwixLoadingOverlay()
+                }
+            }
         }
-
-        CommentAnchorFrame(
-            uiModel = uiState.comment,
-            anchorBottom = photologBottom,
-            paddingBottom = 24.dp,
-            onCommentChanged = onCommentChanged,
-            onFocusChanged = onFocusChanged,
-        )
     }
 }
 
@@ -247,8 +270,10 @@ private fun PhotologEditorScreenPreview() {
                 PhotologEditorUiState(
                     nickname = "페토",
                     goalName = "아이스크림 먹기",
+                    isLoading = false,
                 ),
             onBack = {},
+            onRetry = {},
             onClickSave = {},
             onFocusChanged = {},
             onClickRetake = {},

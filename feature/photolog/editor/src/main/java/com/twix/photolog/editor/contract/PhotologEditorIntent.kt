@@ -3,6 +3,8 @@ package com.twix.photolog.editor.contract
 import com.twix.ui.base.Intent
 
 sealed interface PhotologEditorIntent : Intent {
+    data object Retry : PhotologEditorIntent
+
     data object Save : PhotologEditorIntent
 
     data class CommentFocusChanged(

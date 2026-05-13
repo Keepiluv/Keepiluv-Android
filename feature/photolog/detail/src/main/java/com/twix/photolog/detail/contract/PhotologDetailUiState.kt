@@ -6,7 +6,8 @@ import com.twix.domain.model.enums.GoalIconType
 import com.twix.domain.model.photolog.PhotoLogs
 import com.twix.domain.model.photolog.PhotologDetail
 import com.twix.photolog.detail.component.reaction.ReactionUiModel
-import com.twix.ui.base.State
+import com.twix.result.AppError
+import com.twix.ui.base.LoadableState
 import java.time.LocalDate
 
 @Immutable
@@ -25,10 +26,8 @@ data class PhotologDetailUiState(
      * 내 인증샷에 상대방이 리액션을 남겼을 경우 최초 1회 인터렉션 렌더링을 위한 변수
      */
     val hasShownMyReaction: Boolean = false,
-    /**
-     * 초기값으로 인해 찌르기/업로드 버튼이 렌더링 되는 것을 막기 위한 변수
-     */
-    val isLoading: Boolean = false,
+    override val isLoading: Boolean = true,
+    override val error: AppError? = null,
     /**
      * 찌르기 API 호출 중 여부 - 낙관적 UI를 위해 버튼 중복 클릭 방지에 사용
      */
@@ -37,7 +36,19 @@ data class PhotologDetailUiState(
      * 찌르기 쿨타임 잔여 시간(ms). 0보다 크면 쿨타임 중
      */
     val pokeCooldownRemaining: Long = 0L,
-) : State {
+) : LoadableState {
+    val hasPhotologContent: Boolean
+        get() = myPhotolog != null || partnerPhotolog != null
+
+    val isInitialLoading: Boolean
+        get() = isLoading && !hasPhotologContent
+
+    val hasInitialLoadError: Boolean
+        get() = error != null && !hasPhotologContent
+
+    val isContentLoading: Boolean
+        get() = isLoading && hasPhotologContent
+
     val isPokeDisabled: Boolean
         get() = isPoking || pokeCooldownRemaining > 0
 
@@ -159,6 +170,15 @@ data class PhotologDetailUiState(
      */
     val myReaction: ReactionUiModel?
         get() = myPhotolog?.reaction?.let { ReactionUiModel.find(it) }
+
+    override fun copyLoadableState(
+        isLoading: Boolean,
+        error: AppError?,
+    ): LoadableState =
+        copy(
+            isLoading = isLoading,
+            error = error,
+        )
 }
 
 fun PhotoLogs.toUiState(
@@ -183,5 +203,6 @@ fun PhotoLogs.toUiState(
         myPhotolog = currentGoalPhotolog.myPhotolog,
         partnerPhotolog = currentGoalPhotolog.partnerPhotolog,
         isCompletedGoal = isCompletedGoal,
+        isLoading = false,
     )
 }

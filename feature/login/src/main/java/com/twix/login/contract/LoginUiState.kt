@@ -8,6 +8,9 @@ data class LoginUiState(
     override val isLoading: Boolean = false,
     override val error: AppError? = null,
 ) : LoadableState {
+    val showLoading: Boolean
+        get() = isLoading
+
     override fun copyLoadableState(
         isLoading: Boolean,
         error: AppError?,

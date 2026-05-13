@@ -21,8 +21,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.dialog.CommonDialog
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -35,6 +38,7 @@ import com.twix.settings.SettingsSideEffect
 import com.twix.settings.SettingsViewModel
 import com.twix.settings.component.SettingsMenuFrame
 import com.twix.settings.component.SettingsMenuItem
+import com.twix.settings.model.SettingsUiState
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.noRippleClickable
 import org.koin.compose.koinInject
@@ -46,6 +50,7 @@ fun SettingsAccountRoute(
     popBackStack: () -> Unit,
     navigateToLogin: () -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
 
@@ -57,7 +62,9 @@ fun SettingsAccountRoute(
     }
 
     SettingsAccountScreen(
+        uiState = uiState,
         onBack = popBackStack,
+        onRetry = viewModel::retryInitialLoad,
         onLogout = { viewModel.dispatch(SettingsIntent.Logout) },
         onWithdrawAccount = { viewModel.dispatch(SettingsIntent.WithdrawAccount) },
     )
@@ -65,89 +72,105 @@ fun SettingsAccountRoute(
 
 @Composable
 private fun SettingsAccountScreen(
+    uiState: SettingsUiState,
     onBack: () -> Unit,
+    onRetry: () -> Unit,
     onLogout: () -> Unit,
     onWithdrawAccount: () -> Unit,
 ) {
     var showWithdrawDialog by remember { mutableStateOf(false) }
 
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(CommonColor.White),
-    ) {
-        CommonTopBar(
-            title = stringResource(R.string.word_account),
-            left = {
-                Image(
-                    painter = painterResource(R.drawable.ic_arrow3_left),
-                    contentDescription = "back",
+    when {
+        uiState.showLoading -> TwixLoadingOverlay()
+        uiState.showError -> ErrorScreen(onClickRetry = onRetry, onClickBack = onBack)
+        else -> {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(CommonColor.White),
+            ) {
+                CommonTopBar(
+                    title = stringResource(R.string.word_account),
+                    left = {
+                        Image(
+                            painter = painterResource(R.drawable.ic_arrow3_left),
+                            contentDescription = "back",
+                            modifier =
+                                Modifier
+                                    .padding(18.dp)
+                                    .size(24.dp)
+                                    .noRippleClickable(onClick = onBack),
+                        )
+                    },
+                )
+
+                Spacer(Modifier.height(20.dp))
+
+                SettingsMenuFrame(
                     modifier =
                         Modifier
-                            .padding(18.dp)
-                            .size(24.dp)
-                            .noRippleClickable(onClick = onBack),
-                )
-            },
-        )
+                            .padding(horizontal = 20.dp),
+                ) {
+                    SettingsMenuItem(
+                        title = stringResource(R.string.word_logout),
+                        onClick = {
+                            if (!uiState.isAccountActionInFlight) {
+                                onLogout()
+                            }
+                        },
+                    )
 
-        Spacer(Modifier.height(20.dp))
+                    HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
 
-        SettingsMenuFrame(
-            modifier =
-                Modifier
-                    .padding(horizontal = 20.dp),
-        ) {
-            SettingsMenuItem(
-                title = stringResource(R.string.word_logout),
-                onClick = onLogout,
-            )
+                    SettingsMenuItem(
+                        title = stringResource(R.string.action_withdraw_account),
+                        onClick = {
+                            if (!uiState.isAccountActionInFlight) {
+                                showWithdrawDialog = true
+                            }
+                        },
+                    )
+                }
+            }
 
-            HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
+            CommonDialog(
+                visible = showWithdrawDialog,
+                confirmText = stringResource(R.string.word_cancel),
+                dismissText = stringResource(R.string.action_withdraw_account),
+                onDismiss = {
+                    showWithdrawDialog = false
+                    onWithdrawAccount()
+                },
+                onConfirm = { showWithdrawDialog = false },
+                onDismissRequest = { showWithdrawDialog = false },
+                content = {
+                    Image(
+                        painter = painterResource(R.drawable.ic_warning),
+                        contentDescription = "warning",
+                        modifier =
+                            Modifier
+                                .size(60.dp),
+                    )
 
-            SettingsMenuItem(
-                title = stringResource(R.string.action_withdraw_account),
-                onClick = { showWithdrawDialog = true },
+                    Spacer(Modifier.height(12.dp))
+
+                    AppText(
+                        text = stringResource(R.string.dialog_withdraw_account_title),
+                        color = GrayColor.C500,
+                        style = AppTextStyle.T1,
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+
+                    AppText(
+                        text = stringResource(R.string.dialog_withdraw_account_content),
+                        color = GrayColor.C400,
+                        style = AppTextStyle.B2,
+                        textAlign = TextAlign.Center,
+                    )
+                },
             )
         }
     }
-
-    CommonDialog(
-        visible = showWithdrawDialog,
-        confirmText = stringResource(R.string.word_cancel),
-        dismissText = stringResource(R.string.action_withdraw_account),
-        onDismiss = {
-            showWithdrawDialog = false
-            onWithdrawAccount()
-        },
-        onConfirm = { showWithdrawDialog = false },
-        onDismissRequest = { showWithdrawDialog = false },
-        content = {
-            Image(
-                painter = painterResource(R.drawable.ic_warning),
-                contentDescription = "warning",
-                modifier =
-                    Modifier
-                        .size(60.dp),
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            AppText(
-                text = stringResource(R.string.dialog_withdraw_account_title),
-                color = GrayColor.C500,
-                style = AppTextStyle.T1,
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            AppText(
-                text = stringResource(R.string.dialog_withdraw_account_content),
-                color = GrayColor.C400,
-                style = AppTextStyle.B2,
-                textAlign = TextAlign.Center,
-            )
-        },
-    )
 }

@@ -17,6 +17,10 @@ class SettingsViewModel(
         fetchUserInfo()
     }
 
+    fun retryInitialLoad() {
+        fetchUserInfo()
+    }
+
     override suspend fun handleIntent(intent: SettingsIntent) {
         when (intent) {
             is SettingsIntent.SetNickName -> setNickName(intent.nickName)
@@ -26,9 +30,19 @@ class SettingsViewModel(
     }
 
     private fun fetchUserInfo() {
+        if (currentState.isLoading) return
+
         launchResult(
             block = { userRepository.fetchUserInfo() },
-            onSuccess = { reduce { copy(nickName = it.name, email = it.email) } },
+            onSuccess = {
+                reduce {
+                    copy(
+                        nickName = it.name,
+                        email = it.email,
+                        hasLoadedInitialData = true,
+                    )
+                }
+            },
         )
     }
 
@@ -37,8 +51,13 @@ class SettingsViewModel(
     }
 
     private fun logout() {
+        if (currentState.isAccountActionInFlight) return
+
+        reduce { copy(isAccountActionInFlight = true) }
+
         launchResult(
             block = { authRepository.logout() },
+            onFinally = { reduce { copy(isAccountActionInFlight = false) } },
             onSuccess = {
                 tokenRegistrar.unregisterCurrentToken()
                 tryEmitSideEffect(SettingsSideEffect.ShowToast(R.string.toast_logout_completed, ToastType.SUCCESS))
@@ -49,8 +68,13 @@ class SettingsViewModel(
     }
 
     private fun withdrawAccount() {
+        if (currentState.isAccountActionInFlight) return
+
+        reduce { copy(isAccountActionInFlight = true) }
+
         launchResult(
             block = { authRepository.withdrawAccount() },
+            onFinally = { reduce { copy(isAccountActionInFlight = false) } },
             onSuccess = {
                 tryEmitSideEffect(SettingsSideEffect.ShowToast(R.string.toast_account_deleted, ToastType.SUCCESS))
                 tryEmitSideEffect(SettingsSideEffect.NavigateToLogin)

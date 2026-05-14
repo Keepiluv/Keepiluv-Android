@@ -23,6 +23,7 @@ class NotificationViewModel(
 
     override suspend fun handleIntent(intent: NotificationIntent) {
         when (intent) {
+            NotificationIntent.Retry -> fetchInitialNotificationList()
             NotificationIntent.FetchNextPage -> fetchNextNotificationList()
             is NotificationIntent.NotificationClicked -> handleNotificationClick(intent.notificationId)
         }
@@ -35,7 +36,13 @@ class NotificationViewModel(
             block = { notificationRepository.fetchNotifications() },
             onSuccess = {
                 markAllNotificationAsRead()
-                reduce { copy(notificationList = it.notifications, hasNext = it.hasNext) }
+                reduce {
+                    copy(
+                        notificationList = it.notifications,
+                        hasNext = it.hasNext,
+                        hasLoadedInitialData = true,
+                    )
+                }
             },
         )
     }

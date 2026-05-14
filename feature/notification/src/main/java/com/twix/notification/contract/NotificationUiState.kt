@@ -9,9 +9,19 @@ import com.twix.ui.base.LoadableState
 data class NotificationUiState(
     val notificationList: List<Notification> = emptyList(),
     val hasNext: Boolean = true,
-    override val isLoading: Boolean = false,
+    val hasLoadedInitialData: Boolean = false,
+    override val isLoading: Boolean = true,
     override val error: AppError? = null,
 ) : LoadableState {
+    val showLoading: Boolean
+        get() = isLoading && !hasLoadedInitialData
+
+    val showError: Boolean
+        get() = error != null && !hasLoadedInitialData
+
+    val canLoadNextPage: Boolean
+        get() = hasNext && !isLoading
+
     override fun copyLoadableState(
         isLoading: Boolean,
         error: AppError?,

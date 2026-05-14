@@ -196,9 +196,7 @@ abstract class BaseViewModel<S : State, I : Intent, SE : SideEffect>(
         }
     }
 
-    private inline fun reduceLoadableState(
-        crossinline reducer: DefaultLoadableState.() -> DefaultLoadableState,
-    ) {
+    private inline fun reduceLoadableState(crossinline reducer: DefaultLoadableState.() -> DefaultLoadableState) {
         if (currentState !is DefaultLoadableState) return
 
         reduce {

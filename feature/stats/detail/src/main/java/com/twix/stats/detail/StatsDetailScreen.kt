@@ -126,7 +126,7 @@ fun StatsDetailScreen(
 
     Box {
         when {
-            uiState.isLoading -> {
+            uiState.showLoading -> {
                 TwixLoadingOverlay(
                     modifier =
                         Modifier

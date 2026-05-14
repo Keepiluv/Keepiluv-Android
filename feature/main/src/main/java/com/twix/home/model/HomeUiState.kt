@@ -3,7 +3,7 @@ package com.twix.home.model
 import androidx.compose.runtime.Immutable
 import com.twix.domain.model.goal.GoalList
 import com.twix.result.AppError
-import com.twix.ui.base.LoadableState
+import com.twix.ui.base.ContentLoadableState
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -16,23 +16,19 @@ data class HomeUiState(
     val goalList: GoalList = GoalList(),
     val selectedGoalId: Long = -1,
     val isRefreshing: Boolean = false, // 당겨서 리프레시에 사용
-    val hasInitialLoadSucceeded: Boolean = false,
+    override val hasLoadedContent: Boolean = false,
     override val isLoading: Boolean = false,
     override val error: AppError? = null,
-) : LoadableState {
+) : ContentLoadableState {
     val monthYear: String
         get() = "${visibleDate.month.value}월 ${visibleDate.year}"
 
-    val showLoading get() = isLoading && !hasInitialLoadSucceeded
+    val showContentLoading get() = showOverlayLoading
 
-    val showError get() = error != null && !hasInitialLoadSucceeded
+    val showEmpty get() = hasLoadedContent && goalList.goals.isEmpty() && error == null
 
-    val showContentLoading get() = isLoading && hasInitialLoadSucceeded
-
-    val showEmpty get() = hasInitialLoadSucceeded && goalList.goals.isEmpty() && error == null
-
-    override fun copyLoadableState(
+    override fun copyState(
         isLoading: Boolean,
         error: AppError?,
-    ): LoadableState = copy(isLoading = isLoading, error = error)
+    ): ContentLoadableState = copy(isLoading = isLoading, error = error)
 }

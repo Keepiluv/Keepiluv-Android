@@ -1,5 +1,6 @@
 package com.twix.notification
 
+import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.notification.Notification
@@ -9,7 +10,9 @@ import com.twix.notification.contract.NotificationSideEffect
 import com.twix.notification.contract.NotificationUiState
 import com.twix.notification.deeplink.NotificationDeepLink
 import com.twix.notification.deeplink.NotificationDeepLinkParser
+import com.twix.result.AppResult
 import com.twix.ui.base.BaseViewModel
+import kotlinx.coroutines.launch
 
 class NotificationViewModel(
     private val notificationDeepLinkParser: NotificationDeepLinkParser,
@@ -40,7 +43,7 @@ class NotificationViewModel(
                     copy(
                         notificationList = it.notifications,
                         hasNext = it.hasNext,
-                        hasLoadedInitialData = true,
+                        hasLoadedContent = true,
                     )
                 }
             },
@@ -73,10 +76,12 @@ class NotificationViewModel(
     }
 
     private fun markAllNotificationAsRead() {
-        launchResult(
-            block = { notificationRepository.markAllNotificationsAsRead() },
-            onSuccess = {},
-        )
+        viewModelScope.launch {
+            when (val result = notificationRepository.markAllNotificationsAsRead()) {
+                is AppResult.Success -> Unit
+                is AppResult.Error -> handleError(result.error)
+            }
+        }
     }
 
     private suspend fun handleNotificationClick(id: Long) {
@@ -111,9 +116,11 @@ class NotificationViewModel(
             )
         }
 
-        launchResult(
-            block = { notificationRepository.markNotificationAsRead(notification.id) },
-            onSuccess = {},
-        )
+        viewModelScope.launch {
+            when (val result = notificationRepository.markNotificationAsRead(notification.id)) {
+                is AppResult.Success -> Unit
+                is AppResult.Error -> handleError(result.error)
+            }
+        }
     }
 }

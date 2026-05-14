@@ -69,7 +69,7 @@ class StatsDetailViewModel(
 
         viewModelScope.launch {
             reduce {
-                copyLoadableState(isLoading = true, error = null) as StatsDetailUiState
+                copyState(isLoading = true, error = null) as StatsDetailUiState
             }
             val (summary, detail) = fetchStats(initialDate)
             handleFetchStatsDetailResult(summary, detail, initialDate)
@@ -100,7 +100,7 @@ class StatsDetailViewModel(
             if (detail is AppResult.Error) handleError(detail.error)
             clearCalendarOnError(initialDate)
             reduce {
-                copyLoadableState(
+                copyState(
                     isLoading = false,
                     error = listOfNotNull(summary.errorOrNull(), detail.errorOrNull()).firstOrNull(),
                 ) as StatsDetailUiState
@@ -118,6 +118,7 @@ class StatsDetailViewModel(
                         currentDate = result.currentDate,
                         completedDate = result.completedDate,
                     ),
+                hasLoadedContent = true,
                 isLoading = false,
             )
         }

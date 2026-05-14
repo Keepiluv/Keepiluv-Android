@@ -36,7 +36,7 @@ class SettingsViewModel(
                     copy(
                         nickName = it.name,
                         email = it.email,
-                        hasLoadedInitialData = true,
+                        hasLoadedContent = true,
                     )
                 }
             },

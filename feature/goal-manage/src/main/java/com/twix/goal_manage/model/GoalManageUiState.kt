@@ -3,13 +3,12 @@ package com.twix.goal_manage.model
 import androidx.compose.runtime.Immutable
 import com.twix.domain.model.goal.GoalSummary
 import com.twix.result.AppError
-import com.twix.ui.base.LoadableState
+import com.twix.ui.base.ContentLoadableState
 import java.time.LocalDate
 
 @Immutable
 data class GoalManageUiState(
     val isInitialized: Boolean = false,
-    val hasLoadedInitialData: Boolean = false,
     val selectedDate: LocalDate = LocalDate.now(),
     val referenceDate: LocalDate = LocalDate.now(), // 7일 달력을 생성하기 위한 레퍼런스 날짜
     val goalSummaries: List<GoalSummary> = emptyList(),
@@ -17,20 +16,12 @@ data class GoalManageUiState(
     val openedMenuGoalId: Long? = null, // 팝업 현재 열린 goalId
     val endDialog: GoalDialogState? = null,
     val deleteDialog: GoalDialogState? = null,
+    override val hasLoadedContent: Boolean = false,
     override val isLoading: Boolean = true,
     override val error: AppError? = null,
-) : LoadableState {
-    val showLoading: Boolean
-        get() = isLoading && !hasLoadedInitialData
-
-    val showError: Boolean
-        get() = error != null && !hasLoadedInitialData
-
-    val showOverlayLoading: Boolean
-        get() = isLoading && hasLoadedInitialData
-
-    override fun copyLoadableState(
+) : ContentLoadableState {
+    override fun copyState(
         isLoading: Boolean,
         error: AppError?,
-    ): LoadableState = copy(isLoading = isLoading, error = error)
+    ): ContentLoadableState = copy(isLoading = isLoading, error = error)
 }

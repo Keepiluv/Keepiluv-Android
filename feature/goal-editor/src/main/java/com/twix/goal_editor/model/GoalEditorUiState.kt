@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.twix.domain.model.enums.GoalIconType
 import com.twix.domain.model.enums.RepeatCycle
 import com.twix.result.AppError
-import com.twix.ui.base.LoadableState
+import com.twix.ui.base.ContentLoadableState
 import java.time.LocalDate
 
 @Immutable
@@ -16,17 +16,11 @@ data class GoalEditorUiState(
     val startDate: LocalDate = LocalDate.now(),
     val endDateEnabled: Boolean = false,
     val endDate: LocalDate = LocalDate.now(),
-    val hasLoadedInitialData: Boolean = false,
     val isSaving: Boolean = false,
+    override val hasLoadedContent: Boolean = false,
     override val isLoading: Boolean = false,
     override val error: AppError? = null,
-) : LoadableState {
-    val showLoading: Boolean
-        get() = isLoading && !hasLoadedInitialData
-
-    val showError: Boolean
-        get() = error != null && !hasLoadedInitialData
-
+) : ContentLoadableState {
     val isSaveEnabled: Boolean
         get() = goalTitle.isNotBlank()
 
@@ -36,8 +30,8 @@ data class GoalEditorUiState(
     val canSave: Boolean
         get() = isSaveEnabled && isEndDateValid && !isSaving
 
-    override fun copyLoadableState(
+    override fun copyState(
         isLoading: Boolean,
         error: AppError?,
-    ): LoadableState = copy(isLoading = isLoading, error = error)
+    ): ContentLoadableState = copy(isLoading = isLoading, error = error)
 }

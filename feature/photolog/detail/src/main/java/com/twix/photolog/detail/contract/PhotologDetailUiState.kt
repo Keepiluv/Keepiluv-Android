@@ -7,7 +7,7 @@ import com.twix.domain.model.photolog.PhotoLogs
 import com.twix.domain.model.photolog.PhotologDetail
 import com.twix.photolog.detail.component.reaction.ReactionUiModel
 import com.twix.result.AppError
-import com.twix.ui.base.LoadableState
+import com.twix.ui.base.ContentLoadableState
 import java.time.LocalDate
 
 @Immutable
@@ -22,6 +22,7 @@ data class PhotologDetailUiState(
     val myPhotolog: PhotologDetail? = null,
     val partnerPhotolog: PhotologDetail? = null,
     val isCompletedGoal: Boolean = false,
+    override val hasLoadedContent: Boolean = false,
     /**
      * 내 인증샷에 상대방이 리액션을 남겼을 경우 최초 1회 인터렉션 렌더링을 위한 변수
      */
@@ -36,19 +37,7 @@ data class PhotologDetailUiState(
      * 찌르기 쿨타임 잔여 시간(ms). 0보다 크면 쿨타임 중
      */
     val pokeCooldownRemaining: Long = 0L,
-) : LoadableState {
-    val hasPhotologContent: Boolean
-        get() = myPhotolog != null || partnerPhotolog != null
-
-    val isInitialLoading: Boolean
-        get() = isLoading && !hasPhotologContent
-
-    val hasInitialLoadError: Boolean
-        get() = error != null && !hasPhotologContent
-
-    val isContentLoading: Boolean
-        get() = isLoading && hasPhotologContent
-
+) : ContentLoadableState {
     val isPokeDisabled: Boolean
         get() = isPoking || pokeCooldownRemaining > 0
 
@@ -171,10 +160,10 @@ data class PhotologDetailUiState(
     val myReaction: ReactionUiModel?
         get() = myPhotolog?.reaction?.let { ReactionUiModel.find(it) }
 
-    override fun copyLoadableState(
+    override fun copyState(
         isLoading: Boolean,
         error: AppError?,
-    ): LoadableState =
+    ): ContentLoadableState =
         copy(
             isLoading = isLoading,
             error = error,
@@ -203,6 +192,7 @@ fun PhotoLogs.toUiState(
         myPhotolog = currentGoalPhotolog.myPhotolog,
         partnerPhotolog = currentGoalPhotolog.partnerPhotolog,
         isCompletedGoal = isCompletedGoal,
+        hasLoadedContent = true,
         isLoading = false,
     )
 }

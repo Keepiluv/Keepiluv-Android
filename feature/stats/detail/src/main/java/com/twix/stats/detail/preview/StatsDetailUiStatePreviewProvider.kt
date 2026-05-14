@@ -66,18 +66,21 @@ class StatsDetailUiStatePreviewProvider : PreviewParameterProvider<StatsDetailUi
                 detail = baseDetail,
                 summary = summary,
                 calendarUiModel = baseCalendarUiModel,
+                hasLoadedContent = true,
                 isLoading = false,
             ),
             StatsDetailUiState(
                 detail = baseDetail.copy(isCompleted = true),
                 summary = summary,
                 calendarUiModel = baseCalendarUiModel,
+                hasLoadedContent = true,
                 isLoading = false,
             ),
             StatsDetailUiState(
                 detail = baseDetail,
                 summary = summary,
                 calendarUiModel = baseCalendarUiModel,
+                hasLoadedContent = true,
                 isLoading = true,
             ),
             StatsDetailUiState(

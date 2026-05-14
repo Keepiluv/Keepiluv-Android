@@ -45,6 +45,7 @@ class OnBoardingViewModel(
                                 inviteCode.copy(
                                     myInviteCode = fetchedInviteCode.value,
                                 ),
+                            hasLoadedContent = true,
                         )
                     }
                 },

@@ -133,7 +133,7 @@ class GoalManageViewModel(
         if (currentState.selectedDate == date && currentState.isInitialized) return
         reduce { copy(selectedDate = date, isInitialized = true) }
 
-        val shouldShowInitialLoading = !currentState.hasLoadedInitialData
+        val shouldShowInitialLoading = !currentState.hasLoadedContent
         fetchGoalSummaryList(
             date = date,
             showInitialLoading = shouldShowInitialLoading,
@@ -142,7 +142,7 @@ class GoalManageViewModel(
     }
 
     private fun refreshGoalSummaryList() {
-        if (!currentState.hasLoadedInitialData) return
+        if (!currentState.hasLoadedContent) return
 
         fetchGoalSummaryList(
             date = currentState.selectedDate,
@@ -162,7 +162,7 @@ class GoalManageViewModel(
                 reduce {
                     copy(
                         goalSummaries = it,
-                        hasLoadedInitialData = true,
+                        hasLoadedContent = true,
                     )
                 }
             },

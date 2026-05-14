@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.twix.designsystem.components.comment.model.CommentUiModel
 import com.twix.domain.model.photolog.PhotoLogs
 import com.twix.result.AppError
-import com.twix.ui.base.LoadableState
+import com.twix.ui.base.ContentLoadableState
 import java.time.LocalDate
 
 @Immutable
@@ -17,29 +17,21 @@ data class PhotologEditorUiState(
     val imageUrl: String = "",
     val comment: CommentUiModel = CommentUiModel(),
     val originComment: String = "",
+    override val hasLoadedContent: Boolean = false,
     val isSaving: Boolean = false,
     override val isLoading: Boolean = true,
     override val error: AppError? = null,
-) : LoadableState {
-    val hasLoadedContent: Boolean
-        get() = goalId != -1L || photologId != -1L || imageUrl.isNotEmpty()
-
-    val showLoading: Boolean
-        get() = isLoading && !hasLoadedContent
-
-    val showError: Boolean
-        get() = error != null && !hasLoadedContent
-
+) : ContentLoadableState {
     val isCommentNotChanged: Boolean
         get() = comment.value == originComment
 
     val imageName: String
         get() = imageUrl.split(IMAGE_NAME_SEPARATOR).last()
 
-    override fun copyLoadableState(
+    override fun copyState(
         isLoading: Boolean,
         error: AppError?,
-    ): LoadableState =
+    ): ContentLoadableState =
         copy(
             isLoading = isLoading,
             error = error,
@@ -66,6 +58,7 @@ internal fun PhotoLogs.toEditorUiState(
         imageUrl = myPhotolog?.imageUrl.orEmpty(),
         comment = CommentUiModel(myPhotolog?.comment.orEmpty()),
         originComment = myPhotolog?.comment.orEmpty(),
+        hasLoadedContent = true,
         isLoading = false,
     )
 }

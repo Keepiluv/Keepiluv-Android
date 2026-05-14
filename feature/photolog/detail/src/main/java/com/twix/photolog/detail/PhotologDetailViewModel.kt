@@ -95,7 +95,7 @@ class PhotologDetailViewModel(
     }
 
     private suspend fun handleFetchPhotologError() {
-        if (!currentState.hasPhotologContent) return
+        if (!currentState.hasLoadedContent) return
         showToast(R.string.toast_photolog_detail_fetch_fail)
     }
 

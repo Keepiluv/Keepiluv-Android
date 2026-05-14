@@ -145,7 +145,7 @@ class HomeViewModel(
      * */
     private fun fetchGoalList(isUserRefresh: Boolean = false) {
         val date = currentState.selectedDate.toString()
-        val shouldShowErrorScreen = !currentState.hasInitialLoadSucceeded
+        val shouldShowErrorScreen = !currentState.hasLoadedContent
 
         launchResult(
             onStart = {
@@ -159,7 +159,7 @@ class HomeViewModel(
                 reduce {
                     copy(
                         goalList = goalList,
-                        hasInitialLoadSucceeded = true,
+                        hasLoadedContent = true,
                     )
                 }
             },

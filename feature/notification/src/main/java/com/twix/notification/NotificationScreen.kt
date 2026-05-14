@@ -163,7 +163,7 @@ private fun Preview() {
         NotificationScreen(
             uiState =
                 NotificationUiState(
-                    hasLoadedInitialData = true,
+                    hasLoadedContent = true,
                     isLoading = false,
                     notificationList =
                         listOf(

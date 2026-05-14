@@ -193,11 +193,11 @@ fun PhotologDetailScreen(
             .background(color = CommonColor.White),
     ) {
         when {
-            uiState.isInitialLoading -> {
+            uiState.showLoading -> {
                 TwixLoadingOverlay()
             }
 
-            uiState.hasInitialLoadError -> {
+            uiState.showError -> {
                 ErrorScreen(
                     onClickRetry = onRetry,
                     onClickBack = onBack,
@@ -235,7 +235,7 @@ fun PhotologDetailScreen(
                     }
                 }
 
-                if (uiState.isContentLoading || uiState.isPoking) {
+                if (uiState.showOverlayLoading || uiState.isPoking) {
                     TwixLoadingOverlay()
                 }
             }

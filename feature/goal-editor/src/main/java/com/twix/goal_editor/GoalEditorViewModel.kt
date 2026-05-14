@@ -102,7 +102,7 @@ class GoalEditorViewModel(
                 startDate = goal.startDate.validStartDate(),
                 endDate = (goal.endDate ?: LocalDate.now()).validEndDate(goal.startDate.validStartDate()),
                 endDateEnabled = goal.endDate != null,
-                hasLoadedInitialData = true,
+                hasLoadedContent = true,
             )
         }
     }

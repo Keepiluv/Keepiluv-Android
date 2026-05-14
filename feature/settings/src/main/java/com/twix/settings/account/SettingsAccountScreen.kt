@@ -134,6 +134,10 @@ private fun SettingsAccountScreen(
                 }
             }
 
+            if (uiState.showOverlayLoading) {
+                TwixLoadingOverlay()
+            }
+
             CommonDialog(
                 visible = showWithdrawDialog,
                 confirmText = stringResource(R.string.word_cancel),

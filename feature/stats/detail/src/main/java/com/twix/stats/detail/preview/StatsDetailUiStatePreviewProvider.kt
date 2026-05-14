@@ -7,7 +7,9 @@ import com.twix.domain.model.enums.RepeatCycle
 import com.twix.domain.model.stats.detail.CompletedDate
 import com.twix.domain.model.stats.detail.StatsDetail
 import com.twix.domain.model.stats.detail.StatsSummary
+import com.twix.result.AppError
 import com.twix.stats.detail.contract.StatsDetailUiState
+import java.io.IOException
 import java.time.LocalDate
 
 class StatsDetailUiStatePreviewProvider : PreviewParameterProvider<StatsDetailUiState> {
@@ -64,11 +66,26 @@ class StatsDetailUiStatePreviewProvider : PreviewParameterProvider<StatsDetailUi
                 detail = baseDetail,
                 summary = summary,
                 calendarUiModel = baseCalendarUiModel,
+                isLoading = false,
             ),
             StatsDetailUiState(
                 detail = baseDetail.copy(isCompleted = true),
                 summary = summary,
                 calendarUiModel = baseCalendarUiModel,
+                isLoading = false,
+            ),
+            StatsDetailUiState(
+                detail = baseDetail,
+                summary = summary,
+                calendarUiModel = baseCalendarUiModel,
+                isLoading = true,
+            ),
+            StatsDetailUiState(
+                isLoading = false,
+                error =
+                    AppError.Network(
+                        IOException(),
+                    ),
             ),
         )
 }

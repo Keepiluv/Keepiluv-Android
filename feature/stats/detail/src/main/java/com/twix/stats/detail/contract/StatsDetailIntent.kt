@@ -4,6 +4,8 @@ import com.twix.ui.base.Intent
 import java.time.LocalDate
 
 sealed interface StatsDetailIntent : Intent {
+    data object Retry : StatsDetailIntent
+
     data class SelectDate(
         val date: LocalDate,
     ) : StatsDetailIntent

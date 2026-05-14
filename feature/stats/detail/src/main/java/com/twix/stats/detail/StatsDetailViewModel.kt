@@ -13,6 +13,7 @@ import com.twix.domain.repository.GoalRepository
 import com.twix.domain.repository.StatsRepository
 import com.twix.navigation.NavRoutes
 import com.twix.result.AppResult
+import com.twix.result.errorOrNull
 import com.twix.stats.detail.contract.StatsDetailSideEffect
 import com.twix.stats.detail.contract.StatsDetailUiState
 import com.twix.ui.base.BaseViewModel
@@ -67,6 +68,9 @@ class StatsDetailViewModel(
         val initialDate = LocalDate.parse(argDate).let(YearMonth::from)
 
         viewModelScope.launch {
+            reduce {
+                copyLoadableState(isLoading = true, error = null) as StatsDetailUiState
+            }
             val (summary, detail) = fetchStats(initialDate)
             handleFetchStatsDetailResult(summary, detail, initialDate)
         }
@@ -79,19 +83,28 @@ class StatsDetailViewModel(
             summaryDeferred.await() to detailDeferred.await()
         }
 
-    private suspend fun handleFetchStatsDetailResult(
+    private fun handleFetchStatsDetailResult(
         summary: AppResult<StatsSummary>,
         detail: AppResult<StatsDetail>,
         initialDate: YearMonth,
     ) {
         if (summary is AppResult.Success && detail is AppResult.Success) {
-            reduce { copy(summary = summary.data) }
+            reduce {
+                copy(
+                    summary = summary.data,
+                )
+            }
             reduceStatsDetail(detail.data)
         } else {
             if (summary is AppResult.Error) handleError(summary.error)
             if (detail is AppResult.Error) handleError(detail.error)
             clearCalendarOnError(initialDate)
-            showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
+            reduce {
+                copyLoadableState(
+                    isLoading = false,
+                    error = listOfNotNull(summary.errorOrNull(), detail.errorOrNull()).firstOrNull(),
+                ) as StatsDetailUiState
+            }
         }
     }
 
@@ -105,6 +118,7 @@ class StatsDetailViewModel(
                         currentDate = result.currentDate,
                         completedDate = result.completedDate,
                     ),
+                isLoading = false,
             )
         }
     }
@@ -144,7 +158,6 @@ class StatsDetailViewModel(
             block = { statsRepository.fetchStatsDetail(argGoalId, date) },
             onSuccess = { reduceStatsDetail(it) },
             onError = {
-                clearCalendarOnError(date)
                 showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
             },
         )
@@ -193,6 +206,7 @@ class StatsDetailViewModel(
 
     override suspend fun handleIntent(intent: StatsDetailIntent) {
         when (intent) {
+            StatsDetailIntent.Retry -> fetchInitialStats()
             is StatsDetailIntent.SelectDate -> navigateToPhotologDetail(intent.date)
             StatsDetailIntent.GoalEdit -> navigateToGoalEditor()
             StatsDetailIntent.PreviousMonth -> fetchPreviousMonth()
@@ -222,13 +236,11 @@ class StatsDetailViewModel(
 
     private fun fetchPreviousMonth() {
         val previousMonth = currentState.detail.currentDate.minusMonths(1)
-        reduce { copy(detail = detail.copy(currentDate = previousMonth)) }
         monthChangeFlow.tryEmit(YearMonth.from(previousMonth))
     }
 
     private fun fetchNextMonth() {
         val nextMonth = currentState.detail.currentDate.plusMonths(1)
-        reduce { copy(detail = detail.copy(currentDate = nextMonth)) }
         monthChangeFlow.tryEmit(YearMonth.from(nextMonth))
     }
 

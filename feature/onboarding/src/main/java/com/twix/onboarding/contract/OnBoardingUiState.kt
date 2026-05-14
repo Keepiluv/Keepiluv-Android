@@ -49,10 +49,3 @@ data class OnBoardingUiState(
             error = error,
         )
 }
-
-enum class OnBoardingLoadingAction {
-    CONNECT_COUPLE,
-    SUBMIT_PROFILE,
-    SUBMIT_DDAY,
-    SUBMIT_MARKETING_CONSENT,
-}

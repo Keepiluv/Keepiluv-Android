@@ -120,12 +120,7 @@ class PhotologDetailViewModel(
             onSuccess = {},
             onError = {
                 rollbackReaction()
-                emitSideEffect(
-                    PhotologDetailSideEffect.ShowToast(
-                        R.string.toast_reaction_fail,
-                        ToastType.ERROR,
-                    ),
-                )
+                showToast(R.string.toast_reaction_fail)
             },
         )
     }

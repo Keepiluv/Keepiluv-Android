@@ -5,3 +5,4 @@ fun <T> AppResult<T>.errorOrNull() =
         is AppResult.Error -> error
         is AppResult.Success -> null
     }
+

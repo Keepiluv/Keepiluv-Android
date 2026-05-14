@@ -12,14 +12,47 @@ data class OnBoardingUiState(
     val profile: ProfileUiModel = ProfileUiModel(),
     val inviteCode: InviteCodeUiModel = InviteCodeUiModel(),
     val dDay: DdayUiModel = DdayUiModel(),
-    override val isLoading: Boolean = false,
+    override val isLoading: Boolean = true,
     override val error: AppError? = null,
+    val loadingAction: OnBoardingLoadingAction? = null,
 ) : LoadableState {
+    val hasInviteCodeContent: Boolean
+        get() = inviteCode.myInviteCode.isNotBlank()
+
+    val showLoading: Boolean
+        get() = isLoading && !hasInviteCodeContent
+
+    val showError: Boolean
+        get() = error != null && !hasInviteCodeContent
+
     val isValidNickName: Boolean
         get() = profile.isValid
+
+    val isConnectingCouple: Boolean
+        get() = loadingAction == OnBoardingLoadingAction.CONNECT_COUPLE
+
+    val isSubmittingProfile: Boolean
+        get() = loadingAction == OnBoardingLoadingAction.SUBMIT_PROFILE
+
+    val isSubmittingDday: Boolean
+        get() = loadingAction == OnBoardingLoadingAction.SUBMIT_DDAY
+
+    val isSubmittingMarketingConsent: Boolean
+        get() = loadingAction == OnBoardingLoadingAction.SUBMIT_MARKETING_CONSENT
 
     override fun copyLoadableState(
         isLoading: Boolean,
         error: AppError?,
-    ): LoadableState = copy(isLoading = isLoading, error = error)
+    ): LoadableState =
+        copy(
+            isLoading = isLoading,
+            error = error,
+        )
+}
+
+enum class OnBoardingLoadingAction {
+    CONNECT_COUPLE,
+    SUBMIT_PROFILE,
+    SUBMIT_DDAY,
+    SUBMIT_MARKETING_CONSENT,
 }

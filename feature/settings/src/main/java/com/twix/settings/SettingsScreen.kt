@@ -46,7 +46,7 @@ fun SettingsRoute(
     SettingsScreen(
         uiState = uiState,
         onBack = popBackStack,
-        onRetry = viewModel::retryInitialLoad,
+        onRetry = { viewModel.dispatch(SettingsIntent.Retry) },
         onAccountClick = navigateToSettingsAccount,
         onAboutClick = navigateToSettingsAbout,
     )

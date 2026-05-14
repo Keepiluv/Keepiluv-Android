@@ -64,7 +64,7 @@ fun SettingsAccountRoute(
     SettingsAccountScreen(
         uiState = uiState,
         onBack = popBackStack,
-        onRetry = viewModel::retryInitialLoad,
+        onRetry = { viewModel.dispatch(SettingsIntent.Retry) },
         onLogout = { viewModel.dispatch(SettingsIntent.Logout) },
         onWithdrawAccount = { viewModel.dispatch(SettingsIntent.WithdrawAccount) },
     )

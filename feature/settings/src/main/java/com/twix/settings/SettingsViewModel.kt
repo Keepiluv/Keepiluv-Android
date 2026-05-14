@@ -17,12 +17,9 @@ class SettingsViewModel(
         fetchUserInfo()
     }
 
-    fun retryInitialLoad() {
-        fetchUserInfo()
-    }
-
     override suspend fun handleIntent(intent: SettingsIntent) {
         when (intent) {
+            SettingsIntent.Retry -> fetchUserInfo()
             is SettingsIntent.SetNickName -> setNickName(intent.nickName)
             SettingsIntent.Logout -> logout()
             SettingsIntent.WithdrawAccount -> withdrawAccount()

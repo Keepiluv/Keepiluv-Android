@@ -16,17 +16,20 @@ data class HomeUiState(
     val goalList: GoalList = GoalList(),
     val selectedGoalId: Long = -1,
     val isRefreshing: Boolean = false, // 당겨서 리프레시에 사용
+    val hasInitialLoadSucceeded: Boolean = false,
     override val isLoading: Boolean = false,
     override val error: AppError? = null,
 ) : LoadableState {
     val monthYear: String
         get() = "${visibleDate.month.value}월 ${visibleDate.year}"
 
-    val showLoading get() = isLoading && goalList.goals.isEmpty()
+    val showLoading get() = isLoading && !hasInitialLoadSucceeded
 
-    val showError get() = error != null
+    val showError get() = error != null && !hasInitialLoadSucceeded
 
-    val showEmpty get() = goalList.goals.isEmpty() && !isLoading && error == null
+    val showContentLoading get() = isLoading && hasInitialLoadSucceeded
+
+    val showEmpty get() = hasInitialLoadSucceeded && goalList.goals.isEmpty() && error == null
 
     override fun copyLoadableState(
         isLoading: Boolean,

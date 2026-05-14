@@ -145,6 +145,7 @@ class HomeViewModel(
      * */
     private fun fetchGoalList(isUserRefresh: Boolean = false) {
         val date = currentState.selectedDate.toString()
+        val shouldShowErrorScreen = !currentState.hasInitialLoadSucceeded
 
         launchResult(
             onStart = {
@@ -154,20 +155,25 @@ class HomeViewModel(
                 reduce { copy(isRefreshing = false) }
             },
             block = { goalRepository.fetchGoalList(date = date) },
-            onSuccess = { goalList -> reduce { copy(goalList = goalList) } },
-            onError =
-                if (isUserRefresh) {
-                    {
-                        emitSideEffect(
-                            HomeSideEffect.ShowToast(
-                                R.string.toast_goal_fetch_failed,
-                                ToastType.ERROR,
-                            ),
-                        )
-                    }
-                } else {
-                    null
-                },
+            onSuccess = { goalList ->
+                reduce {
+                    copy(
+                        goalList = goalList,
+                        hasInitialLoadSucceeded = true,
+                    )
+                }
+            },
+            onError = {
+                if (!shouldShowErrorScreen) {
+                    reduce { copy(error = null) }
+                    emitSideEffect(
+                        HomeSideEffect.ShowToast(
+                            R.string.toast_goal_fetch_failed,
+                            ToastType.ERROR,
+                        ),
+                    )
+                }
+            },
         )
     }
 }

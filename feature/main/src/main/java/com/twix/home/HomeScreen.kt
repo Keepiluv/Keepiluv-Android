@@ -247,28 +247,38 @@ fun HomeScreen(
                     )
                 }
 
-                uiState.showEmpty -> {
-                    EmptyGoalGuide(
-                        modifier = Modifier.weight(1f),
-                        text = stringResource(R.string.home_empty_goal_guide),
-                    )
-                }
-
                 else -> {
-                    GoalList(
+                    Box(
                         modifier =
                             Modifier
-                                .padding(horizontal = 20.dp)
                                 .weight(1f),
-                        goals = uiState.goalList.goals,
-                        selectedDate = uiState.selectedDate,
-                        isRefreshing = uiState.isRefreshing,
-                        onVerificationClick = onVerificationClick,
-                        onEditClick = onEditClick,
-                        onClickGoalCard = onClickCard,
-                        onPokeGoal = onPokeGoal,
-                        onRefresh = onRefresh,
-                    )
+                    ) {
+                        if (uiState.showEmpty) {
+                            EmptyGoalGuide(
+                                modifier = Modifier.fillMaxSize(),
+                                text = stringResource(R.string.home_empty_goal_guide),
+                            )
+                        } else {
+                            GoalList(
+                                modifier =
+                                    Modifier
+                                        .fillMaxSize()
+                                        .padding(horizontal = 20.dp),
+                                goals = uiState.goalList.goals,
+                                selectedDate = uiState.selectedDate,
+                                isRefreshing = uiState.isRefreshing,
+                                onVerificationClick = onVerificationClick,
+                                onEditClick = onEditClick,
+                                onClickGoalCard = onClickCard,
+                                onPokeGoal = onPokeGoal,
+                                onRefresh = onRefresh,
+                            )
+                        }
+
+                        if (uiState.showContentLoading) {
+                            TwixLoadingOverlay()
+                        }
+                    }
                 }
             }
         }

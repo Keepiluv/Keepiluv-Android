@@ -22,13 +22,19 @@ class GoalManageViewModel(
     init {
         viewModelScope.launch {
             goalRefreshBus.goalSummariesEvents.collect {
-                fetchGoalSummaryList(currentState.selectedDate)
+                refreshGoalSummaryList()
             }
         }
     }
 
     override suspend fun handleIntent(intent: GoalManageIntent) {
         when (intent) {
+            GoalManageIntent.Retry ->
+                fetchGoalSummaryList(
+                    date = currentState.selectedDate,
+                    showInitialLoading = true,
+                    showToastOnError = false,
+                )
             is GoalManageIntent.EndGoal -> endGoal(intent.id)
             is GoalManageIntent.DeleteGoal -> deleteGoal(intent.id)
             is GoalManageIntent.SetSelectedDate -> setSelectedDate(intent.date)
@@ -127,16 +133,44 @@ class GoalManageViewModel(
         if (currentState.selectedDate == date && currentState.isInitialized) return
         reduce { copy(selectedDate = date, isInitialized = true) }
 
-        fetchGoalSummaryList(date)
+        val shouldShowInitialLoading = !currentState.hasLoadedInitialData
+        fetchGoalSummaryList(
+            date = date,
+            showInitialLoading = shouldShowInitialLoading,
+            showToastOnError = !shouldShowInitialLoading,
+        )
     }
 
-    private fun fetchGoalSummaryList(date: LocalDate) {
+    private fun refreshGoalSummaryList() {
+        if (!currentState.hasLoadedInitialData) return
+
+        fetchGoalSummaryList(
+            date = currentState.selectedDate,
+            showInitialLoading = false,
+            showToastOnError = false,
+        )
+    }
+
+    private fun fetchGoalSummaryList(
+        date: LocalDate,
+        showInitialLoading: Boolean,
+        showToastOnError: Boolean,
+    ) {
         launchResult(
             block = { goalRepository.fetchGoalSummaryList(date.toString()) },
             onSuccess = {
-                reduce { copy(goalSummaries = it) }
+                reduce {
+                    copy(
+                        goalSummaries = it,
+                        hasLoadedInitialData = true,
+                    )
+                }
             },
-            onError = { emitSideEffect(GoalManageSideEffect.ShowToast(R.string.toast_goal_fetch_failed, ToastType.ERROR)) },
+            onError = {
+                if (!showInitialLoading && showToastOnError) {
+                    emitSideEffect(GoalManageSideEffect.ShowToast(R.string.toast_goal_fetch_failed, ToastType.ERROR))
+                }
+            },
         )
     }
 

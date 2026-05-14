@@ -27,8 +27,6 @@ class SettingsViewModel(
     }
 
     private fun fetchUserInfo() {
-        if (currentState.isLoading) return
-
         launchResult(
             block = { userRepository.fetchUserInfo() },
             onSuccess = {

@@ -16,10 +16,17 @@ data class GoalEditorUiState(
     val startDate: LocalDate = LocalDate.now(),
     val endDateEnabled: Boolean = false,
     val endDate: LocalDate = LocalDate.now(),
+    val hasLoadedInitialData: Boolean = false,
     val isSaving: Boolean = false,
     override val isLoading: Boolean = false,
     override val error: AppError? = null,
 ) : LoadableState {
+    val showLoading: Boolean
+        get() = isLoading && !hasLoadedInitialData
+
+    val showError: Boolean
+        get() = error != null && !hasLoadedInitialData
+
     val isSaveEnabled: Boolean
         get() = goalTitle.isNotBlank()
 

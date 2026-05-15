@@ -80,11 +80,14 @@ internal fun InviteCodeRoute(
     toastManager: ToastManager = koinInject(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var hasInjectedInitialInviteCode by remember(initialInviteCode) { mutableStateOf(false) }
 
-    LaunchedEffect(initialInviteCode, uiState.showLoading, uiState.showError) {
+    LaunchedEffect(initialInviteCode, uiState.showLoading, uiState.showError, hasInjectedInitialInviteCode) {
+        if (hasInjectedInitialInviteCode) return@LaunchedEffect
         if (uiState.showLoading) return@LaunchedEffect
         if (uiState.showError) return@LaunchedEffect
         if (!initialInviteCode.isNullOrBlank()) {
+            hasInjectedInitialInviteCode = true
             viewModel.dispatch(OnBoardingIntent.WriteInviteCode(initialInviteCode))
         }
     }

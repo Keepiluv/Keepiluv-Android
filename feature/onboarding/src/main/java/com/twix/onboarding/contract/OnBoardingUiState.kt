@@ -21,16 +21,16 @@ data class OnBoardingUiState(
         get() = profile.isValid
 
     val isConnectingCouple: Boolean
-        get() = loadingAction == OnBoardingLoadingAction.CONNECT_COUPLE
+        get() = isLoading && loadingAction == OnBoardingLoadingAction.CONNECT_COUPLE
 
     val isSubmittingProfile: Boolean
-        get() = loadingAction == OnBoardingLoadingAction.SUBMIT_PROFILE
+        get() = isLoading && loadingAction == OnBoardingLoadingAction.SUBMIT_PROFILE
 
     val isSubmittingDday: Boolean
-        get() = loadingAction == OnBoardingLoadingAction.SUBMIT_DDAY
+        get() = isLoading && loadingAction == OnBoardingLoadingAction.SUBMIT_DDAY
 
     val isSubmittingMarketingConsent: Boolean
-        get() = loadingAction == OnBoardingLoadingAction.SUBMIT_MARKETING_CONSENT
+        get() = isLoading && loadingAction == OnBoardingLoadingAction.SUBMIT_MARKETING_CONSENT
 
     override fun copyState(
         isLoading: Boolean,

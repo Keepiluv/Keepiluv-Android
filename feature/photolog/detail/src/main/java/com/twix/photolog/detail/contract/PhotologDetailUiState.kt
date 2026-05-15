@@ -179,7 +179,7 @@ fun PhotoLogs.toUiState(
     val currentGoalPhotolog =
         goals.firstOrNull {
             it.goalId == goalId
-        } ?: return PhotologDetailUiState()
+        } ?: return PhotologDetailUiState(isLoading = false)
 
     return PhotologDetailUiState(
         goalId = goalId,

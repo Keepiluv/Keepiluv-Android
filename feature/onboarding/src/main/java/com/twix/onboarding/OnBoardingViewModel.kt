@@ -141,13 +141,13 @@ class OnBoardingViewModel(
     private fun connectCouple() {
         val currentUiState = currentState.inviteCode
         if (!currentState.inviteCode.isValid) return
-        if (currentState.loadingAction == OnBoardingLoadingAction.CONNECT_COUPLE) return
+        if (currentState.loadingAction != null) return
         if (connectCoupleJob?.isActive == true) return
 
         connectCoupleJob =
             launchResult(
-                onStart = { reduce { copy(loadingAction = OnBoardingLoadingAction.CONNECT_COUPLE) } },
-                onFinally = { reduce { copy(loadingAction = null) } },
+                onStart = { startLoadingAction(OnBoardingLoadingAction.CONNECT_COUPLE) },
+                onFinally = { clearLoadingAction(OnBoardingLoadingAction.CONNECT_COUPLE) },
                 block = { onBoardingRepository.coupleConnection(currentUiState.partnerInviteCode) },
                 onSuccess = {
                     stopPolling()
@@ -194,11 +194,11 @@ class OnBoardingViewModel(
     }
 
     private fun profileSetup() {
-        if (currentState.loadingAction == OnBoardingLoadingAction.SUBMIT_PROFILE) return
+        if (currentState.loadingAction != null) return
 
         launchResult(
-            onStart = { reduce { copy(loadingAction = OnBoardingLoadingAction.SUBMIT_PROFILE) } },
-            onFinally = { reduce { copy(loadingAction = null) } },
+            onStart = { startLoadingAction(OnBoardingLoadingAction.SUBMIT_PROFILE) },
+            onFinally = { clearLoadingAction(OnBoardingLoadingAction.SUBMIT_PROFILE) },
             block = { onBoardingRepository.profileSetup(currentState.profile.nickname) },
             onSuccess = { fetchOnboardingStatus() },
             onError = { showToast(R.string.onboarding_profile_setup_fail, ToastType.ERROR) },
@@ -233,11 +233,11 @@ class OnBoardingViewModel(
     }
 
     private fun anniversarySetup() {
-        if (currentState.loadingAction == OnBoardingLoadingAction.SUBMIT_DDAY) return
+        if (currentState.loadingAction != null) return
 
         launchResult(
-            onStart = { reduce { copy(loadingAction = OnBoardingLoadingAction.SUBMIT_DDAY) } },
-            onFinally = { reduce { copy(loadingAction = null) } },
+            onStart = { startLoadingAction(OnBoardingLoadingAction.SUBMIT_DDAY) },
+            onFinally = { clearLoadingAction(OnBoardingLoadingAction.SUBMIT_DDAY) },
             block = { onBoardingRepository.anniversarySetup(currentState.dDay.anniversaryDate.toString()) },
             onSuccess = { tryEmitSideEffect(OnBoardingSideEffect.DdaySetting.NavigateToHome) },
             onError = {
@@ -251,11 +251,11 @@ class OnBoardingViewModel(
         isMarketingEnabled: Boolean,
         isNightMarketingEnabled: Boolean,
     ) {
-        if (currentState.loadingAction == OnBoardingLoadingAction.SUBMIT_MARKETING_CONSENT) return
+        if (currentState.loadingAction != null) return
 
         launchResult(
-            onStart = { reduce { copy(loadingAction = OnBoardingLoadingAction.SUBMIT_MARKETING_CONSENT) } },
-            onFinally = { reduce { copy(loadingAction = null) } },
+            onStart = { startLoadingAction(OnBoardingLoadingAction.SUBMIT_MARKETING_CONSENT) },
+            onFinally = { clearLoadingAction(OnBoardingLoadingAction.SUBMIT_MARKETING_CONSENT) },
             block = {
                 notificationRepository.initNotificationSettings(
                     isPushEnabled,
@@ -265,6 +265,17 @@ class OnBoardingViewModel(
             },
             onSuccess = {},
         )
+    }
+
+    private fun startLoadingAction(action: OnBoardingLoadingAction) {
+        reduce { copy(loadingAction = action) }
+    }
+
+    private fun clearLoadingAction(expectedAction: OnBoardingLoadingAction) {
+        reduce {
+            if (loadingAction != expectedAction) return@reduce this
+            copy(loadingAction = null)
+        }
     }
 
     private suspend fun showToast(

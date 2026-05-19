@@ -34,4 +34,6 @@ class DefaultOnboardingRepository(
         safeApiCall { service.coupleConnection(CoupleConnectionRequest(request)) }
 
     override suspend fun profileSetup(request: String): AppResult<Unit> = safeApiCall { service.profileSetup(ProfileRequest(request)) }
+
+    override suspend fun updateProfile(request: String): AppResult<Unit> = safeApiCall { service.updateProfile(ProfileRequest(request)) }
 }

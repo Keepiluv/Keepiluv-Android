@@ -14,4 +14,6 @@ interface OnBoardingRepository {
     suspend fun fetchInviteCode(): AppResult<InviteCode>
 
     suspend fun fetchOnboardingStatus(): AppResult<OnboardingStatus>
+
+    suspend fun updateProfile(request: String): AppResult<Unit>
 }

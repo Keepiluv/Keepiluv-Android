@@ -3,6 +3,7 @@ package com.twix.settings
 import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.repository.AuthRepository
+import com.twix.domain.repository.OnBoardingRepository
 import com.twix.domain.repository.UserRepository
 import com.twix.notification.token.NotificationTokenRegistrar
 import com.twix.settings.model.SettingsUiState
@@ -12,6 +13,7 @@ class SettingsViewModel(
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
     private val tokenRegistrar: NotificationTokenRegistrar,
+    private val onBoardingRepository: OnBoardingRepository,
 ) : BaseViewModel<SettingsUiState, SettingsIntent, SettingsSideEffect>(SettingsUiState()) {
     init {
         fetchUserInfo()
@@ -33,7 +35,14 @@ class SettingsViewModel(
     }
 
     private fun setNickName(nickName: String) {
+        val originalNickName = currentState.nickName
         reduce { copy(nickName = nickName) }
+
+        launchResult(
+            block = { onBoardingRepository.updateProfile(nickName) },
+            onSuccess = {},
+            onError = { reduce { copy(nickName = originalNickName) } },
+        )
     }
 
     private fun logout() {

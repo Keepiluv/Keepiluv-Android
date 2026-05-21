@@ -177,6 +177,25 @@ abstract class BaseViewModel<S : State, I : Intent, SE : SideEffect>(
     }
 
     /**
+     * AppResult를 loading/error 상태 변경 없이 처리한다.
+     *
+     * best effort 요청처럼 DefaultLoadableState를 변경하지 않아야 하는 경우 사용한다.
+     */
+    protected suspend fun <D> handleResultWithoutLoadableStateUpdate(
+        result: AppResult<D>,
+        onSuccess: (D) -> Unit = {},
+        onError: (suspend (AppError) -> Unit)? = null,
+    ) {
+        when (result) {
+            is AppResult.Success -> onSuccess(result.data)
+            is AppResult.Error -> {
+                handleError(result.error)
+                onError?.invoke(result.error)
+            }
+        }
+    }
+
+    /**
      * API 결과 처리
      */
     private suspend fun <D> handleApiResult(

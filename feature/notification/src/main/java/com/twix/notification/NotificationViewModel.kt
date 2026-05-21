@@ -10,7 +10,6 @@ import com.twix.notification.contract.NotificationSideEffect
 import com.twix.notification.contract.NotificationUiState
 import com.twix.notification.deeplink.NotificationDeepLink
 import com.twix.notification.deeplink.NotificationDeepLinkParser
-import com.twix.result.AppResult
 import com.twix.ui.base.BaseViewModel
 import kotlinx.coroutines.launch
 
@@ -77,10 +76,7 @@ class NotificationViewModel(
 
     private fun markAllNotificationAsRead() {
         viewModelScope.launch {
-            when (val result = notificationRepository.markAllNotificationsAsRead()) {
-                is AppResult.Success -> Unit
-                is AppResult.Error -> handleError(result.error)
-            }
+            handleResultWithoutLoadableStateUpdate(notificationRepository.markAllNotificationsAsRead())
         }
     }
 
@@ -116,9 +112,6 @@ class NotificationViewModel(
             )
         }
 
-        when (val result = notificationRepository.markNotificationAsRead(notification.id)) {
-            is AppResult.Success -> Unit
-            is AppResult.Error -> handleError(result.error)
-        }
+        handleResultWithoutLoadableStateUpdate(notificationRepository.markNotificationAsRead(notification.id))
     }
 }

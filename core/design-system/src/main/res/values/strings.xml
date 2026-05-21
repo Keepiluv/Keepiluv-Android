@@ -192,6 +192,7 @@
     <string name="onboarding_profile_helper">닉네임 2~8자</string>
     <string name="onboarding_profile_button_title">완료</string>
     <string name="onboarding_profile_invalid_name_length_toast">2자에서 8자 이내로 닉네임을 입력해주세요.</string>
+    <string name="onboarding_anniversary_already_registered_toast">짝꿍이 기념일을 먼저 등록했어요</string>
     <string name="onboarding_profile_setup_fail">프로필 설정 요청에 실패했습니다.</string>
 
     <string name="onboarding_couple_connect_description">짝꿍과 연결하고\n함께 키피럽 시작하세요</string>

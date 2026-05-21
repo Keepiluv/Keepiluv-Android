@@ -106,7 +106,7 @@ class NotificationViewModel(
     }
 
     // 알림 읽음 처리는 best effort가 정책이므로 에러 처리는 생략
-    private fun markNotificationAsRead(notification: Notification) {
+    private suspend fun markNotificationAsRead(notification: Notification) {
         reduce {
             copy(
                 notificationList =
@@ -116,11 +116,9 @@ class NotificationViewModel(
             )
         }
 
-        viewModelScope.launch {
-            when (val result = notificationRepository.markNotificationAsRead(notification.id)) {
-                is AppResult.Success -> Unit
-                is AppResult.Error -> handleError(result.error)
-            }
+        when (val result = notificationRepository.markNotificationAsRead(notification.id)) {
+            is AppResult.Success -> Unit
+            is AppResult.Error -> handleError(result.error)
         }
     }
 }

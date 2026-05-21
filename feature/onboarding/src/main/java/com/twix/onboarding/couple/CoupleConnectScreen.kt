@@ -50,7 +50,6 @@ import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
-import com.twix.navigation_contract.Constants
 import com.twix.onboarding.OnBoardingViewModel
 import com.twix.onboarding.contract.OnBoardingIntent
 import com.twix.onboarding.contract.OnBoardingSideEffect
@@ -94,7 +93,6 @@ fun CoupleConnectRoute(
                         R.string.onboarding_invite_share_message,
                         sideEffect.inviteCode,
                         deepLink,
-                        Constants.PLAY_STORE_URL,
                     )
                 val sendIntent =
                     Intent(Intent.ACTION_SEND).apply {

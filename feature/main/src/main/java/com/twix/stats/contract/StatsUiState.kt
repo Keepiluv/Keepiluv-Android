@@ -18,7 +18,7 @@ data class StatsUiState(
     override val error: AppError? = null,
 ) : ContentLoadableState {
     override val hasLoadedContent
-        get() = isLoadedInProgressStats || isLoadedCompletedStats
+        get() = isLoadedInProgressStats && isLoadedCompletedStats
 
     val showContentLoading get() = showOverlayLoading
 

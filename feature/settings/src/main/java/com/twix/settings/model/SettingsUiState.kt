@@ -6,6 +6,9 @@ import com.twix.ui.base.LoadableState
 data class SettingsUiState(
     val nickName: String = "",
     val email: String = "",
+    val pokeNotificationEnabled: Boolean = true,
+    val marketingNotificationEnabled: Boolean = false,
+    val nightMarketingNotificationEnabled: Boolean = false,
     override val isLoading: Boolean = false,
     override val error: AppError? = null,
 ) : LoadableState {

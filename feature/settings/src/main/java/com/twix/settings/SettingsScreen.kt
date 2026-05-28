@@ -2,7 +2,7 @@ package com.twix.settings
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,15 +26,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
+import com.twix.designsystem.components.dialog.CommonDialog
 import com.twix.designsystem.components.text.AppText
-import com.twix.designsystem.components.text_field.ValidateUnderlineTextField
 import com.twix.designsystem.components.topbar.CommonTopBar
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
+import com.twix.settings.component.ProfileInfo
 import com.twix.settings.component.SettingsMenuFrame
 import com.twix.settings.component.SettingsMenuItem
+import com.twix.settings.model.SettingsLanguage
 import com.twix.settings.model.SettingsUiState
 import com.twix.ui.extension.dismissKeyboardOnTap
 import com.twix.ui.extension.noRippleClickable
@@ -46,6 +48,8 @@ fun SettingsRoute(
     popBackStack: () -> Unit,
     navigateToSettingsAccount: () -> Unit,
     navigateToSettingsAbout: () -> Unit,
+    navigateToSettingsInquiry: () -> Unit,
+    navigateToSettingsNotification: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -54,6 +58,8 @@ fun SettingsRoute(
         onBack = popBackStack,
         onAccountClick = navigateToSettingsAccount,
         onAboutClick = navigateToSettingsAbout,
+        onInquiryClick = navigateToSettingsInquiry,
+        onNotificationClick = navigateToSettingsNotification,
         onCommitNickName = { viewModel.dispatch(SettingsIntent.SetNickName(it)) },
     )
 }
@@ -64,134 +70,226 @@ private fun SettingsScreen(
     onBack: () -> Unit = {},
     onAccountClick: () -> Unit = {},
     onAboutClick: () -> Unit = {},
+    onInquiryClick: () -> Unit = {},
+    onNotificationClick: () -> Unit = {},
     onCommitNickName: (String) -> Unit = {},
 ) {
     var isEditMode by remember { mutableStateOf(false) }
+    var showLanguageDialog by remember { mutableStateOf(false) }
 
-    Column(
+    Box(
         modifier =
             Modifier
                 .fillMaxSize()
                 .dismissKeyboardOnTap(onDismiss = { isEditMode = false })
                 .background(CommonColor.White),
     ) {
-        CommonTopBar(
-            title = stringResource(R.string.word_setting),
-            left = {
-                Image(
-                    painter = painterResource(R.drawable.ic_arrow3_left),
-                    contentDescription = "back",
-                    modifier =
-                        Modifier
-                            .padding(18.dp)
-                            .size(24.dp)
-                            .noRippleClickable(onClick = onBack),
-                )
-            },
-        )
-
-        Spacer(Modifier.height(20.dp))
-
         Column(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
+            modifier = Modifier.fillMaxSize(),
         ) {
-            ProfileInfo(
-                nickname = uiState.nickName,
-                isEditMode = isEditMode,
-                onCommitNickName = {
-                    onCommitNickName(it)
-                    isEditMode = false
+            CommonTopBar(
+                title = stringResource(R.string.word_setting),
+                left = {
+                    Image(
+                        painter = painterResource(R.drawable.ic_arrow3_left),
+                        contentDescription = "back",
+                        modifier =
+                            Modifier
+                                .padding(18.dp)
+                                .size(24.dp)
+                                .noRippleClickable(onClick = onBack),
+                    )
                 },
-                onEditModeChange = { isEditMode = it },
             )
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(20.dp))
 
-            SettingsMenuFrame {
-                SettingsMenuItem(
-                    resId = R.drawable.ic_profile_small,
-                    title = stringResource(R.string.word_account),
-                    onClick = onAccountClick,
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp),
+            ) {
+                ProfileInfo(
+                    nickname = uiState.nickName,
+                    isEditMode = isEditMode,
+                    onCommitNickName = {
+                        onCommitNickName(it)
+                        isEditMode = false
+                    },
+                    onEditModeChange = { isEditMode = it },
                 )
 
-                HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
+                Spacer(Modifier.height(24.dp))
 
-                SettingsMenuItem(
-                    resId = R.drawable.ic_info,
-                    title = stringResource(R.string.word_information),
-                    onClick = onAboutClick,
-                )
+                SettingsMenuFrame {
+                    SettingsMenuItem(
+                        resId = R.drawable.ic_language,
+                        title = stringResource(R.string.settings_language),
+                        right = {
+                            LanguageMenuRight(language = SettingsLanguage.Korean)
+                        },
+                        onClick = { showLanguageDialog = true },
+                    )
+
+                    SettingsDivider()
+
+                    SettingsMenuItem(
+                        resId = R.drawable.ic_profile_small,
+                        title = stringResource(R.string.word_account),
+                        onClick = onAccountClick,
+                    )
+
+                    SettingsDivider()
+
+                    SettingsMenuItem(
+                        resId = R.drawable.ic_info,
+                        title = stringResource(R.string.word_information),
+                        onClick = onAboutClick,
+                    )
+
+                    SettingsDivider()
+
+                    SettingsMenuItem(
+                        resId = R.drawable.ic_question,
+                        title = stringResource(R.string.settings_inquiry),
+                        right = {
+                            AppText(
+                                text = stringResource(R.string.settings_inquiry_time),
+                                style = AppTextStyle.B2,
+                                color = GrayColor.C500,
+                            )
+                        },
+                        onClick = onInquiryClick,
+                    )
+
+                    SettingsDivider()
+
+                    SettingsMenuItem(
+                        resId = R.drawable.ic_notification,
+                        title = stringResource(R.string.settings_notification),
+                        onClick = onNotificationClick,
+                    )
+                }
             }
         }
+
+        LanguageSettingDialog(
+            visible = showLanguageDialog,
+            selectedLanguage = SettingsLanguage.Korean,
+            onDismissRequest = {
+                showLanguageDialog = false
+            },
+            onConfirm = {
+                showLanguageDialog = false
+            },
+            onDismiss = {
+                showLanguageDialog = false
+            },
+        )
     }
 }
 
 @Composable
-private fun ProfileInfo(
-    nickname: String,
-    isEditMode: Boolean,
-    onCommitNickName: (String) -> Unit,
-    onEditModeChange: (Boolean) -> Unit,
+private fun LanguageSettingDialog(
+    visible: Boolean,
+    selectedLanguage: SettingsLanguage,
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    CommonDialog(
+        visible = visible,
+        confirmText = stringResource(R.string.word_completion),
+        dismissText = stringResource(R.string.word_cancel),
+        onDismissRequest = onDismissRequest,
+        onConfirm = onConfirm,
+        onDismiss = onDismiss,
+        content = {
+            AppText(
+                text = stringResource(R.string.settings_language),
+                style = AppTextStyle.T1,
+                color = GrayColor.C500,
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            AppText(
+                text = stringResource(R.string.settings_language_description),
+                style = AppTextStyle.B2,
+                color = GrayColor.C400,
+            )
+
+            Spacer(Modifier.height(24.dp))
+
+            LanguageDialogItem(
+                language = SettingsLanguage.Korean,
+                selected = selectedLanguage == SettingsLanguage.Korean,
+            )
+        },
+    )
+}
+
+@Composable
+private fun LanguageDialogItem(
+    language: SettingsLanguage,
+    selected: Boolean,
 ) {
     Row(
         modifier =
             Modifier
                 .fillMaxWidth(),
-        verticalAlignment = Alignment.Top,
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
-            painter = painterResource(R.drawable.ic_profile),
-            contentDescription = "profile",
-            modifier =
-                Modifier
-                    .size(52.dp),
+            painter =
+                painterResource(
+                    if (selected) {
+                        R.drawable.ic_checked_you
+                    } else {
+                        R.drawable.ic_empty_check
+                    },
+                ),
+            contentDescription = null,
+            modifier = Modifier.size(28.dp),
         )
 
-        Column(
-            horizontalAlignment = Alignment.Start,
-        ) {
-            if (isEditMode) {
-                ValidateUnderlineTextField(
-                    modifier =
-                        Modifier
-                            .height(77.dp),
-                    value = nickname,
-                    onCommit = onCommitNickName,
-                    placeholder = stringResource(R.string.settings_nickname_placeholder),
-                    guideText = stringResource(R.string.settings_nickname_text_filed_guide),
-                    validLengthRange = 2..8,
-                )
-            } else {
-                Row(
-                    modifier =
-                        Modifier
-                            .height(52.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
-                ) {
-                    Spacer(Modifier.width(16.dp))
+        Spacer(Modifier.width(8.dp))
 
-                    AppText(
-                        text = nickname,
-                        style = AppTextStyle.T1,
-                        color = GrayColor.C500,
-                    )
+        AppText(
+            text = language.displayName,
+            style = AppTextStyle.B2,
+            color = GrayColor.C500,
+        )
+    }
+}
 
-                    Image(
-                        painter = painterResource(R.drawable.ic_edit),
-                        contentDescription = null,
-                        modifier =
-                            Modifier
-                                .padding(10.dp)
-                                .size(24.dp)
-                                .noRippleClickable { onEditModeChange(true) },
-                    )
-                }
-            }
-        }
+@Composable
+private fun SettingsDivider() {
+    HorizontalDivider(
+        thickness = 1.dp,
+        color = GrayColor.C500,
+    )
+}
+
+@Composable
+private fun LanguageMenuRight(language: SettingsLanguage = SettingsLanguage.Korean) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        AppText(
+            text = language.displayName,
+            style = AppTextStyle.B2,
+            color = GrayColor.C500,
+        )
+
+        Spacer(Modifier.width(8.dp))
+
+        Image(
+            painter = painterResource(R.drawable.ic_arrow_down_circle),
+            contentDescription = null,
+            modifier = Modifier.size(24.dp),
+        )
     }
 }
 

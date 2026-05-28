@@ -100,6 +100,9 @@
     <string name="settings_privacy_policy">개인정보 처리방침</string>
     <string name="settings_my_app_version">나의 버전</string>
     <string name="settings_notification">알림 설정</string>
+    <string name="settings_language">언어 설정</string>
+    <string name="settings_inquiry">문의하기</string>
+    <string name="settings_inquiry_time">평일 오전 9시 - 오후 6시 운영</string>
     <string name="settings_nickname_placeholder">닉네임을 입력해 주세요.</string>
     <string name="settings_nickname_text_filed_guide">닉네임 2-8자</string>
 

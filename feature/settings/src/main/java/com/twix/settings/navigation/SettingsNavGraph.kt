@@ -11,6 +11,7 @@ import com.twix.settings.SettingsRoute
 import com.twix.settings.SettingsViewModel
 import com.twix.settings.about.SettingsAboutRoute
 import com.twix.settings.account.SettingsAccountRoute
+import com.twix.settings.notification.SettingsNotificationRoute
 import org.koin.androidx.compose.koinViewModel
 
 object SettingsNavGraph : NavGraphContributor {
@@ -46,6 +47,11 @@ object SettingsNavGraph : NavGraphContributor {
                             launchSingleTop = true
                         }
                     },
+                    navigateToSettingsNotification = {
+                        navController.navigate(NavRoutes.SettingsNotificationRoute.route) {
+                            launchSingleTop = true
+                        }
+                    },
                 )
             }
 
@@ -74,6 +80,21 @@ object SettingsNavGraph : NavGraphContributor {
 
             composable(NavRoutes.SettingsAboutRoute.route) {
                 SettingsAboutRoute(
+                    popBackStack = { navController.popBackStack() },
+                )
+            }
+
+            composable(NavRoutes.SettingsNotificationRoute.route) { entry ->
+                val graphEntry =
+                    rememberNavGraphOwner(
+                        navController = navController,
+                        graphRoute = NavRoutes.SettingsGraph.route,
+                        currentEntry = entry,
+                    )
+                val viewModel: SettingsViewModel = koinViewModel(viewModelStoreOwner = graphEntry)
+
+                SettingsNotificationRoute(
+                    viewModel = viewModel,
                     popBackStack = { navController.popBackStack() },
                 )
             }

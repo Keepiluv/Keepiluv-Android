@@ -105,6 +105,7 @@
     <string name="settings_inquiry_time">평일 오전 9시 - 오후 6시 운영</string>
     <string name="settings_nickname_placeholder">닉네임을 입력해 주세요.</string>
     <string name="settings_nickname_text_filed_guide">닉네임 2-8자</string>
+    <string name="settings_language_description">이미 앱 내에 저장된 언어는 변경되지 않아요</string>
 
     <!-- 통계 화면 -->
     <string name="stats_top_bar_title">스탬프 통계</string>

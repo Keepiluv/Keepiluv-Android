@@ -17,9 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +30,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.dialog.CommonDialog
 import com.twix.designsystem.components.text.AppText
+import com.twix.designsystem.components.toast.ToastManager
+import com.twix.designsystem.components.toast.model.ToastData
+import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.designsystem.components.topbar.CommonTopBar
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
@@ -40,17 +45,21 @@ import com.twix.settings.model.SettingsLanguage
 import com.twix.settings.model.SettingsUiState
 import com.twix.ui.extension.dismissKeyboardOnTap
 import com.twix.ui.extension.noRippleClickable
+import com.twix.util.extension.openExternalUrl
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 @Composable
 fun SettingsRoute(
     viewModel: SettingsViewModel = koinViewModel(),
+    toastManager: ToastManager = koinInject(),
     popBackStack: () -> Unit,
     navigateToSettingsAccount: () -> Unit,
     navigateToSettingsAbout: () -> Unit,
-    navigateToSettingsInquiry: () -> Unit,
     navigateToSettingsNotification: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val currentContext by rememberUpdatedState(context)
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     SettingsScreen(
@@ -58,7 +67,19 @@ fun SettingsRoute(
         onBack = popBackStack,
         onAccountClick = navigateToSettingsAccount,
         onAboutClick = navigateToSettingsAbout,
-        onInquiryClick = navigateToSettingsInquiry,
+        onInquiryClick = {
+            currentContext.openExternalUrl(
+                url = BuildConfig.KAKAO_OPEN_CHAT_URL,
+                onFailed = {
+                    toastManager.tryShow(
+                        ToastData(
+                            message = currentContext.getString(R.string.settings_inquiry_open_failed),
+                            type = ToastType.ERROR,
+                        ),
+                    )
+                },
+            )
+        },
         onNotificationClick = navigateToSettingsNotification,
         onCommitNickName = { viewModel.dispatch(SettingsIntent.SetNickName(it)) },
     )

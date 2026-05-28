@@ -7,6 +7,18 @@ sealed interface SettingsIntent : Intent {
         val nickName: String,
     ) : SettingsIntent
 
+    data class SetPokeNotificationEnabled(
+        val enabled: Boolean,
+    ) : SettingsIntent
+
+    data class SetMarketingNotificationEnabled(
+        val enabled: Boolean,
+    ) : SettingsIntent
+
+    data class SetNightMarketingNotificationEnabled(
+        val enabled: Boolean,
+    ) : SettingsIntent
+
     data object Logout : SettingsIntent
 
     data object WithdrawAccount : SettingsIntent

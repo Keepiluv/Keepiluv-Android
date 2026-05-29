@@ -58,7 +58,7 @@ fun ValidateUnderlineTextField(
     fun commitIfChanged() {
         val trimmed = internalValue.trim()
 
-        if (trimmed != lastCommitted) {
+        if (trimmed.length in validLengthRange && trimmed != lastCommitted) {
             lastCommitted = trimmed
             onCommit(trimmed)
         }

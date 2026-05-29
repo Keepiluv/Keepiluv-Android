@@ -5,6 +5,7 @@ import com.twix.network.execute.safeApiCall
 import com.twix.network.model.request.notification.InitNotificationSettingsRequest
 import com.twix.network.model.request.notification.RegisterFcmTokenRequest
 import com.twix.network.model.request.notification.TokenRequest
+import com.twix.network.model.request.notification.UpdateNotificationSettingRequest
 import com.twix.network.model.response.notification.mapper.toDomain
 import com.twix.network.service.NotificationService
 
@@ -33,6 +34,29 @@ class DefaultNotificationRepository(
             ),
         )
     }
+
+    override suspend fun fetchNotificationSettings() = safeApiCall { service.fetchNotificationSettings().toDomain() }
+
+    override suspend fun updatePokeNotificationSetting(enabled: Boolean) =
+        safeApiCall {
+            service
+                .updatePokeNotificationSetting(UpdateNotificationSettingRequest(enabled))
+                .toDomain()
+        }
+
+    override suspend fun updateMarketingNotificationSetting(enabled: Boolean) =
+        safeApiCall {
+            service
+                .updateMarketingNotificationSetting(UpdateNotificationSettingRequest(enabled))
+                .toDomain()
+        }
+
+    override suspend fun updateNightNotificationSetting(enabled: Boolean) =
+        safeApiCall {
+            service
+                .updateNightNotificationSetting(UpdateNotificationSettingRequest(enabled))
+                .toDomain()
+        }
 
     override suspend fun fetchNotifications(
         lastId: Long?,

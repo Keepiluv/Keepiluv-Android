@@ -27,6 +27,7 @@ import kotlin.math.roundToInt
 fun CommonSwitch(
     modifier: Modifier = Modifier,
     checked: Boolean,
+    enabled: Boolean = true,
     onClick: (Boolean) -> Unit,
 ) {
     val density = LocalDensity.current
@@ -45,7 +46,10 @@ fun CommonSwitch(
                 .clip(RoundedCornerShape(999.dp))
                 .background(if (checked) GrayColor.C500 else CommonColor.White)
                 .border(1.dp, GrayColor.C500, RoundedCornerShape(999.dp))
-                .clickable(onClick = { onClick(!checked) }),
+                .clickable(
+                    enabled = enabled,
+                    onClick = { onClick(!checked) },
+                ),
         contentAlignment = Alignment.CenterStart,
     ) {
         Box(

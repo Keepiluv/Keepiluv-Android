@@ -9,6 +9,7 @@ data class SettingsUiState(
     val pokeNotificationEnabled: Boolean = false,
     val marketingNotificationEnabled: Boolean = false,
     val nightMarketingNotificationEnabled: Boolean = false,
+    val notificationSettingsUpdating: Boolean = false,
     override val isLoading: Boolean = false,
     override val error: AppError? = null,
 ) : LoadableState {

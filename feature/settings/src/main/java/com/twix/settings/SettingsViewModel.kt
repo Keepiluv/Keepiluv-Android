@@ -81,13 +81,19 @@ class SettingsViewModel(
     }
 
     private fun setPokeNotificationEnabled(enabled: Boolean) {
+        if (currentState.notificationSettingsUpdating) return
+
         val originalState = currentState
 
         reduce {
-            copy(pokeNotificationEnabled = enabled)
+            copy(
+                pokeNotificationEnabled = enabled,
+                notificationSettingsUpdating = true,
+            )
         }
 
         launchResult(
+            onFinally = { reduce { copy(notificationSettingsUpdating = false) } },
             block = { notificationRepository.updatePokeNotificationSetting(enabled) },
             onSuccess = { setting ->
                 reduceNotificationSettings(
@@ -109,13 +115,19 @@ class SettingsViewModel(
     }
 
     private fun setMarketingNotificationEnabled(enabled: Boolean) {
+        if (currentState.notificationSettingsUpdating) return
+
         val originalState = currentState
 
         reduce {
-            copy(marketingNotificationEnabled = enabled)
+            copy(
+                marketingNotificationEnabled = enabled,
+                notificationSettingsUpdating = true,
+            )
         }
 
         launchResult(
+            onFinally = { reduce { copy(notificationSettingsUpdating = false) } },
             block = { notificationRepository.updateMarketingNotificationSetting(enabled) },
             onSuccess = { setting ->
                 reduceNotificationSettings(
@@ -137,13 +149,19 @@ class SettingsViewModel(
     }
 
     private fun setNightMarketingNotificationEnabled(enabled: Boolean) {
+        if (currentState.notificationSettingsUpdating) return
+
         val originalState = currentState
 
         reduce {
-            copy(nightMarketingNotificationEnabled = enabled)
+            copy(
+                nightMarketingNotificationEnabled = enabled,
+                notificationSettingsUpdating = true,
+            )
         }
 
         launchResult(
+            onFinally = { reduce { copy(notificationSettingsUpdating = false) } },
             block = { notificationRepository.updateNightNotificationSetting(enabled) },
             onSuccess = { setting ->
                 reduceNotificationSettings(

@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,23 +24,38 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.common.CommonSwitch
 import com.twix.designsystem.components.text.AppText
+import com.twix.designsystem.components.toast.ToastManager
+import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.components.topbar.CommonTopBar
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.settings.SettingsIntent
+import com.twix.settings.SettingsSideEffect
 import com.twix.settings.SettingsViewModel
 import com.twix.settings.component.SettingsMenuFrame
 import com.twix.settings.model.SettingsUiState
+import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.noRippleClickable
+import org.koin.compose.koinInject
 
 @Composable
 fun SettingsNotificationRoute(
     viewModel: SettingsViewModel,
+    toastManager: ToastManager = koinInject(),
     popBackStack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val currentContext by rememberUpdatedState(context)
+
+    ObserveAsEvents(viewModel.sideEffect) { effect ->
+        when (effect) {
+            is SettingsSideEffect.ShowToast -> toastManager.tryShow(ToastData(currentContext.getString(effect.resId), effect.type))
+            else -> Unit
+        }
+    }
 
     SettingsNotificationScreen(
         uiState = uiState,
@@ -91,6 +108,7 @@ private fun SettingsNotificationScreen(
             NotificationSettingItem(
                 title = stringResource(R.string.settings_poke_push_notification),
                 checked = uiState.pokeNotificationEnabled,
+                enabled = !uiState.notificationSettingsUpdating,
                 onCheckedChange = onPokeNotificationChange,
             )
 
@@ -99,6 +117,7 @@ private fun SettingsNotificationScreen(
             NotificationSettingItem(
                 title = stringResource(R.string.settings_marketing_push_notification),
                 checked = uiState.marketingNotificationEnabled,
+                enabled = !uiState.notificationSettingsUpdating,
                 onCheckedChange = onMarketingNotificationChange,
             )
 
@@ -107,6 +126,7 @@ private fun SettingsNotificationScreen(
             NotificationSettingItem(
                 title = stringResource(R.string.settings_night_marketing_push_notification),
                 checked = uiState.nightMarketingNotificationEnabled,
+                enabled = !uiState.notificationSettingsUpdating,
                 onCheckedChange = onNightMarketingNotificationChange,
             )
         }
@@ -117,6 +137,7 @@ private fun SettingsNotificationScreen(
 private fun NotificationSettingItem(
     title: String,
     checked: Boolean,
+    enabled: Boolean,
     onCheckedChange: (Boolean) -> Unit,
 ) {
     Row(
@@ -137,6 +158,7 @@ private fun NotificationSettingItem(
 
         CommonSwitch(
             checked = checked,
+            enabled = enabled,
             onClick = onCheckedChange,
         )
     }

@@ -39,7 +39,7 @@ class InviteLaunchDispatcher : InviteLaunchEventSource {
         private const val INVITE_SCHEME = "twix"
         private const val INVITE_HOST = "invite"
         private const val INVITE_CODE_PARAM = "code"
-        private const val INVITE_WEB_HOST = "keepiluv.jiyong.xyz"
+        private const val INVITE_WEB_HOST = "keepiluv.teamtwix.com"
         private const val HTTP_SCHEME = "http"
         private const val HTTPS_SCHEME = "https"
 

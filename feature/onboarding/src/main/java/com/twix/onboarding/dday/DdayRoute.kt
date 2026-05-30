@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +55,13 @@ fun DdayRoute(
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
     var showCalendarBottomSheet by remember { mutableStateOf(false) }
+
+    DisposableEffect(Unit) {
+        viewModel.dispatch(OnBoardingIntent.StartDdayPollingStatus)
+        onDispose {
+            viewModel.dispatch(OnBoardingIntent.StopDdayPollingStatus)
+        }
+    }
 
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {

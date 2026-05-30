@@ -24,7 +24,7 @@ class OnBoardingViewModel(
     private val onBoardingRepository: OnBoardingRepository,
     private val notificationRepository: NotificationRepository,
 ) : BaseViewModel<OnBoardingUiState, OnBoardingIntent, OnBoardingSideEffect>(OnBoardingUiState()) {
-    private var pollingJob: Job? = null
+    private var onboardingStatusJob: Job? = null
     private var connectCoupleJob: Job? = null
     private var inviteCodeInitializationJob: Job? = null
 
@@ -74,6 +74,8 @@ class OnBoardingViewModel(
             // 디데이 설정 화면
             is OnBoardingIntent.SelectDate -> reduceDday(intent.value)
             OnBoardingIntent.SubmitDday -> anniversarySetup()
+            OnBoardingIntent.StartDdayPollingStatus -> startDdayPolling()
+            OnBoardingIntent.StopDdayPollingStatus -> stopPolling()
 
             is OnBoardingIntent.SubmitMarketingConsent ->
                 initNotificationSettings(
@@ -85,14 +87,28 @@ class OnBoardingViewModel(
     }
 
     private fun startPolling() {
-        if (pollingJob?.isActive == true) return
-        pollingJob =
+        startStatusPolling { status ->
+            if (status == OnboardingStatus.COUPLE_CONNECTION) return@startStatusPolling false
+
+            emitSideEffect(OnBoardingSideEffect.CoupleConnection.NavigateToNext)
+            true
+        }
+    }
+
+    private fun startDdayPolling() {
+        startStatusPolling { status ->
+            if (status != OnboardingStatus.COMPLETED) return@startStatusPolling false
+
+            showAnniversaryAlreadyRegisteredToast()
+            emitSideEffect(OnBoardingSideEffect.DdaySetting.NavigateToHome)
+            true
+        }
+    }
+
+    private fun startStatusPolling(onStatusFetched: suspend (OnboardingStatus) -> Boolean) {
+        if (onboardingStatusJob?.isActive == true) return
+        onboardingStatusJob =
             viewModelScope.launch {
-                /**
-                 * 네트워크 오류 등으로 API 호출이 연속으로 실패한 횟수
-                 * 성공 응답을 받으면 0으로 리셋되며, MAX_POLLING_FAILURE_COUNT에 도달하면 폴링을 중단한다.
-                 * 일시적인 오류에는 폴링을 유지하되, 지속적인 오류 상황에서 무한 루프를 방지하기 위해 사용한다.
-                 * **/
                 var consecutiveFailureCount = 0
 
                 while (isActive) {
@@ -100,16 +116,15 @@ class OnBoardingViewModel(
                     when (val result = onBoardingRepository.fetchOnboardingStatus()) {
                         is AppResult.Success -> {
                             consecutiveFailureCount = 0
-                            if (result.data != OnboardingStatus.COUPLE_CONNECTION) {
-                                stopPolling()
-                                emitSideEffect(OnBoardingSideEffect.CoupleConnection.NavigateToNext)
+                            if (onStatusFetched(result.data)) {
+                                onboardingStatusJob = null
                                 break
                             }
                         }
 
                         is AppResult.Error -> {
                             if (++consecutiveFailureCount >= MAX_POLLING_FAILURE_COUNT) {
-                                stopPolling()
+                                onboardingStatusJob = null
                                 break
                             }
                         }
@@ -119,8 +134,8 @@ class OnBoardingViewModel(
     }
 
     private fun stopPolling() {
-        pollingJob?.cancel()
-        pollingJob = null
+        onboardingStatusJob?.cancel()
+        onboardingStatusJob = null
     }
 
     private fun reduceInviteCode(value: String) {
@@ -209,19 +224,27 @@ class OnBoardingViewModel(
         launchResult(
             block = { onBoardingRepository.fetchOnboardingStatus() },
             onSuccess = { onboardingStatus ->
-                val sideEffect =
-                    when (onboardingStatus) {
-                        OnboardingStatus.ANNIVERSARY_SETUP ->
-                            OnBoardingSideEffect.ProfileSetting.NavigateToNext
+                when (onboardingStatus) {
+                    OnboardingStatus.ANNIVERSARY_SETUP ->
+                        tryEmitSideEffect(OnBoardingSideEffect.ProfileSetting.NavigateToNext)
 
-                        OnboardingStatus.COMPLETED ->
-                            OnBoardingSideEffect.ProfileSetting.NavigateToHome
+                    OnboardingStatus.COMPLETED ->
+                        onProfileAnniversaryAlreadyRegistered()
 
-                        else -> return@launchResult
-                    }
-                tryEmitSideEffect(sideEffect)
+                    else -> return@launchResult
+                }
             },
         )
+    }
+
+    private fun onProfileAnniversaryAlreadyRegistered() {
+        tryEmitSideEffect(
+            OnBoardingSideEffect.ShowToast(
+                message = R.string.onboarding_anniversary_already_registered_toast,
+                type = ToastType.DEFAULT,
+            ),
+        )
+        tryEmitSideEffect(OnBoardingSideEffect.ProfileSetting.NavigateToHome)
     }
 
     private fun reduceDday(value: LocalDate) {
@@ -283,6 +306,10 @@ class OnBoardingViewModel(
         type: ToastType,
     ) {
         emitSideEffect(OnBoardingSideEffect.ShowToast(message, type))
+    }
+
+    private suspend fun showAnniversaryAlreadyRegisteredToast() {
+        showToast(R.string.onboarding_anniversary_already_registered_toast, ToastType.DEFAULT)
     }
 
     companion object {

@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.button.AppButton
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.text_field.UnderlineTextField
 import com.twix.designsystem.components.toast.ToastManager
@@ -79,6 +80,7 @@ fun ProfileRoute(
 
     ProfileScreen(
         uiModel = uiState.profile,
+        showLoadingOverlay = uiState.isSubmittingProfile,
         onCompleted = {
             viewModel.dispatch(OnBoardingIntent.SubmitNickName)
         },
@@ -89,6 +91,7 @@ fun ProfileRoute(
 @Composable
 private fun ProfileScreen(
     uiModel: ProfileUiModel,
+    showLoadingOverlay: Boolean,
     onCompleted: () -> Unit,
     onChangeNickName: (String) -> Unit,
 ) {
@@ -98,7 +101,7 @@ private fun ProfileScreen(
         focusRequester.requestFocus()
     }
 
-    Column(
+    androidx.compose.foundation.layout.Box(
         modifier =
             Modifier
                 .fillMaxSize()
@@ -106,69 +109,75 @@ private fun ProfileScreen(
                 .statusBarsPadding()
                 .imePadding(),
     ) {
-        Spacer(modifier = Modifier.height(80.dp))
-
-        AppText(
-            text = stringResource(R.string.onboarding_profile_title),
-            style = AppTextStyle.H3,
-            color = GrayColor.C500,
-            modifier = Modifier.padding(start = 24.dp),
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        UnderlineTextField(
-            value = uiModel.nickname,
-            placeHolder = stringResource(R.string.onboarding_name_placeholder),
-            showTrailing = true,
-            onValueChange = onChangeNickName,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
-            trailing = {
-                Image(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_clear_text),
-                    contentDescription = null,
-                    modifier = Modifier.noRippleClickable { onChangeNickName("") },
-                )
-            },
-            modifier =
-                Modifier
-                    .focusRequester(focusRequester)
-                    .padding(horizontal = 20.dp),
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier.padding(horizontal = 20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_check_success),
-                contentDescription = null,
-                tint = if (uiModel.isValid) SystemColor.Success else GrayColor.C300,
-            )
-
-            Spacer(modifier = Modifier.width(4.dp))
+        Column(modifier = Modifier.fillMaxSize()) {
+            Spacer(modifier = Modifier.height(80.dp))
 
             AppText(
-                style = AppTextStyle.C2,
-                color = if (uiModel.isValid) SystemColor.Success else GrayColor.C300,
-                text = stringResource(id = R.string.onboarding_name_helper),
+                text = stringResource(R.string.onboarding_profile_title),
+                style = AppTextStyle.H3,
+                color = GrayColor.C500,
+                modifier = Modifier.padding(start = 24.dp),
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            UnderlineTextField(
+                value = uiModel.nickname,
+                placeHolder = stringResource(R.string.onboarding_name_placeholder),
+                showTrailing = true,
+                onValueChange = onChangeNickName,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.None),
+                trailing = {
+                    Image(
+                        imageVector = ImageVector.vectorResource(R.drawable.ic_clear_text),
+                        contentDescription = null,
+                        modifier = Modifier.noRippleClickable { onChangeNickName("") },
+                    )
+                },
+                modifier =
+                    Modifier
+                        .focusRequester(focusRequester)
+                        .padding(horizontal = 20.dp),
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.padding(horizontal = 20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(R.drawable.ic_check_success),
+                    contentDescription = null,
+                    tint = if (uiModel.isValid) SystemColor.Success else GrayColor.C300,
+                )
+
+                Spacer(modifier = Modifier.width(4.dp))
+
+                AppText(
+                    style = AppTextStyle.C2,
+                    color = if (uiModel.isValid) SystemColor.Success else GrayColor.C300,
+                    text = stringResource(id = R.string.onboarding_name_helper),
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            AppButton(
+                text = stringResource(R.string.onboarding_profile_button_title),
+                onClick = { onCompleted() },
+                backgroundColor = if (uiModel.isValid) GrayColor.C500 else GrayColor.C100,
+                textColor = if (uiModel.isValid) CommonColor.White else GrayColor.C300,
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 8.dp),
             )
         }
 
-        Spacer(modifier = Modifier.weight(1f))
-
-        AppButton(
-            text = stringResource(R.string.onboarding_profile_button_title),
-            onClick = { onCompleted() },
-            backgroundColor = if (uiModel.isValid) GrayColor.C500 else GrayColor.C100,
-            textColor = if (uiModel.isValid) CommonColor.White else GrayColor.C300,
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-        )
+        if (showLoadingOverlay) {
+            TwixLoadingOverlay()
+        }
     }
 }
 
@@ -180,6 +189,7 @@ private fun UnValidProfileScreenPreview() {
             ProfileScreen(
                 onCompleted = {},
                 onChangeNickName = {},
+                showLoadingOverlay = false,
                 uiModel =
                     ProfileUiModel(
                         nickname = "",
@@ -197,6 +207,7 @@ private fun ValidProfileScreenPreview() {
         ProfileScreen(
             onCompleted = {},
             onChangeNickName = {},
+            showLoadingOverlay = false,
             uiModel =
                 ProfileUiModel(
                     nickname = "",

@@ -102,6 +102,7 @@ class GoalEditorViewModel(
                 startDate = goal.startDate.validStartDate(),
                 endDate = (goal.endDate ?: LocalDate.now()).validEndDate(goal.startDate.validStartDate()),
                 endDateEnabled = goal.endDate != null,
+                hasLoadedContent = true,
             )
         }
     }
@@ -192,12 +193,6 @@ class GoalEditorViewModel(
             onSuccess = { setGoal(it) },
             onError = {
                 initializedGoalId = null
-                emitSideEffect(
-                    GoalEditorSideEffect.ShowToast(
-                        R.string.toast_goal_fetch_failed,
-                        ToastType.ERROR,
-                    ),
-                )
             },
         )
     }

@@ -1,15 +1,18 @@
 package com.twix.login.contract
 
 import com.twix.result.AppError
-import com.twix.ui.base.LoadableState
+import com.twix.ui.base.DefaultLoadableState
 
 data class LoginUiState(
     val isLoggedIn: Boolean = false,
     override val isLoading: Boolean = false,
     override val error: AppError? = null,
-) : LoadableState {
-    override fun copyLoadableState(
+) : DefaultLoadableState {
+    val showLoading: Boolean
+        get() = isLoading
+
+    override fun copyState(
         isLoading: Boolean,
         error: AppError?,
-    ): LoadableState = copy(isLoading = isLoading, error = error)
+    ): DefaultLoadableState = copy(isLoading = isLoading, error = error)
 }

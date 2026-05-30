@@ -86,13 +86,13 @@ abstract class BaseViewModel<S : State, I : Intent, SE : SideEffect>(
     /**
      * 서버 통신 메서드 호출 및 응답을 처리하는 헬퍼 메서드
      *
-     * LoadableState를 구현한 경우 자동으로 isLoading과 error를 업데이트한다.
+     * DefaultLoadableState를 구현한 경우 자동으로 isLoading과 error를 업데이트한다.
      * 일반 State를 구현한 경우 onStart/onFinally로 화면별 로딩 상태를 직접 관리해야 한다.
      *
      * ## 에러 처리 가이드라인
      *
      * ### 1. 데이터 로딩 (초기 로드, 화면 진입 시)
-     * - LoadableState 구현 시 자동으로 error 상태 업데이트
+     * - DefaultLoadableState 구현 시 자동으로 error 상태 업데이트
      * - `onError = null` 또는 추가 로직만 처리
      * - 사용 예: 화면 진입 시 데이터 fetch, 리스트 초기 로드
      *
@@ -140,43 +140,58 @@ abstract class BaseViewModel<S : State, I : Intent, SE : SideEffect>(
 
     /**
      * 에러 초기화
-     * LoadableState를 구현한 경우 자동으로 error를 null로 업데이트
+     * DefaultLoadableState를 구현한 경우 자동으로 error를 null로 업데이트
      */
     private fun clearError() {
-        if (currentState is LoadableState) {
-            reduce { (this as LoadableState).copyLoadableState(error = null) as S }
-        }
+        reduceLoadableState { copyState(error = null) }
     }
 
     /**
      * 로딩 상태 시작
-     * LoadableState를 구현한 경우 자동으로 isLoading을 true로 업데이트
+     * DefaultLoadableState를 구현한 경우 자동으로 isLoading을 true로 업데이트
      */
     private fun startLoading() {
         loadingCount.update { it + 1 }
-        if (currentState is LoadableState && loadingCount.value == 1) {
-            reduce { (this as LoadableState).copyLoadableState(isLoading = true) as S }
+        if (loadingCount.value == 1) {
+            reduceLoadableState { copyState(isLoading = true) }
         }
     }
 
     /**
      * 로딩 상태 종료
-     * LoadableState를 구현한 경우 자동으로 isLoading을 false로 업데이트
+     * DefaultLoadableState를 구현한 경우 자동으로 isLoading을 false로 업데이트
      */
     private fun stopLoading() {
         loadingCount.update { maxOf(0, it - 1) }
-        if (currentState is LoadableState && loadingCount.value == 0) {
-            reduce { (this as LoadableState).copyLoadableState(isLoading = false) as S }
+        if (loadingCount.value == 0) {
+            reduceLoadableState { copyState(isLoading = false) }
         }
     }
 
     /**
      * 에러 업데이트
-     * LoadableState를 구현한 경우 자동으로 error를 업데이트
+     * DefaultLoadableState를 구현한 경우 자동으로 error를 업데이트
      */
     private fun updateError(error: AppError) {
-        if (currentState is LoadableState) {
-            reduce { (this as LoadableState).copyLoadableState(error = error) as S }
+        reduceLoadableState { copyState(error = error) }
+    }
+
+    /**
+     * AppResult를 loading/error 상태 변경 없이 처리한다.
+     *
+     * best effort 요청처럼 DefaultLoadableState를 변경하지 않아야 하는 경우 사용한다.
+     */
+    protected suspend fun <D> handleResultWithoutLoadableStateUpdate(
+        result: AppResult<D>,
+        onSuccess: (D) -> Unit = {},
+        onError: (suspend (AppError) -> Unit)? = null,
+    ) {
+        when (result) {
+            is AppResult.Success -> onSuccess(result.data)
+            is AppResult.Error -> {
+                handleError(result.error)
+                onError?.invoke(result.error)
+            }
         }
     }
 
@@ -191,12 +206,22 @@ abstract class BaseViewModel<S : State, I : Intent, SE : SideEffect>(
         when (result) {
             is AppResult.Success -> onSuccess(result.data)
             is AppResult.Error -> {
-                // 공통 처리: 로깅 및 LoadableState 에러 업데이트
+                // 공통 처리: 로깅 및 DefaultLoadableState 에러 업데이트
                 handleError(result.error)
                 updateError(result.error)
                 // 메서드별 처리: 특정 화면만의 UX ex) 다이얼로그/토스트
                 onError?.invoke(result.error)
             }
+        }
+    }
+
+    private inline fun reduceLoadableState(crossinline reducer: DefaultLoadableState.() -> DefaultLoadableState) {
+        if (currentState !is DefaultLoadableState) return
+
+        reduce {
+            val loadableState = this as? DefaultLoadableState ?: return@reduce this
+            @Suppress("UNCHECKED_CAST")
+            loadableState.reducer() as S
         }
     }
 

@@ -6,6 +6,7 @@ import com.twix.domain.model.enums.GoalIconType
 import com.twix.domain.model.enums.GoalReactionType
 import com.twix.domain.model.photolog.PhotologDetail
 import com.twix.photolog.detail.contract.PhotologDetailUiState
+import com.twix.result.AppError
 
 class PhotologDetailPreviewProvider : PreviewParameterProvider<PhotologDetailUiState> {
     override val values =
@@ -29,7 +30,7 @@ class PhotologDetailPreviewProvider : PreviewParameterProvider<PhotologDetailUiS
                         reaction = null,
                     ),
                 partnerPhotolog = null,
-                isLoading = true,
+                isLoading = false,
             ),
             PhotologDetailUiState(
                 goalId = 1,
@@ -39,7 +40,7 @@ class PhotologDetailPreviewProvider : PreviewParameterProvider<PhotologDetailUiS
                 partnerNickname = "민정",
                 icon = GoalIconType.EXERCISE,
                 myPhotolog = null,
-                isLoading = true,
+                isLoading = false,
                 partnerPhotolog =
                     PhotologDetail(
                         photologId = 2,
@@ -51,6 +52,13 @@ class PhotologDetailPreviewProvider : PreviewParameterProvider<PhotologDetailUiS
                         comment = "인증합니다",
                         reaction = GoalReactionType.FUCK,
                     ),
+            ),
+            PhotologDetailUiState(
+                isLoading = true,
+            ),
+            PhotologDetailUiState(
+                isLoading = false,
+                error = AppError.Unknown(IllegalStateException("preview")),
             ),
         )
 }

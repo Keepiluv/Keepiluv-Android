@@ -1,5 +1,6 @@
 package com.twix.notification
 
+import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.notification.Notification
@@ -10,6 +11,7 @@ import com.twix.notification.contract.NotificationUiState
 import com.twix.notification.deeplink.NotificationDeepLink
 import com.twix.notification.deeplink.NotificationDeepLinkParser
 import com.twix.ui.base.BaseViewModel
+import kotlinx.coroutines.launch
 
 class NotificationViewModel(
     private val notificationDeepLinkParser: NotificationDeepLinkParser,
@@ -23,6 +25,7 @@ class NotificationViewModel(
 
     override suspend fun handleIntent(intent: NotificationIntent) {
         when (intent) {
+            NotificationIntent.Retry -> fetchInitialNotificationList()
             NotificationIntent.FetchNextPage -> fetchNextNotificationList()
             is NotificationIntent.NotificationClicked -> handleNotificationClick(intent.notificationId)
         }
@@ -35,7 +38,13 @@ class NotificationViewModel(
             block = { notificationRepository.fetchNotifications() },
             onSuccess = {
                 markAllNotificationAsRead()
-                reduce { copy(notificationList = it.notifications, hasNext = it.hasNext) }
+                reduce {
+                    copy(
+                        notificationList = it.notifications,
+                        hasNext = it.hasNext,
+                        hasLoadedContent = true,
+                    )
+                }
             },
         )
     }
@@ -66,10 +75,9 @@ class NotificationViewModel(
     }
 
     private fun markAllNotificationAsRead() {
-        launchResult(
-            block = { notificationRepository.markAllNotificationsAsRead() },
-            onSuccess = {},
-        )
+        viewModelScope.launch {
+            handleResultWithoutLoadableStateUpdate(notificationRepository.markAllNotificationsAsRead())
+        }
     }
 
     private suspend fun handleNotificationClick(id: Long) {
@@ -94,7 +102,7 @@ class NotificationViewModel(
     }
 
     // 알림 읽음 처리는 best effort가 정책이므로 에러 처리는 생략
-    private fun markNotificationAsRead(notification: Notification) {
+    private suspend fun markNotificationAsRead(notification: Notification) {
         reduce {
             copy(
                 notificationList =
@@ -104,9 +112,6 @@ class NotificationViewModel(
             )
         }
 
-        launchResult(
-            block = { notificationRepository.markNotificationAsRead(notification.id) },
-            onSuccess = {},
-        )
+        handleResultWithoutLoadableStateUpdate(notificationRepository.markNotificationAsRead(notification.id))
     }
 }

@@ -46,6 +46,8 @@ import com.twix.designsystem.components.bottomsheet.model.CommonBottomSheetConfi
 import com.twix.designsystem.components.button.AppButton
 import com.twix.designsystem.components.calendar.Calendar
 import com.twix.designsystem.components.dialog.CommonDialog
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -116,6 +118,7 @@ fun GoalEditorRoute(
         uiState = uiState,
         isEdit = goalId != -1L,
         onBack = navigateToBack,
+        onRetry = { viewModel.dispatch(GoalEditorIntent.InitGoal(goalId)) },
         onCommitTitle = { viewModel.dispatch(GoalEditorIntent.SetTitle(it)) },
         onSelectRepeatType = { viewModel.dispatch(GoalEditorIntent.SetRepeatType(it)) },
         onCommitIcon = { viewModel.dispatch(GoalEditorIntent.SetIcon(it)) },
@@ -132,6 +135,7 @@ fun GoalEditorScreen(
     uiState: GoalEditorUiState,
     isEdit: Boolean = false,
     onBack: () -> Unit,
+    onRetry: () -> Unit,
     onCommitTitle: (String) -> Unit,
     onSelectRepeatType: (RepeatCycle) -> Unit,
     onCommitIcon: (GoalIconType) -> Unit,
@@ -141,6 +145,16 @@ fun GoalEditorScreen(
     onToggleEndDateEnabled: (Boolean) -> Unit,
     onComplete: () -> Unit,
 ) {
+    if (isEdit && uiState.showLoading) {
+        TwixLoadingOverlay()
+        return
+    }
+
+    if (isEdit && uiState.showError) {
+        ErrorScreen(onClickRetry = onRetry, onClickBack = onBack)
+        return
+    }
+
     var showRepeatCountBottomSheet by remember { mutableStateOf(false) }
     var showCalendarBottomSheet by remember { mutableStateOf(false) }
     var showIconEditorDialog by remember { mutableStateOf(false) }
@@ -506,6 +520,7 @@ private fun Preview() {
         GoalEditorScreen(
             uiState = uiState,
             onBack = {},
+            onRetry = {},
             onCommitTitle = {},
             onSelectRepeatType = {},
             onCommitEndDate = {},

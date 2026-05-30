@@ -92,3 +92,7 @@ lint/tmp/
 /public/.well-known
 .firebase/
 .claude
+.codex
+.agents
+AGENTS.md
+CLAUDE.md

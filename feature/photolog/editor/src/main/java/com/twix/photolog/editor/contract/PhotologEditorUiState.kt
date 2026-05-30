@@ -3,7 +3,8 @@ package com.twix.photolog.editor.contract
 import androidx.compose.runtime.Immutable
 import com.twix.designsystem.components.comment.model.CommentUiModel
 import com.twix.domain.model.photolog.PhotoLogs
-import com.twix.ui.base.State
+import com.twix.result.AppError
+import com.twix.ui.base.ContentLoadableState
 import java.time.LocalDate
 
 @Immutable
@@ -16,12 +17,25 @@ data class PhotologEditorUiState(
     val imageUrl: String = "",
     val comment: CommentUiModel = CommentUiModel(),
     val originComment: String = "",
-) : State {
+    override val hasLoadedContent: Boolean = false,
+    val isSaving: Boolean = false,
+    override val isLoading: Boolean = true,
+    override val error: AppError? = null,
+) : ContentLoadableState {
     val isCommentNotChanged: Boolean
         get() = comment.value == originComment
 
     val imageName: String
         get() = imageUrl.split(IMAGE_NAME_SEPARATOR).last()
+
+    override fun copyState(
+        isLoading: Boolean,
+        error: AppError?,
+    ): ContentLoadableState =
+        copy(
+            isLoading = isLoading,
+            error = error,
+        )
 
     companion object {
         private const val IMAGE_NAME_SEPARATOR = "/"
@@ -44,5 +58,7 @@ internal fun PhotoLogs.toEditorUiState(
         imageUrl = myPhotolog?.imageUrl.orEmpty(),
         comment = CommentUiModel(myPhotolog?.comment.orEmpty()),
         originComment = myPhotolog?.comment.orEmpty(),
+        hasLoadedContent = true,
+        isLoading = false,
     )
 }

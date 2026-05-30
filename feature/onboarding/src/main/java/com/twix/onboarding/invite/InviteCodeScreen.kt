@@ -50,6 +50,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.button.AppButton
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -78,9 +80,14 @@ internal fun InviteCodeRoute(
     toastManager: ToastManager = koinInject(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var hasInjectedInitialInviteCode by remember(initialInviteCode) { mutableStateOf(false) }
 
-    LaunchedEffect(initialInviteCode) {
+    LaunchedEffect(initialInviteCode, uiState.showLoading, uiState.showError, hasInjectedInitialInviteCode) {
+        if (hasInjectedInitialInviteCode) return@LaunchedEffect
+        if (uiState.showLoading) return@LaunchedEffect
+        if (uiState.showError) return@LaunchedEffect
         if (!initialInviteCode.isNullOrBlank()) {
+            hasInjectedInitialInviteCode = true
             viewModel.dispatch(OnBoardingIntent.WriteInviteCode(initialInviteCode))
         }
     }
@@ -90,7 +97,11 @@ internal fun InviteCodeRoute(
     val currentContext by rememberUpdatedState(context)
     val clipboard = LocalClipboard.current
 
-    DisposableEffect(Unit) {
+    DisposableEffect(uiState.showLoading, uiState.showError) {
+        if (uiState.showLoading || uiState.showError) {
+            return@DisposableEffect onDispose {}
+        }
+
         viewModel.dispatch(OnBoardingIntent.StartPollingStatus)
         onDispose {
             viewModel.dispatch(OnBoardingIntent.StopPollingStatus)
@@ -138,20 +149,31 @@ internal fun InviteCodeRoute(
         }
     }
 
-    InviteCodeScreen(
-        uiModel = uiState.inviteCode,
-        keyboardState = keyboardState,
-        navigateToBack = navigateToBack,
-        onChangeInviteCode = { viewModel.dispatch(OnBoardingIntent.WriteInviteCode(it)) },
-        onComplete = { viewModel.dispatch(OnBoardingIntent.ConnectCouple) },
-        onCopyInviteCode = { viewModel.dispatch(OnBoardingIntent.CopyInviteCode) },
-    )
+    when {
+        uiState.showLoading -> TwixLoadingOverlay()
+        uiState.showError ->
+            ErrorScreen(
+                onClickRetry = { viewModel.dispatch(OnBoardingIntent.RetryFetchInviteCode) },
+                onClickBack = navigateToBack,
+            )
+        else ->
+            InviteCodeScreen(
+                uiModel = uiState.inviteCode,
+                keyboardState = keyboardState,
+                showLoadingOverlay = uiState.isConnectingCouple,
+                navigateToBack = navigateToBack,
+                onChangeInviteCode = { viewModel.dispatch(OnBoardingIntent.WriteInviteCode(it)) },
+                onComplete = { viewModel.dispatch(OnBoardingIntent.ConnectCouple) },
+                onCopyInviteCode = { viewModel.dispatch(OnBoardingIntent.CopyInviteCode) },
+            )
+    }
 }
 
 @Composable
 private fun InviteCodeScreen(
     uiModel: InviteCodeUiModel,
     keyboardState: Keyboard,
+    showLoadingOverlay: Boolean,
     navigateToBack: () -> Unit,
     onChangeInviteCode: (String) -> Unit,
     onComplete: () -> Unit,
@@ -306,6 +328,10 @@ private fun InviteCodeScreen(
                     .padding(horizontal = 20.dp, vertical = 8.dp)
                     .imePadding(),
         )
+
+        if (showLoadingOverlay) {
+            TwixLoadingOverlay()
+        }
     }
 }
 
@@ -353,6 +379,7 @@ private fun InviteCodeScreenPreview() {
                     myInviteCode = "ABCDEFG",
                     isValid = textState.length == 6,
                 ),
+            showLoadingOverlay = false,
             onChangeInviteCode = { textState = it },
             onComplete = {},
             navigateToBack = {},

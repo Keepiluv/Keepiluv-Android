@@ -21,6 +21,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.topbar.CommonTopBar
 import com.twix.designsystem.theme.CommonColor
@@ -44,6 +46,7 @@ fun SettingsRoute(
     SettingsScreen(
         uiState = uiState,
         onBack = popBackStack,
+        onRetry = { viewModel.dispatch(SettingsIntent.Retry) },
         onAccountClick = navigateToSettingsAccount,
         onAboutClick = navigateToSettingsAbout,
     )
@@ -53,56 +56,63 @@ fun SettingsRoute(
 private fun SettingsScreen(
     uiState: SettingsUiState,
     onBack: () -> Unit,
+    onRetry: () -> Unit,
     onAccountClick: () -> Unit,
     onAboutClick: () -> Unit,
 ) {
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(CommonColor.White),
-    ) {
-        CommonTopBar(
-            title = stringResource(R.string.word_setting),
-            left = {
-                Image(
-                    painter = painterResource(R.drawable.ic_arrow3_left),
-                    contentDescription = "back",
+    when {
+        uiState.showLoading -> TwixLoadingOverlay()
+        uiState.showError -> ErrorScreen(onClickRetry = onRetry, onClickBack = onBack)
+        else -> {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(CommonColor.White),
+            ) {
+                CommonTopBar(
+                    title = stringResource(R.string.word_setting),
+                    left = {
+                        Image(
+                            painter = painterResource(R.drawable.ic_arrow3_left),
+                            contentDescription = "back",
+                            modifier =
+                                Modifier
+                                    .padding(18.dp)
+                                    .size(24.dp)
+                                    .noRippleClickable(onClick = onBack),
+                        )
+                    },
+                )
+
+                Spacer(Modifier.height(20.dp))
+
+                Column(
                     modifier =
                         Modifier
-                            .padding(18.dp)
-                            .size(24.dp)
-                            .noRippleClickable(onClick = onBack),
-                )
-            },
-        )
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp),
+                ) {
+                    ProfileInfo(nickname = uiState.nickName)
 
-        Spacer(Modifier.height(20.dp))
+                    Spacer(Modifier.height(24.dp))
 
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
-        ) {
-            ProfileInfo(nickname = uiState.nickName)
+                    SettingsMenuFrame {
+                        SettingsMenuItem(
+                            resId = R.drawable.ic_profile_small,
+                            title = stringResource(R.string.word_account),
+                            onClick = onAccountClick,
+                        )
 
-            Spacer(Modifier.height(24.dp))
+                        HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
 
-            SettingsMenuFrame {
-                SettingsMenuItem(
-                    resId = R.drawable.ic_profile_small,
-                    title = stringResource(R.string.word_account),
-                    onClick = onAccountClick,
-                )
-
-                HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
-
-                SettingsMenuItem(
-                    resId = R.drawable.ic_info,
-                    title = stringResource(R.string.word_information),
-                    onClick = onAboutClick,
-                )
+                        SettingsMenuItem(
+                            resId = R.drawable.ic_info,
+                            title = stringResource(R.string.word_information),
+                            onClick = onAboutClick,
+                        )
+                    }
+                }
             }
         }
     }

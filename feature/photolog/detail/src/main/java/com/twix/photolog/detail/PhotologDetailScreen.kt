@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.components.toast.model.ToastType
@@ -134,6 +137,7 @@ fun PhotologDetailRoute(
             uiState = uiState,
             screenHeightPx = screenHeightPx,
             onBack = navigateToBack,
+            onRetry = { viewModel.dispatch(PhotologDetailIntent.Retry) },
             onClickModify = {
                 navigateToEditor(
                     uiState.goalId,
@@ -176,40 +180,64 @@ fun PhotologDetailScreen(
     uiState: PhotologDetailUiState,
     screenHeightPx: Float,
     onBack: () -> Unit,
+    onRetry: () -> Unit,
     onClickModify: () -> Unit,
     onClickReaction: (GoalReactionType) -> Unit,
     onClickUpload: () -> Unit,
     onPoke: () -> Unit,
     onSwipe: () -> Unit,
 ) {
-    Column(
+    Box(
         Modifier
             .fillMaxSize()
             .background(color = CommonColor.White),
     ) {
-        PhotologDetailTopBar(
-            title = uiState.goalName,
-            canModify = uiState.canModify,
-            onBack = onBack,
-            onClickModify = onClickModify,
-        )
-        Spacer(Modifier.height(103.dp))
+        when {
+            uiState.showLoading -> {
+                TwixLoadingOverlay()
+            }
 
-        if (uiState.isLoading) {
-            PhotologCardContent(
-                uiState = uiState,
-                isPokeDisabled = uiState.isPokeDisabled,
-                onSwipe = onSwipe,
-                onClickUpload = onClickUpload,
-                onPoke = onPoke,
-            )
-
-            if (uiState.canReaction) {
-                ReactionContent(
-                    screenHeightPx = screenHeightPx,
-                    reaction = uiState.partnerPhotolog?.reaction,
-                    onClickReaction = onClickReaction,
+            uiState.showError -> {
+                ErrorScreen(
+                    onClickRetry = onRetry,
+                    onClickBack = onBack,
                 )
+            }
+
+            else -> {
+                Column(
+                    Modifier
+                        .fillMaxSize()
+                        .background(color = CommonColor.White),
+                ) {
+                    PhotologDetailTopBar(
+                        title = uiState.goalName,
+                        canModify = uiState.canModify,
+                        onBack = onBack,
+                        onClickModify = onClickModify,
+                    )
+                    Spacer(Modifier.height(103.dp))
+
+                    PhotologCardContent(
+                        uiState = uiState,
+                        isPokeDisabled = uiState.isPokeDisabled,
+                        onSwipe = onSwipe,
+                        onClickUpload = onClickUpload,
+                        onPoke = onPoke,
+                    )
+
+                    if (uiState.canReaction) {
+                        ReactionContent(
+                            screenHeightPx = screenHeightPx,
+                            reaction = uiState.partnerPhotolog?.reaction,
+                            onClickReaction = onClickReaction,
+                        )
+                    }
+                }
+
+                if (uiState.showOverlayLoading || uiState.isPoking) {
+                    TwixLoadingOverlay()
+                }
             }
         }
     }
@@ -252,6 +280,7 @@ private fun PhotologDetailScreenPreview(
             uiState = previewState,
             screenHeightPx = 0f,
             onBack = {},
+            onRetry = {},
             onClickModify = {},
             onClickReaction = {},
             onClickUpload = {},

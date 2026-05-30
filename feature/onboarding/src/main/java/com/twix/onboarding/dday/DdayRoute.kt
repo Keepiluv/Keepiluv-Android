@@ -26,6 +26,7 @@ import com.twix.designsystem.components.bottomsheet.CommonBottomSheet
 import com.twix.designsystem.components.bottomsheet.model.CommonBottomSheetConfig
 import com.twix.designsystem.components.button.AppButton
 import com.twix.designsystem.components.calendar.Calendar
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -72,6 +73,7 @@ fun DdayRoute(
 
     DdayScreen(
         uiModel = uiState.dDay,
+        showLoadingOverlay = uiState.isSubmittingDday,
         onCompleted = { viewModel.dispatch(OnBoardingIntent.SubmitDday) },
         onClickBack = navigateToBack,
         onDateClick = { showCalendarBottomSheet = true },
@@ -87,6 +89,7 @@ fun DdayRoute(
 @Composable
 fun DdayScreen(
     uiModel: DdayUiModel,
+    showLoadingOverlay: Boolean,
     onCompleted: () -> Unit,
     onClickBack: () -> Unit,
     onDateClick: () -> Unit,
@@ -145,6 +148,10 @@ fun DdayScreen(
                 onComplete = onDateSelected,
             )
         }
+
+        if (showLoadingOverlay) {
+            TwixLoadingOverlay()
+        }
     }
 }
 
@@ -157,6 +164,7 @@ fun DdayScreenPreview() {
                 DdayUiModel(
                     anniversaryDate = LocalDate.now(),
                 ),
+            showLoadingOverlay = false,
             onClickBack = {},
             onDateClick = {},
             showCalendarBottomSheet = false,

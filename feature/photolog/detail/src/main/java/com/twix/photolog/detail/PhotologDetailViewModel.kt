@@ -6,6 +6,7 @@ import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.enums.BetweenUs
 import com.twix.domain.model.enums.GoalReactionType
+import com.twix.domain.model.photolog.PhotoLogs
 import com.twix.domain.model.poke.PokeGoalResult
 import com.twix.domain.repository.PhotoLogRepository
 import com.twix.domain.usecase.PokeGoalUseCase
@@ -14,6 +15,7 @@ import com.twix.photolog.detail.contract.PhotologDetailIntent
 import com.twix.photolog.detail.contract.PhotologDetailSideEffect
 import com.twix.photolog.detail.contract.PhotologDetailUiState
 import com.twix.photolog.detail.contract.toUiState
+import com.twix.result.AppResult
 import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.PhotologRefreshBus
@@ -69,22 +71,32 @@ class PhotologDetailViewModel(
 
     private fun fetchPhotolog() {
         launchResult(
-            block = { photologRepository.fetchPhotologs(argTargetDate, argGoalId) },
-            onSuccess = {
-                reduce {
-                    it.toUiState(
-                        argGoalId,
-                        argBetweenUs,
-                        argTargetDate,
-                        argIsCompleted,
-                    )
-                }
-            },
-            onError = {
-                showToast(R.string.toast_photolog_detail_fetch_fail, ToastType.ERROR)
-            },
-            onFinally = { reduce { copy(isLoading = true) } },
+            block = ::fetchPhotologs,
+            onSuccess = ::handleFetchPhotologSuccess,
+            onError = { handleFetchPhotologError() },
         )
+    }
+
+    private suspend fun fetchPhotologs(): AppResult<PhotoLogs> = photologRepository.fetchPhotologs(argTargetDate, argGoalId)
+
+    private fun handleFetchPhotologSuccess(photoLogs: PhotoLogs) {
+        reduce {
+            photoLogs
+                .toUiState(
+                    argGoalId,
+                    argBetweenUs,
+                    argTargetDate,
+                    argIsCompleted,
+                ).copy(
+                    hasShownMyReaction = currentState.hasShownMyReaction,
+                    pokeCooldownRemaining = currentState.pokeCooldownRemaining,
+                )
+        }
+    }
+
+    private suspend fun handleFetchPhotologError() {
+        if (!currentState.hasLoadedContent) return
+        showToast(R.string.toast_photolog_detail_fetch_fail)
     }
 
     @OptIn(FlowPreview::class)
@@ -108,7 +120,7 @@ class PhotologDetailViewModel(
             onSuccess = {},
             onError = {
                 rollbackReaction()
-                showToast(R.string.toast_reaction_fail, ToastType.ERROR)
+                showToast(R.string.toast_reaction_fail)
             },
         )
     }
@@ -136,6 +148,7 @@ class PhotologDetailViewModel(
 
     override suspend fun handleIntent(intent: PhotologDetailIntent) {
         when (intent) {
+            PhotologDetailIntent.Retry -> fetchPhotolog()
             is PhotologDetailIntent.Reaction -> reduceReaction(intent.type)
             PhotologDetailIntent.Poke -> pokeToPartner()
             PhotologDetailIntent.SwipeCard -> reduceShownCard()
@@ -158,22 +171,41 @@ class PhotologDetailViewModel(
 
     private fun pokeToPartner() {
         viewModelScope.launch {
-            reduce { copy(isPoking = true) }
-            when (val result = pokeGoalUseCase.invoke(argGoalId)) {
-                is PokeGoalResult.Success -> {
-                    reduce { copy(isPoking = false, pokeCooldownRemaining = PokeGoalUseCase.COOLDOWN_MS) }
-                    tryEmitSideEffect(PhotologDetailSideEffect.ShowPokeToast)
-                }
-                is PokeGoalResult.OnCooldown -> {
-                    reduce { copy(isPoking = false) }
-                    tryEmitSideEffect(PhotologDetailSideEffect.ShowPokeCooldownToast(result.remainingMs))
-                }
-                PokeGoalResult.Error -> {
-                    reduce { copy(isPoking = false) }
-                    showToast(R.string.toast_poke_goal_failed, ToastType.ERROR)
-                }
-            }
+            startPokeLoading()
+            handlePokeResult(pokeGoalUseCase.invoke(argGoalId))
         }
+    }
+
+    private fun startPokeLoading() {
+        reduce { copy(isPoking = true) }
+    }
+
+    private suspend fun handlePokeResult(result: PokeGoalResult) {
+        when (result) {
+            is PokeGoalResult.Success -> handlePokeSuccess()
+            is PokeGoalResult.OnCooldown -> handlePokeCooldown(result.remainingMs)
+            PokeGoalResult.Error -> handlePokeError()
+        }
+    }
+
+    private fun handlePokeSuccess() {
+        reduce {
+            copy(
+                isPoking = false,
+                pokeCooldownRemaining = PokeGoalUseCase.COOLDOWN_MS,
+            )
+        }
+        tryEmitSideEffect(PhotologDetailSideEffect.ShowPokeToast)
+    }
+
+    private fun handlePokeCooldown(remainingMs: Long) {
+        reduce { copy(isPoking = false) }
+        tryEmitSideEffect(PhotologDetailSideEffect.ShowPokeCooldownToast(remainingMs))
+    }
+
+    private suspend fun handlePokeError() {
+        reduce { copy(isPoking = false) }
+        showToast(R.string.toast_poke_goal_failed)
     }
 
     private fun reduceShownCard() {
@@ -193,11 +225,13 @@ class PhotologDetailViewModel(
         reduce { copy(hasShownMyReaction = true) }
     }
 
-    private suspend fun showToast(
-        message: Int,
-        type: ToastType,
-    ) {
-        emitSideEffect(PhotologDetailSideEffect.ShowToast(message, type))
+    private suspend fun showToast(message: Int) {
+        emitSideEffect(
+            PhotologDetailSideEffect.ShowToast(
+                message,
+                ToastType.ERROR,
+            ),
+        )
     }
 
     companion object {

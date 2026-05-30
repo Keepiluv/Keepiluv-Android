@@ -3,7 +3,7 @@ package com.twix.goal_manage.model
 import androidx.compose.runtime.Immutable
 import com.twix.domain.model.goal.GoalSummary
 import com.twix.result.AppError
-import com.twix.ui.base.LoadableState
+import com.twix.ui.base.ContentLoadableState
 import java.time.LocalDate
 
 @Immutable
@@ -16,11 +16,12 @@ data class GoalManageUiState(
     val openedMenuGoalId: Long? = null, // 팝업 현재 열린 goalId
     val endDialog: GoalDialogState? = null,
     val deleteDialog: GoalDialogState? = null,
-    override val isLoading: Boolean = false,
+    override val hasLoadedContent: Boolean = false,
+    override val isLoading: Boolean = true,
     override val error: AppError? = null,
-) : LoadableState {
-    override fun copyLoadableState(
+) : ContentLoadableState {
+    override fun copyState(
         isLoading: Boolean,
         error: AppError?,
-    ): LoadableState = copy(isLoading = isLoading, error = error)
+    ): ContentLoadableState = copy(isLoading = isLoading, error = error)
 }

@@ -20,7 +20,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.dialog.CommonDialog
 import com.twix.designsystem.components.text.AppText
@@ -29,6 +31,7 @@ import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.components.topbar.CommonTopBar
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
+import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.settings.SettingsIntent
 import com.twix.settings.SettingsSideEffect
@@ -46,6 +49,7 @@ fun SettingsAccountRoute(
     popBackStack: () -> Unit,
     navigateToLogin: () -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
 
@@ -57,19 +61,25 @@ fun SettingsAccountRoute(
     }
 
     SettingsAccountScreen(
+        inviteCode = uiState.inviteCode,
         onBack = popBackStack,
         onLogout = { viewModel.dispatch(SettingsIntent.Logout) },
         onWithdrawAccount = { viewModel.dispatch(SettingsIntent.WithdrawAccount) },
+        // TODO: 커플 끊기 API 구현 후 SettingsIntent.UnlinkCouple 로 교체
+        onUnlinkCouple = { viewModel.dispatch(SettingsIntent.WithdrawAccount) },
     )
 }
 
 @Composable
 private fun SettingsAccountScreen(
+    inviteCode: String = "",
     onBack: () -> Unit,
     onLogout: () -> Unit,
     onWithdrawAccount: () -> Unit,
+    onUnlinkCouple: () -> Unit,
 ) {
     var showWithdrawDialog by remember { mutableStateOf(false) }
+    var showUnlinkCoupleDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier =
@@ -107,6 +117,26 @@ private fun SettingsAccountScreen(
             HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
 
             SettingsMenuItem(
+                title = stringResource(R.string.word_couple_code),
+                right = {
+                    AppText(
+                        text = inviteCode,
+                        color = GrayColor.C500,
+                        style = AppTextStyle.B2,
+                    )
+                },
+            )
+
+            HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
+
+            SettingsMenuItem(
+                title = stringResource(R.string.action_unlink_couple),
+                onClick = { showUnlinkCoupleDialog = true },
+            )
+
+            HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
+
+            SettingsMenuItem(
                 title = stringResource(R.string.action_withdraw_account),
                 onClick = { showWithdrawDialog = true },
             )
@@ -124,30 +154,92 @@ private fun SettingsAccountScreen(
         onConfirm = { showWithdrawDialog = false },
         onDismissRequest = { showWithdrawDialog = false },
         content = {
-            Image(
-                painter = painterResource(R.drawable.ic_warning),
-                contentDescription = "warning",
-                modifier =
-                    Modifier
-                        .size(60.dp),
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            AppText(
-                text = stringResource(R.string.dialog_withdraw_account_title),
-                color = GrayColor.C500,
-                style = AppTextStyle.T1,
-            )
-
-            Spacer(Modifier.height(8.dp))
-
-            AppText(
-                text = stringResource(R.string.dialog_withdraw_account_content),
-                color = GrayColor.C400,
-                style = AppTextStyle.B2,
-                textAlign = TextAlign.Center,
-            )
+            WithdrawAccountDialogContent()
         },
     )
+
+    CommonDialog(
+        visible = showUnlinkCoupleDialog,
+        confirmText = stringResource(R.string.word_cancel),
+        dismissText = stringResource(R.string.action_unlink_couple),
+        onDismiss = {
+            showUnlinkCoupleDialog = false
+            onUnlinkCouple()
+        },
+        onConfirm = { showUnlinkCoupleDialog = false },
+        onDismissRequest = { showUnlinkCoupleDialog = false },
+        content = {
+            UnlinkCoupleDialogContent()
+        },
+    )
+}
+
+@Composable
+private fun WithdrawAccountDialogContent() {
+    Image(
+        painter = painterResource(R.drawable.ic_warning),
+        contentDescription = "warning",
+        modifier =
+            Modifier
+                .size(60.dp),
+    )
+
+    Spacer(Modifier.height(12.dp))
+
+    AppText(
+        text = stringResource(R.string.dialog_withdraw_account_title),
+        color = GrayColor.C500,
+        style = AppTextStyle.T1,
+    )
+
+    Spacer(Modifier.height(8.dp))
+
+    AppText(
+        text = stringResource(R.string.dialog_withdraw_account_content),
+        color = GrayColor.C400,
+        style = AppTextStyle.B2,
+        textAlign = TextAlign.Center,
+    )
+}
+
+@Composable
+private fun UnlinkCoupleDialogContent() {
+    Image(
+        painter = painterResource(R.drawable.ic_warning),
+        contentDescription = "warning",
+        modifier =
+            Modifier
+                .size(60.dp),
+    )
+
+    Spacer(Modifier.height(12.dp))
+
+    AppText(
+        text = stringResource(R.string.dialog_unlink_couple_title),
+        color = GrayColor.C500,
+        style = AppTextStyle.T1,
+    )
+
+    Spacer(Modifier.height(8.dp))
+
+    AppText(
+        text = stringResource(R.string.dialog_unlink_couple_content),
+        color = GrayColor.C400,
+        style = AppTextStyle.B2,
+        textAlign = TextAlign.Center,
+    )
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun Preview() {
+    TwixTheme {
+        SettingsAccountScreen(
+            inviteCode = "inviteCode",
+            onBack = {},
+            onLogout = {},
+            onWithdrawAccount = {},
+            onUnlinkCouple = {},
+        )
+    }
 }

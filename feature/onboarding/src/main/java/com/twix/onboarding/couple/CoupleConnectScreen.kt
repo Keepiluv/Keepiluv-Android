@@ -36,10 +36,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.bottomsheet.CommonBottomSheet
 import com.twix.designsystem.components.bottomsheet.model.CommonBottomSheetConfig
 import com.twix.designsystem.components.dialog.MarketingDialog
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -47,7 +50,6 @@ import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
 import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
-import com.twix.navigation_contract.Constants
 import com.twix.onboarding.OnBoardingViewModel
 import com.twix.onboarding.contract.OnBoardingIntent
 import com.twix.onboarding.contract.OnBoardingSideEffect
@@ -67,6 +69,7 @@ fun CoupleConnectRoute(
     navigateToNext: () -> Unit,
     navigateToBack: () -> Unit,
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showMarketingDialog by rememberSaveable { mutableStateOf(true) }
     var showRestoreSheet by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
@@ -90,7 +93,6 @@ fun CoupleConnectRoute(
                         R.string.onboarding_invite_share_message,
                         sideEffect.inviteCode,
                         deepLink,
-                        Constants.PLAY_STORE_URL,
                     )
                 val sendIntent =
                     Intent(Intent.ACTION_SEND).apply {
@@ -105,17 +107,27 @@ fun CoupleConnectRoute(
     }
 
     Box {
-        CoupleConnectScreen(
-            showRestoreSheet = showRestoreSheet,
-            onClickSend = { viewModel.dispatch(OnBoardingIntent.ShareInviteLink) },
-            onClickConnect = navigateToNext,
-            onClickRestore = { showRestoreSheet = true },
-            onDismissSheet = { showRestoreSheet = false },
-            onClickBack = navigateToBack,
-        )
+        when {
+            uiState.showLoading -> TwixLoadingOverlay()
+            uiState.showError ->
+                ErrorScreen(
+                    onClickRetry = { viewModel.dispatch(OnBoardingIntent.RetryFetchInviteCode) },
+                    onClickBack = navigateToBack,
+                )
+            else ->
+                CoupleConnectScreen(
+                    showRestoreSheet = showRestoreSheet,
+                    showLoadingOverlay = uiState.isSubmittingMarketingConsent,
+                    onClickSend = { viewModel.dispatch(OnBoardingIntent.ShareInviteLink) },
+                    onClickConnect = navigateToNext,
+                    onClickRestore = { showRestoreSheet = true },
+                    onDismissSheet = { showRestoreSheet = false },
+                    onClickBack = navigateToBack,
+                )
+        }
 
         MarketingDialog(
-            visible = showMarketingDialog,
+            visible = showMarketingDialog && !uiState.showLoading && !uiState.showError,
             onConfirm = { marketing, nightMarketing ->
                 showMarketingDialog = false
                 val isPushEnabled = isNotificationPermissionGranted(context)
@@ -134,6 +146,7 @@ fun CoupleConnectRoute(
 @Composable
 fun CoupleConnectScreen(
     showRestoreSheet: Boolean,
+    showLoadingOverlay: Boolean,
     onClickSend: () -> Unit,
     onClickConnect: () -> Unit,
     onClickRestore: () -> Unit,
@@ -211,6 +224,10 @@ fun CoupleConnectScreen(
             onDismissRequest = onDismissSheet,
             content = { RestoreCoupleBottomSheetContent() },
         )
+
+        if (showLoadingOverlay) {
+            TwixLoadingOverlay()
+        }
     }
 }
 
@@ -234,6 +251,7 @@ private fun CoupleConnectScreenPreview() {
     TwixTheme {
         CoupleConnectScreen(
             showRestoreSheet = false,
+            showLoadingOverlay = false,
             onClickSend = {},
             onClickConnect = {},
             onClickRestore = {},

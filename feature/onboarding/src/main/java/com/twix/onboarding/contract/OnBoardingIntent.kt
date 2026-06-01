@@ -26,6 +26,8 @@ sealed interface OnBoardingIntent : Intent {
 
     data object ConnectCouple : OnBoardingIntent
 
+    data object RetryFetchInviteCode : OnBoardingIntent
+
     data class SelectDate(
         val value: LocalDate,
     ) : OnBoardingIntent
@@ -35,4 +37,8 @@ sealed interface OnBoardingIntent : Intent {
     data object StartPollingStatus : OnBoardingIntent
 
     data object StopPollingStatus : OnBoardingIntent
+
+    data object StartDdayPollingStatus : OnBoardingIntent
+
+    data object StopDdayPollingStatus : OnBoardingIntent
 }

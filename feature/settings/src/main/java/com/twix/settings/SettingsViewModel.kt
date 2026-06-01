@@ -24,6 +24,10 @@ class SettingsViewModel(
 
     override suspend fun handleIntent(intent: SettingsIntent) {
         when (intent) {
+            SettingsIntent.Retry -> {
+                fetchUserInfo()
+                fetchNotificationSetting()
+            }
             is SettingsIntent.SetNickName -> setNickName(intent.nickName)
             is SettingsIntent.SetPokeNotificationEnabled -> {
                 setPokeNotificationEnabled(intent.enabled)
@@ -50,6 +54,7 @@ class SettingsViewModel(
                     isMarketingPushEnabled = setting.isMarketingPushEnabled,
                     isNightPushEnabled = setting.isNightPushEnabled,
                 )
+                reduce { copy(isLoadedNotificationSettings = true) }
             },
             onError = {
                 tryEmitSideEffect(
@@ -65,7 +70,16 @@ class SettingsViewModel(
     private fun fetchUserInfo() {
         launchResult(
             block = { userRepository.fetchUserInfo() },
-            onSuccess = { reduce { copy(nickName = it.name, email = it.email, inviteCode = it.inviteCode) } },
+            onSuccess = {
+                reduce {
+                    copy(
+                        nickName = it.name,
+                        email = it.email,
+                        inviteCode = it.inviteCode,
+                        isLoadedUserInfo = true,
+                    )
+                }
+            },
         )
     }
 
@@ -205,8 +219,13 @@ class SettingsViewModel(
     }
 
     private fun logout() {
+        if (currentState.isAccountActionInFlight) return
+
+        reduce { copy(isAccountActionInFlight = true) }
+
         launchResult(
             block = { authRepository.logout() },
+            onFinally = { reduce { copy(isAccountActionInFlight = false) } },
             onSuccess = {
                 tokenRegistrar.unregisterCurrentToken()
                 tryEmitSideEffect(SettingsSideEffect.ShowToast(R.string.toast_logout_completed, ToastType.SUCCESS))
@@ -217,8 +236,13 @@ class SettingsViewModel(
     }
 
     private fun withdrawAccount() {
+        if (currentState.isAccountActionInFlight) return
+
+        reduce { copy(isAccountActionInFlight = true) }
+
         launchResult(
             block = { authRepository.withdrawAccount() },
+            onFinally = { reduce { copy(isAccountActionInFlight = false) } },
             onSuccess = {
                 tryEmitSideEffect(SettingsSideEffect.ShowToast(R.string.toast_account_deleted, ToastType.SUCCESS))
                 tryEmitSideEffect(SettingsSideEffect.NavigateToLogin)

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +27,7 @@ import com.twix.designsystem.components.bottomsheet.CommonBottomSheet
 import com.twix.designsystem.components.bottomsheet.model.CommonBottomSheetConfig
 import com.twix.designsystem.components.button.AppButton
 import com.twix.designsystem.components.calendar.Calendar
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -54,6 +56,13 @@ fun DdayRoute(
     val currentContext by rememberUpdatedState(context)
     var showCalendarBottomSheet by remember { mutableStateOf(false) }
 
+    DisposableEffect(Unit) {
+        viewModel.dispatch(OnBoardingIntent.StartDdayPollingStatus)
+        onDispose {
+            viewModel.dispatch(OnBoardingIntent.StopDdayPollingStatus)
+        }
+    }
+
     ObserveAsEvents(viewModel.sideEffect) { sideEffect ->
         when (sideEffect) {
             OnBoardingSideEffect.DdaySetting.NavigateToHome -> navigateToHome()
@@ -72,6 +81,7 @@ fun DdayRoute(
 
     DdayScreen(
         uiModel = uiState.dDay,
+        showLoadingOverlay = uiState.isSubmittingDday,
         onCompleted = { viewModel.dispatch(OnBoardingIntent.SubmitDday) },
         onClickBack = navigateToBack,
         onDateClick = { showCalendarBottomSheet = true },
@@ -87,6 +97,7 @@ fun DdayRoute(
 @Composable
 fun DdayScreen(
     uiModel: DdayUiModel,
+    showLoadingOverlay: Boolean,
     onCompleted: () -> Unit,
     onClickBack: () -> Unit,
     onDateClick: () -> Unit,
@@ -145,6 +156,10 @@ fun DdayScreen(
                 onComplete = onDateSelected,
             )
         }
+
+        if (showLoadingOverlay) {
+            TwixLoadingOverlay()
+        }
     }
 }
 
@@ -157,6 +172,7 @@ fun DdayScreenPreview() {
                 DdayUiModel(
                     anniversaryDate = LocalDate.now(),
                 ),
+            showLoadingOverlay = false,
             onClickBack = {},
             onDateClick = {},
             showCalendarBottomSheet = false,

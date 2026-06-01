@@ -8,6 +8,7 @@ import com.twix.domain.model.invitecode.InviteCode
 import com.twix.domain.repository.NotificationRepository
 import com.twix.domain.repository.OnBoardingRepository
 import com.twix.onboarding.contract.OnBoardingIntent
+import com.twix.onboarding.contract.OnBoardingLoadingAction
 import com.twix.onboarding.contract.OnBoardingSideEffect
 import com.twix.onboarding.contract.OnBoardingUiState
 import com.twix.result.AppError
@@ -23,30 +24,32 @@ class OnBoardingViewModel(
     private val onBoardingRepository: OnBoardingRepository,
     private val notificationRepository: NotificationRepository,
 ) : BaseViewModel<OnBoardingUiState, OnBoardingIntent, OnBoardingSideEffect>(OnBoardingUiState()) {
-    private var pollingJob: Job? = null
+    private var onboardingStatusJob: Job? = null
     private var connectCoupleJob: Job? = null
+    private var inviteCodeInitializationJob: Job? = null
 
     init {
         fetchMyInviteCode()
     }
 
     private fun fetchMyInviteCode() {
-        launchResult(
-            block = { onBoardingRepository.fetchInviteCode() },
-            onSuccess = { fetchedInviteCode ->
-                reduce {
-                    copy(
-                        inviteCode =
-                            inviteCode.copy(
-                                myInviteCode = fetchedInviteCode.value,
-                            ),
-                    )
-                }
-            },
-            onError = {
-                showToast(R.string.onboarding_couple_fetch_my_invite_code_fail, ToastType.ERROR)
-            },
-        )
+        if (inviteCodeInitializationJob?.isActive == true) return
+
+        inviteCodeInitializationJob =
+            launchResult(
+                block = { onBoardingRepository.fetchInviteCode() },
+                onSuccess = { fetchedInviteCode ->
+                    reduce {
+                        copy(
+                            inviteCode =
+                                inviteCode.copy(
+                                    myInviteCode = fetchedInviteCode.value,
+                                ),
+                            hasLoadedContent = true,
+                        )
+                    }
+                },
+            )
     }
 
     override suspend fun handleIntent(intent: OnBoardingIntent) {
@@ -58,6 +61,7 @@ class OnBoardingViewModel(
                 emitSideEffect(OnBoardingSideEffect.InviteCode.CopyInviteCode(currentState.inviteCode.myInviteCode))
             OnBoardingIntent.ShareInviteLink ->
                 emitSideEffect(OnBoardingSideEffect.InviteCode.ShareInviteLink(currentState.inviteCode.myInviteCode))
+            OnBoardingIntent.RetryFetchInviteCode -> fetchMyInviteCode()
 
             // 초대 코드 화면
             OnBoardingIntent.StartPollingStatus -> startPolling()
@@ -70,6 +74,8 @@ class OnBoardingViewModel(
             // 디데이 설정 화면
             is OnBoardingIntent.SelectDate -> reduceDday(intent.value)
             OnBoardingIntent.SubmitDday -> anniversarySetup()
+            OnBoardingIntent.StartDdayPollingStatus -> startDdayPolling()
+            OnBoardingIntent.StopDdayPollingStatus -> stopPolling()
 
             is OnBoardingIntent.SubmitMarketingConsent ->
                 initNotificationSettings(
@@ -81,14 +87,28 @@ class OnBoardingViewModel(
     }
 
     private fun startPolling() {
-        if (pollingJob?.isActive == true) return
-        pollingJob =
+        startStatusPolling { status ->
+            if (status == OnboardingStatus.COUPLE_CONNECTION) return@startStatusPolling false
+
+            emitSideEffect(OnBoardingSideEffect.CoupleConnection.NavigateToNext)
+            true
+        }
+    }
+
+    private fun startDdayPolling() {
+        startStatusPolling { status ->
+            if (status != OnboardingStatus.COMPLETED) return@startStatusPolling false
+
+            showAnniversaryAlreadyRegisteredToast()
+            emitSideEffect(OnBoardingSideEffect.DdaySetting.NavigateToHome)
+            true
+        }
+    }
+
+    private fun startStatusPolling(onStatusFetched: suspend (OnboardingStatus) -> Boolean) {
+        if (onboardingStatusJob?.isActive == true) return
+        onboardingStatusJob =
             viewModelScope.launch {
-                /**
-                 * 네트워크 오류 등으로 API 호출이 연속으로 실패한 횟수
-                 * 성공 응답을 받으면 0으로 리셋되며, MAX_POLLING_FAILURE_COUNT에 도달하면 폴링을 중단한다.
-                 * 일시적인 오류에는 폴링을 유지하되, 지속적인 오류 상황에서 무한 루프를 방지하기 위해 사용한다.
-                 * **/
                 var consecutiveFailureCount = 0
 
                 while (isActive) {
@@ -96,16 +116,15 @@ class OnBoardingViewModel(
                     when (val result = onBoardingRepository.fetchOnboardingStatus()) {
                         is AppResult.Success -> {
                             consecutiveFailureCount = 0
-                            if (result.data != OnboardingStatus.COUPLE_CONNECTION) {
-                                stopPolling()
-                                emitSideEffect(OnBoardingSideEffect.CoupleConnection.NavigateToNext)
+                            if (onStatusFetched(result.data)) {
+                                onboardingStatusJob = null
                                 break
                             }
                         }
 
                         is AppResult.Error -> {
                             if (++consecutiveFailureCount >= MAX_POLLING_FAILURE_COUNT) {
-                                stopPolling()
+                                onboardingStatusJob = null
                                 break
                             }
                         }
@@ -115,8 +134,8 @@ class OnBoardingViewModel(
     }
 
     private fun stopPolling() {
-        pollingJob?.cancel()
-        pollingJob = null
+        onboardingStatusJob?.cancel()
+        onboardingStatusJob = null
     }
 
     private fun reduceInviteCode(value: String) {
@@ -137,10 +156,13 @@ class OnBoardingViewModel(
     private fun connectCouple() {
         val currentUiState = currentState.inviteCode
         if (!currentState.inviteCode.isValid) return
+        if (currentState.loadingAction != null) return
         if (connectCoupleJob?.isActive == true) return
 
         connectCoupleJob =
             launchResult(
+                onStart = { startLoadingAction(OnBoardingLoadingAction.CONNECT_COUPLE) },
+                onFinally = { clearLoadingAction(OnBoardingLoadingAction.CONNECT_COUPLE) },
                 block = { onBoardingRepository.coupleConnection(currentUiState.partnerInviteCode) },
                 onSuccess = {
                     stopPolling()
@@ -187,7 +209,11 @@ class OnBoardingViewModel(
     }
 
     private fun profileSetup() {
+        if (currentState.loadingAction != null) return
+
         launchResult(
+            onStart = { startLoadingAction(OnBoardingLoadingAction.SUBMIT_PROFILE) },
+            onFinally = { clearLoadingAction(OnBoardingLoadingAction.SUBMIT_PROFILE) },
             block = { onBoardingRepository.profileSetup(currentState.profile.nickname) },
             onSuccess = { fetchOnboardingStatus() },
             onError = { showToast(R.string.onboarding_profile_setup_fail, ToastType.ERROR) },
@@ -198,19 +224,27 @@ class OnBoardingViewModel(
         launchResult(
             block = { onBoardingRepository.fetchOnboardingStatus() },
             onSuccess = { onboardingStatus ->
-                val sideEffect =
-                    when (onboardingStatus) {
-                        OnboardingStatus.ANNIVERSARY_SETUP ->
-                            OnBoardingSideEffect.ProfileSetting.NavigateToNext
+                when (onboardingStatus) {
+                    OnboardingStatus.ANNIVERSARY_SETUP ->
+                        tryEmitSideEffect(OnBoardingSideEffect.ProfileSetting.NavigateToNext)
 
-                        OnboardingStatus.COMPLETED ->
-                            OnBoardingSideEffect.ProfileSetting.NavigateToHome
+                    OnboardingStatus.COMPLETED ->
+                        onProfileAnniversaryAlreadyRegistered()
 
-                        else -> return@launchResult
-                    }
-                tryEmitSideEffect(sideEffect)
+                    else -> return@launchResult
+                }
             },
         )
+    }
+
+    private fun onProfileAnniversaryAlreadyRegistered() {
+        tryEmitSideEffect(
+            OnBoardingSideEffect.ShowToast(
+                message = R.string.onboarding_anniversary_already_registered_toast,
+                type = ToastType.DEFAULT,
+            ),
+        )
+        tryEmitSideEffect(OnBoardingSideEffect.ProfileSetting.NavigateToHome)
     }
 
     private fun reduceDday(value: LocalDate) {
@@ -222,7 +256,11 @@ class OnBoardingViewModel(
     }
 
     private fun anniversarySetup() {
+        if (currentState.loadingAction != null) return
+
         launchResult(
+            onStart = { startLoadingAction(OnBoardingLoadingAction.SUBMIT_DDAY) },
+            onFinally = { clearLoadingAction(OnBoardingLoadingAction.SUBMIT_DDAY) },
             block = { onBoardingRepository.anniversarySetup(currentState.dDay.anniversaryDate.toString()) },
             onSuccess = { tryEmitSideEffect(OnBoardingSideEffect.DdaySetting.NavigateToHome) },
             onError = {
@@ -236,7 +274,11 @@ class OnBoardingViewModel(
         isMarketingEnabled: Boolean,
         isNightMarketingEnabled: Boolean,
     ) {
+        if (currentState.loadingAction != null) return
+
         launchResult(
+            onStart = { startLoadingAction(OnBoardingLoadingAction.SUBMIT_MARKETING_CONSENT) },
+            onFinally = { clearLoadingAction(OnBoardingLoadingAction.SUBMIT_MARKETING_CONSENT) },
             block = {
                 notificationRepository.initNotificationSettings(
                     isPushEnabled,
@@ -248,11 +290,26 @@ class OnBoardingViewModel(
         )
     }
 
+    private fun startLoadingAction(action: OnBoardingLoadingAction) {
+        reduce { copy(loadingAction = action) }
+    }
+
+    private fun clearLoadingAction(expectedAction: OnBoardingLoadingAction) {
+        reduce {
+            if (loadingAction != expectedAction) return@reduce this
+            copy(loadingAction = null)
+        }
+    }
+
     private suspend fun showToast(
         message: Int,
         type: ToastType,
     ) {
         emitSideEffect(OnBoardingSideEffect.ShowToast(message, type))
+    }
+
+    private suspend fun showAnniversaryAlreadyRegisteredToast() {
+        showToast(R.string.onboarding_anniversary_already_registered_toast, ToastType.DEFAULT)
     }
 
     companion object {

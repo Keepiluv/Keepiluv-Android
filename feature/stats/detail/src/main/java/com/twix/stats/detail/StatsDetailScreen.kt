@@ -35,6 +35,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.calendar.CalendarNavigator
 import com.twix.designsystem.components.dialog.CommonDialog
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.stats.StatsCalendar
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
@@ -95,6 +97,7 @@ fun StatsDetailRoute(
     StatsDetailScreen(
         uiState = uiState,
         onBack = onBack,
+        onRetry = { viewModel.dispatch(StatsDetailIntent.Retry) },
         onSelectDate = { selectedDate -> viewModel.dispatch(StatsDetailIntent.SelectDate(selectedDate)) },
         onPreviousMonth = { viewModel.dispatch(StatsDetailIntent.PreviousMonth) },
         onNextMonth = { viewModel.dispatch(StatsDetailIntent.NextMonth) },
@@ -108,6 +111,7 @@ fun StatsDetailRoute(
 fun StatsDetailScreen(
     uiState: StatsDetailUiState,
     onBack: () -> Unit,
+    onRetry: () -> Unit,
     onSelectDate: (LocalDate) -> Unit,
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
@@ -121,126 +125,156 @@ fun StatsDetailScreen(
     val isInProgressStatsDetail = !uiState.detail.isCompleted
 
     Box {
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-                    .background(GrayColor.C050),
-        ) {
-            StatsDetailTopbar(
-                goalName = uiState.detail.goalName,
-                isInProgressStatsDetail = isInProgressStatsDetail,
-                popupMenuVisibility = popupMenuVisibility,
-                onBack = onBack,
-                onClickAction = {
-                    if (isInProgressStatsDetail) {
-                        popupMenuVisibility = true
-                    } else {
-                        statsDeleteDialogVisibility = true
-                    }
-                },
-                onDismiss = { popupMenuVisibility = false },
-                onClickPopupEdit = {
-                    popupMenuVisibility = false
-                    onClickPopupEdit()
-                },
-                onClickPopupEnd = {
-                    popupMenuVisibility = false
-                    onClickPopupEnd()
-                },
-                onClickPopupDelete = {
-                    popupMenuVisibility = false
-                    statsDeleteDialogVisibility = true
-                },
-            )
-
-            Box(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = 32.dp),
-            ) {
-                Image(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_hug),
-                    contentDescription = null,
+        when {
+            uiState.showLoading -> {
+                TwixLoadingOverlay(
                     modifier =
                         Modifier
-                            .align(Alignment.TopStart)
-                            .padding(start = 20.dp),
-                )
-
-                Column(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp)
-                            .padding(top = 4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    CalendarNavigator(
-                        currentDate = uiState.detail.currentDate,
-                        onPreviousMonth = onPreviousMonth,
-                        onNextMonth = onNextMonth,
-                        hasPrevious = uiState.hasPrevious,
-                        hasNext = uiState.hasNext,
-                    )
-
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .background(CommonColor.White, shape = RoundedCornerShape(16.dp))
-                            .border(
-                                color = GrayColor.C500,
-                                width = 1.dp,
-                                shape = RoundedCornerShape(16.dp),
-                            ).padding(horizontal = 12.dp)
-                            .padding(top = 24.dp, bottom = 32.dp),
-                    ) {
-                        StatsCalendar(
-                            uiModel = uiState.calendarUiModel,
-                            onSelectedDate = onSelectDate,
-                        )
-                    }
-                }
-
-                Image(
-                    imageVector = ImageVector.vectorResource(R.drawable.ic_plane),
-                    contentDescription = null,
-                    modifier =
-                        Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(end = 27.dp),
+                            .fillMaxSize()
+                            .background(GrayColor.C050),
                 )
             }
 
-            Spacer(Modifier.height(44.dp))
-
-            SummaryContent(uiState.summary)
-        }
-
-        CommonDialog(
-            visible = statsDeleteDialogVisibility,
-            confirmText = stringResource(R.string.word_delete),
-            dismissText = stringResource(R.string.word_cancel),
-            onDismissRequest = { statsDeleteDialogVisibility = false },
-            onConfirm = {
-                statsDeleteDialogVisibility = false
-                onClickDeleteStats()
-            },
-            onDismiss = { statsDeleteDialogVisibility = false },
-            content = {
-                StatsDeleteDialogContent(
-                    title =
-                        stringResource(
-                            R.string.dialog_delete_goal_title,
-                            uiState.detail.goalName,
-                        ),
-                    content = stringResource(R.string.dialog_delete_goal_content),
-                    icon = uiState.detail.goalIcon,
+            uiState.showError -> {
+                ErrorScreen(
+                    onClickRetry = onRetry,
+                    onClickBack = onBack,
+                    modifier = Modifier.background(GrayColor.C050),
                 )
-            },
-        )
+            }
+
+            else -> {
+                Column(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .verticalScroll(scrollState)
+                            .background(GrayColor.C050),
+                ) {
+                    StatsDetailTopbar(
+                        goalName = uiState.detail.goalName,
+                        isInProgressStatsDetail = isInProgressStatsDetail,
+                        popupMenuVisibility = popupMenuVisibility,
+                        onBack = onBack,
+                        onClickAction = {
+                            if (isInProgressStatsDetail) {
+                                popupMenuVisibility = true
+                            } else {
+                                statsDeleteDialogVisibility = true
+                            }
+                        },
+                        onDismiss = { popupMenuVisibility = false },
+                        onClickPopupEdit = {
+                            popupMenuVisibility = false
+                            onClickPopupEdit()
+                        },
+                        onClickPopupEnd = {
+                            popupMenuVisibility = false
+                            onClickPopupEnd()
+                        },
+                        onClickPopupDelete = {
+                            popupMenuVisibility = false
+                            statsDeleteDialogVisibility = true
+                        },
+                    )
+
+                    Box(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 32.dp),
+                    ) {
+                        Image(
+                            imageVector = ImageVector.vectorResource(R.drawable.ic_hug),
+                            contentDescription = null,
+                            modifier =
+                                Modifier
+                                    .align(Alignment.TopStart)
+                                    .padding(start = 20.dp),
+                        )
+
+                        Column(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 20.dp)
+                                    .padding(top = 4.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            CalendarNavigator(
+                                currentDate = uiState.detail.currentDate,
+                                onPreviousMonth = onPreviousMonth,
+                                onNextMonth = onNextMonth,
+                                hasPrevious = uiState.hasPrevious,
+                                hasNext = uiState.hasNext,
+                            )
+
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .background(CommonColor.White, shape = RoundedCornerShape(16.dp))
+                                    .border(
+                                        color = GrayColor.C500,
+                                        width = 1.dp,
+                                        shape = RoundedCornerShape(16.dp),
+                                    ).padding(horizontal = 12.dp)
+                                    .padding(top = 24.dp, bottom = 32.dp),
+                            ) {
+                                StatsCalendar(
+                                    uiModel = uiState.calendarUiModel,
+                                    onSelectedDate = onSelectDate,
+                                )
+                            }
+                        }
+
+                        Image(
+                            imageVector = ImageVector.vectorResource(R.drawable.ic_plane),
+                            contentDescription = null,
+                            modifier =
+                                Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(end = 27.dp),
+                        )
+                    }
+
+                    Spacer(Modifier.height(44.dp))
+
+                    SummaryContent(uiState.summary)
+                }
+
+                CommonDialog(
+                    visible = statsDeleteDialogVisibility,
+                    confirmText = stringResource(R.string.word_delete),
+                    dismissText = stringResource(R.string.word_cancel),
+                    onDismissRequest = { statsDeleteDialogVisibility = false },
+                    onConfirm = {
+                        statsDeleteDialogVisibility = false
+                        onClickDeleteStats()
+                    },
+                    onDismiss = { statsDeleteDialogVisibility = false },
+                    content = {
+                        StatsDeleteDialogContent(
+                            title =
+                                stringResource(
+                                    R.string.dialog_delete_goal_title,
+                                    uiState.detail.goalName,
+                                ),
+                            content = stringResource(R.string.dialog_delete_goal_content),
+                            icon = uiState.detail.goalIcon,
+                        )
+                    },
+                )
+
+                if (uiState.showOverlayLoading) {
+                    TwixLoadingOverlay(
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .background(GrayColor.C050.copy(alpha = 0.7f)),
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -294,6 +328,7 @@ private fun StatsDetailScreenPreview(
         StatsDetailScreen(
             uiState = uiState,
             onBack = {},
+            onRetry = {},
             onSelectDate = {},
             onPreviousMonth = {},
             onNextMonth = {},

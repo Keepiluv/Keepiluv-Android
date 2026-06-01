@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.dialog.CommonDialog
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -65,6 +67,7 @@ fun SettingsRoute(
     SettingsScreen(
         uiState = uiState,
         onBack = popBackStack,
+        onRetry = { viewModel.dispatch(SettingsIntent.Retry) },
         onAccountClick = navigateToSettingsAccount,
         onAboutClick = navigateToSettingsAbout,
         onInquiryClick = {
@@ -87,8 +90,9 @@ fun SettingsRoute(
 
 @Composable
 private fun SettingsScreen(
-    uiState: SettingsUiState = SettingsUiState(),
-    onBack: () -> Unit = {},
+    uiState: SettingsUiState,
+    onBack: () -> Unit,
+    onRetry: () -> Unit,
     onAccountClick: () -> Unit = {},
     onAboutClick: () -> Unit = {},
     onInquiryClick: () -> Unit = {},
@@ -98,116 +102,122 @@ private fun SettingsScreen(
     var isEditMode by remember { mutableStateOf(false) }
     var showLanguageDialog by remember { mutableStateOf(false) }
 
-    Box(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .dismissKeyboardOnTap(onDismiss = { isEditMode = false })
-                .background(CommonColor.White),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            CommonTopBar(
-                title = stringResource(R.string.word_setting),
-                left = {
-                    Image(
-                        painter = painterResource(R.drawable.ic_arrow3_left),
-                        contentDescription = "back",
-                        modifier =
-                            Modifier
-                                .padding(18.dp)
-                                .size(24.dp)
-                                .noRippleClickable(onClick = onBack),
-                    )
-                },
-            )
-
-            Spacer(Modifier.height(20.dp))
-
-            Column(
+    when {
+        uiState.showLoading -> TwixLoadingOverlay()
+        uiState.showError -> ErrorScreen(onClickRetry = onRetry, onClickBack = onBack)
+        else -> {
+            Box(
                 modifier =
                     Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
+                        .fillMaxSize()
+                        .dismissKeyboardOnTap(onDismiss = { isEditMode = false })
+                        .background(CommonColor.White),
             ) {
-                ProfileInfo(
-                    nickname = uiState.nickName,
-                    isEditMode = isEditMode,
-                    onCommitNickName = {
-                        onCommitNickName(it)
-                        isEditMode = false
-                    },
-                    onEditModeChange = { isEditMode = it },
-                )
-
-                Spacer(Modifier.height(24.dp))
-
-                SettingsMenuFrame {
-                    SettingsMenuItem(
-                        resId = R.drawable.ic_language,
-                        title = stringResource(R.string.settings_language),
-                        right = {
-                            LanguageMenuRight(language = SettingsLanguage.Korean)
-                        },
-                        onClick = { showLanguageDialog = true },
-                    )
-
-                    SettingsDivider()
-
-                    SettingsMenuItem(
-                        resId = R.drawable.ic_profile_small,
-                        title = stringResource(R.string.word_account),
-                        onClick = onAccountClick,
-                    )
-
-                    SettingsDivider()
-
-                    SettingsMenuItem(
-                        resId = R.drawable.ic_info,
-                        title = stringResource(R.string.word_information),
-                        onClick = onAboutClick,
-                    )
-
-                    SettingsDivider()
-
-                    SettingsMenuItem(
-                        resId = R.drawable.ic_question,
-                        title = stringResource(R.string.settings_inquiry),
-                        right = {
-                            AppText(
-                                text = stringResource(R.string.settings_inquiry_time),
-                                style = AppTextStyle.B2,
-                                color = GrayColor.C500,
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    CommonTopBar(
+                        title = stringResource(R.string.word_setting),
+                        left = {
+                            Image(
+                                painter = painterResource(R.drawable.ic_arrow3_left),
+                                contentDescription = "back",
+                                modifier =
+                                    Modifier
+                                        .padding(18.dp)
+                                        .size(24.dp)
+                                        .noRippleClickable(onClick = onBack),
                             )
                         },
-                        onClick = onInquiryClick,
                     )
 
-                    SettingsDivider()
+                    Spacer(Modifier.height(20.dp))
 
-                    SettingsMenuItem(
-                        resId = R.drawable.ic_notification,
-                        title = stringResource(R.string.settings_notification),
-                        onClick = onNotificationClick,
-                    )
+                    Column(
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp),
+                    ) {
+                        ProfileInfo(
+                            nickname = uiState.nickName,
+                            isEditMode = isEditMode,
+                            onCommitNickName = {
+                                onCommitNickName(it)
+                                isEditMode = false
+                            },
+                            onEditModeChange = { isEditMode = it },
+                        )
+
+                        Spacer(Modifier.height(24.dp))
+
+                        SettingsMenuFrame {
+                            SettingsMenuItem(
+                                resId = R.drawable.ic_language,
+                                title = stringResource(R.string.settings_language),
+                                right = {
+                                    LanguageMenuRight(language = SettingsLanguage.Korean)
+                                },
+                                onClick = { showLanguageDialog = true },
+                            )
+
+                            SettingsDivider()
+
+                            SettingsMenuItem(
+                                resId = R.drawable.ic_profile_small,
+                                title = stringResource(R.string.word_account),
+                                onClick = onAccountClick,
+                            )
+
+                            SettingsDivider()
+
+                            SettingsMenuItem(
+                                resId = R.drawable.ic_info,
+                                title = stringResource(R.string.word_information),
+                                onClick = onAboutClick,
+                            )
+
+                            SettingsDivider()
+
+                            SettingsMenuItem(
+                                resId = R.drawable.ic_question,
+                                title = stringResource(R.string.settings_inquiry),
+                                right = {
+                                    AppText(
+                                        text = stringResource(R.string.settings_inquiry_time),
+                                        style = AppTextStyle.B2,
+                                        color = GrayColor.C500,
+                                    )
+                                },
+                                onClick = onInquiryClick,
+                            )
+
+                            SettingsDivider()
+
+                            SettingsMenuItem(
+                                resId = R.drawable.ic_notification,
+                                title = stringResource(R.string.settings_notification),
+                                onClick = onNotificationClick,
+                            )
+                        }
+                    }
                 }
+
+                LanguageSettingDialog(
+                    visible = showLanguageDialog,
+                    selectedLanguage = SettingsLanguage.Korean,
+                    onDismissRequest = {
+                        showLanguageDialog = false
+                    },
+                    onConfirm = {
+                        showLanguageDialog = false
+                    },
+                    onDismiss = {
+                        showLanguageDialog = false
+                    },
+                )
             }
         }
-
-        LanguageSettingDialog(
-            visible = showLanguageDialog,
-            selectedLanguage = SettingsLanguage.Korean,
-            onDismissRequest = {
-                showLanguageDialog = false
-            },
-            onConfirm = {
-                showLanguageDialog = false
-            },
-            onDismiss = {
-                showLanguageDialog = false
-            },
-        )
     }
 }
 
@@ -318,6 +328,10 @@ private fun LanguageMenuRight(language: SettingsLanguage = SettingsLanguage.Kore
 @Composable
 private fun Preview() {
     TwixTheme {
-        SettingsScreen()
+        SettingsScreen(
+            uiState = SettingsUiState(),
+            onBack = {},
+            onRetry = {},
+        )
     }
 }

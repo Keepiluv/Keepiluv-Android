@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.dialog.CommonDialog
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -38,6 +40,7 @@ import com.twix.settings.SettingsSideEffect
 import com.twix.settings.SettingsViewModel
 import com.twix.settings.component.SettingsMenuFrame
 import com.twix.settings.component.SettingsMenuItem
+import com.twix.settings.model.SettingsUiState
 import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.noRippleClickable
 import org.koin.compose.koinInject
@@ -61,8 +64,10 @@ fun SettingsAccountRoute(
     }
 
     SettingsAccountScreen(
+        uiState = uiState,
         inviteCode = uiState.inviteCode,
         onBack = popBackStack,
+        onRetry = { viewModel.dispatch(SettingsIntent.Retry) },
         onLogout = { viewModel.dispatch(SettingsIntent.Logout) },
         onWithdrawAccount = { viewModel.dispatch(SettingsIntent.WithdrawAccount) },
         // TODO: 커플 끊기 API 구현 후 SettingsIntent.UnlinkCouple 로 교체
@@ -73,7 +78,9 @@ fun SettingsAccountRoute(
 @Composable
 private fun SettingsAccountScreen(
     inviteCode: String = "",
+    uiState: SettingsUiState,
     onBack: () -> Unit,
+    onRetry: () -> Unit,
     onLogout: () -> Unit,
     onWithdrawAccount: () -> Unit,
     onUnlinkCouple: () -> Unit,
@@ -81,97 +88,115 @@ private fun SettingsAccountScreen(
     var showWithdrawDialog by remember { mutableStateOf(false) }
     var showUnlinkCoupleDialog by remember { mutableStateOf(false) }
 
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(CommonColor.White),
-    ) {
-        CommonTopBar(
-            title = stringResource(R.string.word_account),
-            left = {
-                Image(
-                    painter = painterResource(R.drawable.ic_arrow3_left),
-                    contentDescription = "back",
+    when {
+        uiState.showLoading -> TwixLoadingOverlay()
+        uiState.showError -> ErrorScreen(onClickRetry = onRetry, onClickBack = onBack)
+        else -> {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(CommonColor.White),
+            ) {
+                CommonTopBar(
+                    title = stringResource(R.string.word_account),
+                    left = {
+                        Image(
+                            painter = painterResource(R.drawable.ic_arrow3_left),
+                            contentDescription = "back",
+                            modifier =
+                                Modifier
+                                    .padding(18.dp)
+                                    .size(24.dp)
+                                    .noRippleClickable(onClick = onBack),
+                        )
+                    },
+                )
+
+                Spacer(Modifier.height(20.dp))
+
+                SettingsMenuFrame(
                     modifier =
                         Modifier
-                            .padding(18.dp)
-                            .size(24.dp)
-                            .noRippleClickable(onClick = onBack),
-                )
-            },
-        )
-
-        Spacer(Modifier.height(20.dp))
-
-        SettingsMenuFrame(
-            modifier =
-                Modifier
-                    .padding(horizontal = 20.dp),
-        ) {
-            SettingsMenuItem(
-                title = stringResource(R.string.word_logout),
-                onClick = onLogout,
-            )
-
-            HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
-
-            SettingsMenuItem(
-                title = stringResource(R.string.word_couple_code),
-                right = {
-                    AppText(
-                        text = inviteCode,
-                        color = GrayColor.C500,
-                        style = AppTextStyle.B2,
+                            .padding(horizontal = 20.dp),
+                ) {
+                    SettingsMenuItem(
+                        title = stringResource(R.string.word_logout),
+                        onClick = {
+                            if (!uiState.isAccountActionInFlight) {
+                                onLogout()
+                            }
+                        },
                     )
+
+                    HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
+
+                    SettingsMenuItem(
+                        title = stringResource(R.string.word_couple_code),
+                        right = {
+                            AppText(
+                                text = inviteCode,
+                                color = GrayColor.C500,
+                                style = AppTextStyle.B2,
+                            )
+                        },
+                    )
+
+                    HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
+
+                    SettingsMenuItem(
+                        title = stringResource(R.string.action_unlink_couple),
+                        onClick = { showUnlinkCoupleDialog = true },
+                    )
+
+                    HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
+
+                    SettingsMenuItem(
+                        title = stringResource(R.string.action_withdraw_account),
+                        onClick = {
+                            if (!uiState.isAccountActionInFlight) {
+                                showWithdrawDialog = true
+                            }
+                        },
+                    )
+                }
+            }
+
+            if (uiState.showOverlayLoading) {
+                TwixLoadingOverlay()
+            }
+
+            CommonDialog(
+                visible = showWithdrawDialog,
+                confirmText = stringResource(R.string.word_cancel),
+                dismissText = stringResource(R.string.action_withdraw_account),
+                onDismiss = {
+                    showWithdrawDialog = false
+                    onWithdrawAccount()
+                },
+                onConfirm = { showWithdrawDialog = false },
+                onDismissRequest = { showWithdrawDialog = false },
+                content = {
+                    WithdrawAccountDialogContent()
                 },
             )
 
-            HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
-
-            SettingsMenuItem(
-                title = stringResource(R.string.action_unlink_couple),
-                onClick = { showUnlinkCoupleDialog = true },
-            )
-
-            HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
-
-            SettingsMenuItem(
-                title = stringResource(R.string.action_withdraw_account),
-                onClick = { showWithdrawDialog = true },
+            CommonDialog(
+                visible = showUnlinkCoupleDialog,
+                confirmText = stringResource(R.string.word_cancel),
+                dismissText = stringResource(R.string.action_unlink_couple),
+                onDismiss = {
+                    showUnlinkCoupleDialog = false
+                    onUnlinkCouple()
+                },
+                onConfirm = { showUnlinkCoupleDialog = false },
+                onDismissRequest = { showUnlinkCoupleDialog = false },
+                content = {
+                    UnlinkCoupleDialogContent()
+                },
             )
         }
     }
-
-    CommonDialog(
-        visible = showWithdrawDialog,
-        confirmText = stringResource(R.string.word_cancel),
-        dismissText = stringResource(R.string.action_withdraw_account),
-        onDismiss = {
-            showWithdrawDialog = false
-            onWithdrawAccount()
-        },
-        onConfirm = { showWithdrawDialog = false },
-        onDismissRequest = { showWithdrawDialog = false },
-        content = {
-            WithdrawAccountDialogContent()
-        },
-    )
-
-    CommonDialog(
-        visible = showUnlinkCoupleDialog,
-        confirmText = stringResource(R.string.word_cancel),
-        dismissText = stringResource(R.string.action_unlink_couple),
-        onDismiss = {
-            showUnlinkCoupleDialog = false
-            onUnlinkCouple()
-        },
-        onConfirm = { showUnlinkCoupleDialog = false },
-        onDismissRequest = { showUnlinkCoupleDialog = false },
-        content = {
-            UnlinkCoupleDialogContent()
-        },
-    )
 }
 
 @Composable
@@ -236,7 +261,9 @@ private fun Preview() {
     TwixTheme {
         SettingsAccountScreen(
             inviteCode = "inviteCode",
+            uiState = SettingsUiState(),
             onBack = {},
+            onRetry = {},
             onLogout = {},
             onWithdrawAccount = {},
             onUnlinkCouple = {},

@@ -39,6 +39,7 @@ class PhotologEditorViewModel(
 
     override suspend fun handleIntent(intent: PhotologEditorIntent) {
         when (intent) {
+            PhotologEditorIntent.Retry -> fetchPhotolog()
             is PhotologEditorIntent.CommentFocusChanged -> reduceCommentFocus(intent.isFocused)
             is PhotologEditorIntent.ModifyComment -> reduceComment(intent.value)
             PhotologEditorIntent.Save -> modifyComment()
@@ -60,6 +61,7 @@ class PhotologEditorViewModel(
             showToast(R.string.toast_comment_not_modified, ToastType.DEFAULT)
         } else {
             launchResult(
+                onStart = { reduce { copy(isSaving = true) } },
                 block = { launchModifyComment() },
                 onSuccess = {
                     detailRefreshBus.notifyChanged(PhotologRefreshBus.Publisher.EDITOR)
@@ -69,6 +71,7 @@ class PhotologEditorViewModel(
                 onError = {
                     showToast(R.string.toast_comment_modify_fail, ToastType.ERROR)
                 },
+                onFinally = { reduce { copy(isSaving = false) } },
             )
         }
     }
@@ -87,9 +90,10 @@ class PhotologEditorViewModel(
     private fun fetchPhotolog() {
         launchResult(
             block = { photologRepository.fetchPhotologs(argTargetDate, argGoalId) },
-            onSuccess = { reduce { it.toEditorUiState(argGoalId, argTargetDate) } },
-            onError = {
-                showToast(R.string.toast_photolog_detail_fetch_fail, ToastType.ERROR)
+            onSuccess = {
+                reduce {
+                    it.toEditorUiState(argGoalId, argTargetDate)
+                }
             },
         )
     }

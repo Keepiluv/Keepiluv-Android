@@ -3,6 +3,7 @@ package com.twix.login
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,7 +22,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -50,6 +53,7 @@ fun LoginRoute(
     googleLoginProvider: GoogleLoginProvider = koinInject(),
     viewModel: LoginViewModel = koinViewModel(),
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     val currentContext by rememberUpdatedState(context)
@@ -69,8 +73,12 @@ fun LoginRoute(
         }
     }
 
-    LoginScreen { type ->
+    LoginScreen(
+        isAuthenticating = uiState.showLoading,
+    ) { type ->
         coroutineScope.launch {
+            if (uiState.isLoading) return@launch
+
             val result =
                 when (type) {
                     LoginType.KAKAO -> kakaoLoginProvider.login(currentContext)
@@ -82,52 +90,69 @@ fun LoginRoute(
 }
 
 @Composable
-private fun LoginScreen(onClickLogin: (LoginType) -> Unit) {
+private fun LoginScreen(
+    isAuthenticating: Boolean,
+    onClickLogin: (LoginType) -> Unit,
+) {
     val scrollState = rememberScrollState()
-    Column(
+    Box(
         modifier =
             Modifier
                 .fillMaxSize()
-                .background(CommonColor.White)
-                .verticalScroll(scrollState),
+                .background(CommonColor.White),
     ) {
-        Spacer(Modifier.height(35.dp))
-
-        Image(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_app_logo),
-            contentDescription = null,
-            modifier = Modifier.padding(start = 24.dp),
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        AppText(
-            text = stringResource(R.string.login_title_message),
-            style = AppTextStyle.H3,
-            color = GrayColor.C500,
-            modifier = Modifier.padding(start = 24.dp),
-        )
-
-        Spacer(Modifier.height(27.dp))
-
-        Image(
-            imageVector = ImageVector.vectorResource(R.drawable.ic_singing),
-            contentDescription = null,
-        )
-
         Column(
             modifier =
                 Modifier
-                    .padding(horizontal = 20.dp)
-                    .padding(top = 29.dp, bottom = 27.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                    .fillMaxSize()
+                    .verticalScroll(scrollState),
         ) {
-            LoginType.entries.forEach { type ->
-                LoginButton(
-                    type = type,
-                    onClickLogin = onClickLogin,
-                )
+            Spacer(Modifier.height(35.dp))
+
+            Image(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_app_logo),
+                contentDescription = null,
+                modifier = Modifier.padding(start = 24.dp),
+            )
+
+            Spacer(Modifier.height(24.dp))
+
+            AppText(
+                text = stringResource(R.string.login_title_message),
+                style = AppTextStyle.H3,
+                color = GrayColor.C500,
+                modifier = Modifier.padding(start = 24.dp),
+            )
+
+            Spacer(Modifier.height(27.dp))
+
+            Image(
+                imageVector = ImageVector.vectorResource(R.drawable.ic_singing),
+                contentDescription = null,
+            )
+
+            Column(
+                modifier =
+                    Modifier
+                        .padding(horizontal = 20.dp)
+                        .padding(top = 29.dp, bottom = 27.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                LoginType.entries.forEach { type ->
+                    LoginButton(
+                        type = type,
+                        onClickLogin = {
+                            if (!isAuthenticating) {
+                                onClickLogin(it)
+                            }
+                        },
+                    )
+                }
             }
+        }
+
+        if (isAuthenticating) {
+            TwixLoadingOverlay()
         }
     }
 }
@@ -136,6 +161,9 @@ private fun LoginScreen(onClickLogin: (LoginType) -> Unit) {
 @Composable
 private fun LoginScreenPreview() {
     TwixTheme {
-        LoginScreen(onClickLogin = {})
+        LoginScreen(
+            isAuthenticating = false,
+            onClickLogin = {},
+        )
     }
 }

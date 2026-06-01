@@ -4,6 +4,8 @@ import com.twix.domain.model.enums.GoalReactionType
 import com.twix.ui.base.Intent
 
 sealed interface PhotologDetailIntent : Intent {
+    data object Retry : PhotologDetailIntent
+
     data class Reaction(
         val type: GoalReactionType,
     ) : PhotologDetailIntent

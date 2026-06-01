@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.common.CommonSwitch
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -60,6 +62,7 @@ fun SettingsNotificationRoute(
     SettingsNotificationScreen(
         uiState = uiState,
         onBack = popBackStack,
+        onRetry = { viewModel.dispatch(SettingsIntent.Retry) },
         onPokeNotificationChange = {
             viewModel.dispatch(SettingsIntent.SetPokeNotificationEnabled(it))
         },
@@ -76,59 +79,66 @@ fun SettingsNotificationRoute(
 private fun SettingsNotificationScreen(
     uiState: SettingsUiState = SettingsUiState(),
     onBack: () -> Unit = {},
+    onRetry: () -> Unit = {},
     onPokeNotificationChange: (Boolean) -> Unit = {},
     onMarketingNotificationChange: (Boolean) -> Unit = {},
     onNightMarketingNotificationChange: (Boolean) -> Unit = {},
 ) {
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(CommonColor.White),
-    ) {
-        CommonTopBar(
-            title = stringResource(R.string.settings_notification),
-            left = {
-                Image(
-                    painter = painterResource(R.drawable.ic_arrow3_left),
-                    contentDescription = "back",
-                    modifier =
-                        Modifier
-                            .padding(18.dp)
-                            .noRippleClickable(onClick = onBack),
+    when {
+        uiState.showLoading -> TwixLoadingOverlay()
+        uiState.showError -> ErrorScreen(onClickRetry = onRetry, onClickBack = onBack)
+        else -> {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(CommonColor.White),
+            ) {
+                CommonTopBar(
+                    title = stringResource(R.string.settings_notification),
+                    left = {
+                        Image(
+                            painter = painterResource(R.drawable.ic_arrow3_left),
+                            contentDescription = "back",
+                            modifier =
+                                Modifier
+                                    .padding(18.dp)
+                                    .noRippleClickable(onClick = onBack),
+                        )
+                    },
                 )
-            },
-        )
 
-        Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(20.dp))
 
-        SettingsMenuFrame(
-            modifier = Modifier.padding(horizontal = 20.dp),
-        ) {
-            NotificationSettingItem(
-                title = stringResource(R.string.settings_poke_push_notification),
-                checked = uiState.pokeNotificationEnabled,
-                enabled = !uiState.notificationSettingsUpdating,
-                onCheckedChange = onPokeNotificationChange,
-            )
+                SettingsMenuFrame(
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                ) {
+                    NotificationSettingItem(
+                        title = stringResource(R.string.settings_poke_push_notification),
+                        checked = uiState.pokeNotificationEnabled,
+                        enabled = !uiState.notificationSettingsUpdating,
+                        onCheckedChange = onPokeNotificationChange,
+                    )
 
-            SettingsNotificationDivider()
+                    SettingsNotificationDivider()
 
-            NotificationSettingItem(
-                title = stringResource(R.string.settings_marketing_push_notification),
-                checked = uiState.marketingNotificationEnabled,
-                enabled = !uiState.notificationSettingsUpdating,
-                onCheckedChange = onMarketingNotificationChange,
-            )
+                    NotificationSettingItem(
+                        title = stringResource(R.string.settings_marketing_push_notification),
+                        checked = uiState.marketingNotificationEnabled,
+                        enabled = !uiState.notificationSettingsUpdating,
+                        onCheckedChange = onMarketingNotificationChange,
+                    )
 
-            SettingsNotificationDivider()
+                    SettingsNotificationDivider()
 
-            NotificationSettingItem(
-                title = stringResource(R.string.settings_night_marketing_push_notification),
-                checked = uiState.nightMarketingNotificationEnabled,
-                enabled = !uiState.notificationSettingsUpdating,
-                onCheckedChange = onNightMarketingNotificationChange,
-            )
+                    NotificationSettingItem(
+                        title = stringResource(R.string.settings_night_marketing_push_notification),
+                        checked = uiState.nightMarketingNotificationEnabled,
+                        enabled = !uiState.notificationSettingsUpdating,
+                        onCheckedChange = onNightMarketingNotificationChange,
+                    )
+                }
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ import com.twix.domain.model.enums.StampType
 import com.twix.domain.model.stats.ParticipantStats
 import com.twix.domain.model.stats.Stats
 import com.twix.domain.model.stats.StatsGoal
+import com.twix.result.AppError
 import com.twix.stats.contract.StatsUiState
 import java.time.LocalDate
 
@@ -15,6 +16,8 @@ class StatsUiStatePreviewProvider : PreviewParameterProvider<StatsUiState> {
         sequenceOf(
             defaultState(),
             emptyState(),
+            loadingState(),
+            errorState(),
         )
 
     private fun defaultState() =
@@ -54,6 +57,8 @@ class StatsUiStatePreviewProvider : PreviewParameterProvider<StatsUiState> {
                         ),
                 ),
             completedStats = emptyList(),
+            isLoadedInProgressStats = true,
+            isLoadedCompletedStats = true,
         )
 
     private fun emptyState() =
@@ -64,5 +69,17 @@ class StatsUiStatePreviewProvider : PreviewParameterProvider<StatsUiState> {
                     statsGoals = emptyList(),
                 ),
             completedStats = emptyList(),
+            isLoadedInProgressStats = true,
+            isLoadedCompletedStats = true,
+        )
+
+    private fun loadingState() =
+        StatsUiState(
+            isLoading = true,
+        )
+
+    private fun errorState() =
+        StatsUiState(
+            error = AppError.Network(),
         )
 }

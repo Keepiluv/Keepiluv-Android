@@ -40,8 +40,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
 import com.twix.designsystem.components.calendar.WeeklyCalendar
 import com.twix.designsystem.components.dialog.CommonDialog
+import com.twix.designsystem.components.error.ErrorScreen
 import com.twix.designsystem.components.goal.EmptyGoalGuide
 import com.twix.designsystem.components.goal.GoalCardFrame
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.popup.CommonPopup
 import com.twix.designsystem.components.popup.CommonPopupDivider
 import com.twix.designsystem.components.popup.CommonPopupItem
@@ -91,6 +93,7 @@ fun GoalManageRoute(
         openedMenuGoalId = uiState.openedMenuGoalId,
         pendingIds = uiState.pendingGoalIds,
         onBack = popBackStack,
+        onRetry = { viewModel.dispatch(GoalManageIntent.Retry) },
         onSelectDate = { viewModel.dispatch(GoalManageIntent.SetSelectedDate(it)) },
         onPreviousWeek = { viewModel.dispatch(GoalManageIntent.PreviousWeek) },
         onNextWeek = { viewModel.dispatch(GoalManageIntent.NextWeek) },
@@ -116,6 +119,7 @@ private fun GoalManageScreen(
     uiState: GoalManageUiState,
     openedMenuGoalId: Long?,
     onBack: () -> Unit,
+    onRetry: () -> Unit,
     onSelectDate: (LocalDate) -> Unit,
     onPreviousWeek: () -> Unit,
     onNextWeek: () -> Unit,
@@ -143,105 +147,114 @@ private fun GoalManageScreen(
         if (deleteDialog != null) deleteDialogSnapshot = deleteDialog
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .background(CommonColor.White),
-        ) {
-            CommonTopBar(
-                title = stringResource(R.string.word_edit),
-                left = {
-                    Image(
-                        painter = painterResource(R.drawable.ic_arrow3_left),
-                        contentDescription = "back",
-                        modifier =
-                            Modifier
-                                .padding(18.dp)
-                                .size(24.dp)
-                                .noRippleClickable(onClick = onBack),
+    when {
+        uiState.showLoading -> TwixLoadingOverlay()
+        uiState.showError -> ErrorScreen(onClickRetry = onRetry, onClickBack = onBack)
+        else ->
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .background(CommonColor.White),
+                ) {
+                    CommonTopBar(
+                        title = stringResource(R.string.word_edit),
+                        left = {
+                            Image(
+                                painter = painterResource(R.drawable.ic_arrow3_left),
+                                contentDescription = "back",
+                                modifier =
+                                    Modifier
+                                        .padding(18.dp)
+                                        .size(24.dp)
+                                        .noRippleClickable(onClick = onBack),
+                            )
+                        },
                     )
-                },
-            )
 
-            Spacer(Modifier.height(4.dp))
+                    Spacer(Modifier.height(4.dp))
 
-            WeeklyCalendar(
-                selectedDate = uiState.selectedDate,
-                referenceDate = uiState.referenceDate,
-                onSelectDate = onSelectDate,
-                onPreviousWeek = onPreviousWeek,
-                onNextWeek = onNextWeek,
-            )
+                    WeeklyCalendar(
+                        selectedDate = uiState.selectedDate,
+                        referenceDate = uiState.referenceDate,
+                        onSelectDate = onSelectDate,
+                        onPreviousWeek = onPreviousWeek,
+                        onNextWeek = onNextWeek,
+                    )
 
-            if (uiState.goalSummaries.isEmpty()) {
-                EmptyGoalGuide(
-                    modifier =
-                        Modifier
-                            .padding(top = 128.dp),
-                    text = stringResource(R.string.goal_detail_empty_goal_guide),
-                    isDetail = true,
+                    if (uiState.goalSummaries.isEmpty()) {
+                        EmptyGoalGuide(
+                            modifier =
+                                Modifier
+                                    .padding(top = 128.dp),
+                            text = stringResource(R.string.goal_detail_empty_goal_guide),
+                            isDetail = true,
+                        )
+                    } else {
+                        GoalSummaryList(
+                            modifier =
+                                Modifier
+                                    .padding(horizontal = 20.dp)
+                                    .weight(1f),
+                            summaryList = uiState.goalSummaries,
+                            openedMenuGoalId = openedMenuGoalId,
+                            pendingIds = pendingIds,
+                            onOpenMenu = onOpenMenu,
+                            onCloseMenu = onCloseMenu,
+                            onEdit = onEdit,
+                            onRequestDelete = onRequestDelete,
+                            onRequestEnd = onRequestEnd,
+                        )
+                    }
+                }
+
+                CommonDialog(
+                    visible = endDialog != null,
+                    confirmText = stringResource(R.string.action_complete_goal),
+                    dismissText = stringResource(R.string.word_cancel),
+                    onDismissRequest = onDismissEndDialog,
+                    onConfirm = {
+                        val id = endDialog?.goalId
+                        onDismissEndDialog()
+                        id?.let(onConfirmEnd)
+                    },
+                    onDismiss = onDismissEndDialog,
+                    content = {
+                        val dialog = endDialogSnapshot ?: return@CommonDialog
+                        GoalSummaryDialogContent(
+                            title = stringResource(R.string.dialog_end_goal_title, dialog.name),
+                            content = stringResource(R.string.dialog_end_goal_content),
+                            icon = dialog.icon,
+                        )
+                    },
                 )
-            } else {
-                GoalSummaryList(
-                    modifier =
-                        Modifier
-                            .padding(horizontal = 20.dp)
-                            .weight(1f),
-                    summaryList = uiState.goalSummaries,
-                    openedMenuGoalId = openedMenuGoalId,
-                    pendingIds = pendingIds,
-                    onOpenMenu = onOpenMenu,
-                    onCloseMenu = onCloseMenu,
-                    onEdit = onEdit,
-                    onRequestDelete = onRequestDelete,
-                    onRequestEnd = onRequestEnd,
+
+                CommonDialog(
+                    visible = deleteDialog != null,
+                    confirmText = stringResource(R.string.word_delete),
+                    dismissText = stringResource(R.string.word_cancel),
+                    onDismissRequest = onDismissDeleteDialog,
+                    onConfirm = {
+                        val id = deleteDialog?.goalId
+                        onDismissDeleteDialog()
+                        id?.let(onConfirmDelete)
+                    },
+                    onDismiss = onDismissDeleteDialog,
+                    content = {
+                        val dialog = deleteDialogSnapshot ?: return@CommonDialog
+                        GoalSummaryDialogContent(
+                            title = stringResource(R.string.dialog_delete_goal_title, dialog.name),
+                            content = stringResource(R.string.dialog_delete_goal_content),
+                            icon = dialog.icon,
+                        )
+                    },
                 )
+
+                if (uiState.showOverlayLoading) {
+                    TwixLoadingOverlay()
+                }
             }
-        }
-
-        CommonDialog(
-            visible = endDialog != null,
-            confirmText = stringResource(R.string.action_complete_goal),
-            dismissText = stringResource(R.string.word_cancel),
-            onDismissRequest = onDismissEndDialog,
-            onConfirm = {
-                val id = endDialog?.goalId
-                onDismissEndDialog()
-                id?.let(onConfirmEnd)
-            },
-            onDismiss = onDismissEndDialog,
-            content = {
-                val dialog = endDialogSnapshot ?: return@CommonDialog
-                GoalSummaryDialogContent(
-                    title = stringResource(R.string.dialog_end_goal_title, dialog.name),
-                    content = stringResource(R.string.dialog_end_goal_content),
-                    icon = dialog.icon,
-                )
-            },
-        )
-
-        CommonDialog(
-            visible = deleteDialog != null,
-            confirmText = stringResource(R.string.word_delete),
-            dismissText = stringResource(R.string.word_cancel),
-            onDismissRequest = onDismissDeleteDialog,
-            onConfirm = {
-                val id = deleteDialog?.goalId
-                onDismissDeleteDialog()
-                id?.let(onConfirmDelete)
-            },
-            onDismiss = onDismissDeleteDialog,
-            content = {
-                val dialog = deleteDialogSnapshot ?: return@CommonDialog
-                GoalSummaryDialogContent(
-                    title = stringResource(R.string.dialog_delete_goal_title, dialog.name),
-                    content = stringResource(R.string.dialog_delete_goal_content),
-                    icon = dialog.icon,
-                )
-            },
-        )
     }
 }
 

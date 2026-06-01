@@ -5,21 +5,39 @@ import com.twix.onboarding.dday.DdayUiModel
 import com.twix.onboarding.invite.InviteCodeUiModel
 import com.twix.onboarding.profile.ProfileUiModel
 import com.twix.result.AppError
-import com.twix.ui.base.LoadableState
+import com.twix.ui.base.ContentLoadableState
 
 @Immutable
 data class OnBoardingUiState(
     val profile: ProfileUiModel = ProfileUiModel(),
     val inviteCode: InviteCodeUiModel = InviteCodeUiModel(),
     val dDay: DdayUiModel = DdayUiModel(),
-    override val isLoading: Boolean = false,
+    val loadingAction: OnBoardingLoadingAction? = null,
+    override val hasLoadedContent: Boolean = false,
+    override val isLoading: Boolean = true,
     override val error: AppError? = null,
-) : LoadableState {
+) : ContentLoadableState {
     val isValidNickName: Boolean
         get() = profile.isValid
 
-    override fun copyLoadableState(
+    val isConnectingCouple: Boolean
+        get() = isLoading && loadingAction == OnBoardingLoadingAction.CONNECT_COUPLE
+
+    val isSubmittingProfile: Boolean
+        get() = isLoading && loadingAction == OnBoardingLoadingAction.SUBMIT_PROFILE
+
+    val isSubmittingDday: Boolean
+        get() = isLoading && loadingAction == OnBoardingLoadingAction.SUBMIT_DDAY
+
+    val isSubmittingMarketingConsent: Boolean
+        get() = isLoading && loadingAction == OnBoardingLoadingAction.SUBMIT_MARKETING_CONSENT
+
+    override fun copyState(
         isLoading: Boolean,
         error: AppError?,
-    ): LoadableState = copy(isLoading = isLoading, error = error)
+    ): ContentLoadableState =
+        copy(
+            isLoading = isLoading,
+            error = error,
+        )
 }

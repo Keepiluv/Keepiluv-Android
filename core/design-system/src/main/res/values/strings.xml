@@ -209,6 +209,7 @@
     <string name="onboarding_profile_helper">닉네임 2~8자</string>
     <string name="onboarding_profile_button_title">완료</string>
     <string name="onboarding_profile_invalid_name_length_toast">2자에서 8자 이내로 닉네임을 입력해주세요.</string>
+    <string name="onboarding_anniversary_already_registered_toast">짝꿍이 기념일을 먼저 등록했어요</string>
     <string name="onboarding_profile_setup_fail">프로필 설정 요청에 실패했습니다.</string>
 
     <string name="onboarding_couple_connect_description">짝꿍과 연결하고\n함께 키피럽 시작하세요</string>
@@ -224,7 +225,7 @@
     <string name="onboarding_couple_connection_fail">커플 연결 요청에 실패했어요</string>
     <string name="toast_self_invite_code">자신의 초대 코드는 사용할 수 없어요</string>
 
-    <string name="onboarding_invite_share_message">[키피럽 함께 시작해요]\n함께 시작하고 일상 속 시너지를!\n\n1. \'키피럽\'을 설치해 주세요.\n%3$s\n\n2. 회원가입을 해 주세요.\n\n3. 아래 링크를 통해 연결하거나, 연결 코드를 메이트와 공유하세요!\n\n연결 코드: %1$s\n%2$s</string>
+    <string name="onboarding_invite_share_message">[키피럽 함께 시작해요]\n함께 시작하고 일상 속 시너지를!\n\n1. \'키피럽\'을 설치해 주세요.\n\n2. 회원가입을 해 주세요.\n\n3. 아래 링크를 통해 연결하거나, 연결 코드를 메이트와 공유하세요!\n\n연결 코드: %1$s\n%2$s</string>
 
     <string name="onboarding_invite_code_plz_write_invite_code">짝꿍에게 받은\n초대 코드를 써주세요</string>
     <string name="onboarding_invite_code_my_invite_code">내 초대 코드</string>

@@ -6,6 +6,7 @@ import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.model.enums.StatsStatus
 import com.twix.domain.model.stats.Stats
 import com.twix.domain.repository.StatsRepository
+import com.twix.result.AppResult
 import com.twix.stats.contract.StatsIntent
 import com.twix.stats.contract.StatsSideEffect
 import com.twix.stats.contract.StatsUiState
@@ -45,8 +46,7 @@ class StatsViewModel(
 
     init {
         collectMonthChange()
-        fetchInProgressStats(YearMonth.from(currentState.currentDate))
-        fetchCompletedStats()
+        fetchInitialStats()
         collectEventBus()
     }
 
@@ -63,9 +63,16 @@ class StatsViewModel(
 
     override suspend fun handleIntent(intent: StatsIntent) {
         when (intent) {
+            StatsIntent.Retry -> fetchInitialStats()
             is StatsIntent.PreviousMonth -> fetchPreviousMonthStats()
             is StatsIntent.NextMonth -> fetchNextMonthStats()
         }
+    }
+
+    private fun fetchInitialStats() {
+        val currentMonth = currentYearMonth()
+        fetchInProgressStats(currentMonth)
+        fetchCompletedStats()
     }
 
     private fun fetchInProgressStats(
@@ -74,11 +81,12 @@ class StatsViewModel(
     ) {
         if (!refresh && applyCached(date)) return
         val requestId = ++latestInProgressRequestId
+        val shouldShowErrorScreen = !currentState.isLoadedInProgressStats
 
         launchResult(
             block = { statsRepository.fetchStats(date, StatsStatus.IN_PROGRESS) },
             onSuccess = { stats -> handleFetchInProgressStatsSuccess(stats, date, requestId) },
-            onError = { handleFetchInProgressStatsFail(requestId, date) },
+            onError = { handleFetchInProgressStatsFail(requestId, date, shouldShowErrorScreen) },
         )
     }
 
@@ -90,21 +98,29 @@ class StatsViewModel(
         inProgressStatsCache[date] = stats
 
         val isLatestRequest = requestId == latestInProgressRequestId
-        val isCurrentMonth = YearMonth.from(currentState.currentDate) == date
+        val isCurrentMonth = currentYearMonth() == date
         if (isLatestRequest && isCurrentMonth) {
-            reduce { copy(inProgressStats = stats) }
+            reduce {
+                copy(
+                    inProgressStats = stats,
+                    isLoadedInProgressStats = true,
+                )
+            }
         }
     }
 
     private suspend fun handleFetchInProgressStatsFail(
         requestId: Long,
         date: YearMonth,
+        shouldShowErrorScreen: Boolean,
     ) {
         val isLatestRequest = requestId == latestInProgressRequestId
-        val isCurrentMonth = YearMonth.from(currentState.currentDate) == date
-        if (isLatestRequest && isCurrentMonth) {
-            showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
-        }
+        val isCurrentMonth = currentYearMonth() == date
+        if (!isLatestRequest || !isCurrentMonth) return
+        if (shouldShowErrorScreen) return
+
+        reduce { copy(error = null) }
+        showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
     }
 
     private fun fetchPreviousMonthStats() {
@@ -124,16 +140,31 @@ class StatsViewModel(
     }
 
     private fun fetchCompletedStats() {
+        val shouldShowErrorScreen = !currentState.isLoadedCompletedStats
+
         launchResult(
-            block = {
-                statsRepository.fetchStats(
-                    YearMonth.from(currentState.currentDate),
-                    StatsStatus.COMPLETED,
-                )
-            },
-            onSuccess = { reduce { copy(completedStats = it.statsGoals) } },
-            onError = { showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR) },
+            block = ::fetchCompletedStatsData,
+            onSuccess = ::handleFetchCompletedStatsSuccess,
+            onError = { handleFetchCompletedStatsFail(shouldShowErrorScreen) },
         )
+    }
+
+    private suspend fun fetchCompletedStatsData(): AppResult<Stats> = statsRepository.fetchStats(currentYearMonth(), StatsStatus.COMPLETED)
+
+    private fun handleFetchCompletedStatsSuccess(stats: Stats) {
+        reduce {
+            copy(
+                completedStats = stats.statsGoals,
+                isLoadedCompletedStats = true,
+            )
+        }
+    }
+
+    private suspend fun handleFetchCompletedStatsFail(shouldShowErrorScreen: Boolean) {
+        if (shouldShowErrorScreen) return
+
+        reduce { copy(error = null) }
+        showToast(R.string.toast_fetch_stats_failed, ToastType.ERROR)
     }
 
     private fun collectEventBus() {
@@ -152,16 +183,23 @@ class StatsViewModel(
     }
 
     private fun refreshInProgressStats() {
-        inProgressStatsCache.remove(YearMonth.from(currentState.currentDate))
+        inProgressStatsCache.remove(currentYearMonth())
         fetchInProgressStats(
-            YearMonth.from(currentState.currentDate),
+            currentYearMonth(),
             refresh = true,
         )
     }
 
+    private fun currentYearMonth(): YearMonth = YearMonth.from(currentState.currentDate)
+
     private fun applyCached(yearMonth: YearMonth): Boolean {
         val cached = inProgressStatsCache[yearMonth] ?: return false
-        reduce { copy(inProgressStats = cached) }
+        reduce {
+            copy(
+                inProgressStats = cached,
+                isLoadedInProgressStats = true,
+            )
+        }
         return true
     }
 

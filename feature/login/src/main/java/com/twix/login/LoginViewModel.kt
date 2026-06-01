@@ -1,6 +1,5 @@
 package com.twix.login
 
-import androidx.lifecycle.viewModelScope
 import com.twix.designsystem.R
 import com.twix.designsystem.components.toast.model.ToastType
 import com.twix.domain.login.LoginResult
@@ -11,7 +10,6 @@ import com.twix.login.contract.LoginIntent
 import com.twix.login.contract.LoginSideEffect
 import com.twix.login.contract.LoginUiState
 import com.twix.ui.base.BaseViewModel
-import kotlinx.coroutines.launch
 
 class LoginViewModel(
     private val authRepository: AuthRepository,
@@ -23,43 +21,29 @@ class LoginViewModel(
         }
     }
 
-    private fun login(result: LoginResult) {
-        viewModelScope.launch {
-            when (result) {
-                is LoginResult.Success -> {
-                    authRepository.login(result.idToken, result.type)
-                    checkOnboardingStatus()
-                }
+    private suspend fun login(result: LoginResult) {
+        if (currentState.isLoading) return
 
-                is LoginResult.Failure -> {
-                    LoginSideEffect.ShowToast(
-                        message = R.string.login_fail_message,
-                        type = ToastType.ERROR,
-                    )
-                }
-
-                LoginResult.Cancel -> Unit
-            }
+        when (result) {
+            is LoginResult.Success -> authenticate(result)
+            is LoginResult.Failure -> showToast(R.string.login_fail_message)
+            LoginResult.Cancel -> Unit
         }
+    }
+
+    private fun authenticate(result: LoginResult.Success) {
+        launchResult(
+            block = { authRepository.login(result.idToken, result.type) },
+            onSuccess = { checkOnboardingStatus() },
+            onError = { showToast(R.string.login_fail_message) },
+        )
     }
 
     private fun checkOnboardingStatus() {
         launchResult(
             block = { onBoardingRepository.fetchOnboardingStatus() },
             onSuccess = { onboardingStatus ->
-                viewModelScope.launch {
-                    val sideEffect =
-                        when (onboardingStatus) {
-                            OnboardingStatus.COUPLE_CONNECTION,
-                            OnboardingStatus.PROFILE_SETUP,
-                            OnboardingStatus.ANNIVERSARY_SETUP,
-                            -> LoginSideEffect.NavigateToOnBoarding(onboardingStatus)
-
-                            OnboardingStatus.COMPLETED -> LoginSideEffect.NavigateToHome
-                        }
-
-                    emitSideEffect(sideEffect)
-                }
+                tryEmitSideEffect(onboardingStatus.toSideEffect())
             },
             onError = {
                 emitSideEffect(
@@ -69,6 +53,23 @@ class LoginViewModel(
                     ),
                 )
             },
+        )
+    }
+
+    private fun OnboardingStatus.toSideEffect(): LoginSideEffect {
+        if (this == OnboardingStatus.COMPLETED) {
+            return LoginSideEffect.NavigateToHome
+        }
+
+        return LoginSideEffect.NavigateToOnBoarding(this)
+    }
+
+    private suspend fun showToast(message: Int) {
+        emitSideEffect(
+            LoginSideEffect.ShowToast(
+                message = message,
+                type = ToastType.ERROR,
+            ),
         )
     }
 }

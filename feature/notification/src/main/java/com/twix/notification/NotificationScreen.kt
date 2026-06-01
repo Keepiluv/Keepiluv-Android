@@ -22,6 +22,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -71,6 +73,7 @@ fun NotificationRoute(
     NotificationScreen(
         uiState = uiState,
         onBack = popBackStack,
+        onRetry = { viewModel.dispatch(NotificationIntent.Retry) },
         onNotificationClick = { viewModel.dispatch(NotificationIntent.NotificationClicked(it)) },
         onNextPage = { viewModel.dispatch(NotificationIntent.FetchNextPage) },
     )
@@ -80,6 +83,7 @@ fun NotificationRoute(
 private fun NotificationScreen(
     uiState: NotificationUiState,
     onBack: () -> Unit,
+    onRetry: () -> Unit,
     onNotificationClick: (Long) -> Unit,
     onNextPage: () -> Unit,
 ) {
@@ -96,53 +100,59 @@ private fun NotificationScreen(
         }.distinctUntilChanged()
             .filter { it }
             .collect {
-                if (uiState.hasNext && !uiState.isLoading) {
+                if (uiState.canLoadNextPage) {
                     onNextPage()
                 }
             }
     }
 
-    Column(
-        modifier =
-            Modifier
-                .fillMaxSize(),
-    ) {
-        CommonTopBar(
-            title = stringResource(R.string.word_notification),
-            left = {
-                Image(
-                    painter = painterResource(R.drawable.ic_arrow3_left),
-                    contentDescription = "back",
+    when {
+        uiState.showLoading -> TwixLoadingOverlay()
+        uiState.showError -> ErrorScreen(onClickRetry = onRetry, onClickBack = onBack)
+        else -> {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxSize(),
+            ) {
+                CommonTopBar(
+                    title = stringResource(R.string.word_notification),
+                    left = {
+                        Image(
+                            painter = painterResource(R.drawable.ic_arrow3_left),
+                            contentDescription = "back",
+                            modifier =
+                                Modifier
+                                    .padding(18.dp)
+                                    .size(24.dp)
+                                    .noRippleClickable(onClick = onBack),
+                        )
+                    },
+                )
+
+                Spacer(Modifier.height(12.dp))
+
+                AppText(
+                    text = stringResource(R.string.notification_recent_14_days),
+                    style = AppTextStyle.T1,
+                    color = GrayColor.C500,
+                    modifier =
+                        Modifier.padding(start = 20.dp),
+                )
+
+                Spacer(Modifier.height(4.dp))
+
+                NotificationList(
                     modifier =
                         Modifier
-                            .padding(18.dp)
-                            .size(24.dp)
-                            .noRippleClickable(onClick = onBack),
+                            .weight(1f)
+                            .fillMaxWidth(),
+                    notificationsList = uiState.notificationList,
+                    listState = listState,
+                    onNotificationClick = onNotificationClick,
                 )
-            },
-        )
-
-        Spacer(Modifier.height(12.dp))
-
-        AppText(
-            text = stringResource(R.string.notification_recent_14_days),
-            style = AppTextStyle.T1,
-            color = GrayColor.C500,
-            modifier =
-                Modifier.padding(start = 20.dp),
-        )
-
-        Spacer(Modifier.height(4.dp))
-
-        NotificationList(
-            modifier =
-                Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-            notificationsList = uiState.notificationList,
-            listState = listState,
-            onNotificationClick = onNotificationClick,
-        )
+            }
+        }
     }
 }
 
@@ -153,6 +163,8 @@ private fun Preview() {
         NotificationScreen(
             uiState =
                 NotificationUiState(
+                    hasLoadedContent = true,
+                    isLoading = false,
                     notificationList =
                         listOf(
                             Notification(
@@ -176,6 +188,7 @@ private fun Preview() {
                         ),
                 ),
             onBack = {},
+            onRetry = {},
             onNotificationClick = {},
             onNextPage = {},
         )

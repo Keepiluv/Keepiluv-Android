@@ -3,6 +3,7 @@ package com.twix.stats
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
+import com.twix.designsystem.components.error.ErrorScreen
+import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
@@ -76,6 +79,7 @@ fun StatsRoute(
         uiState = uiState,
         onClickInProgressPreviousMonth = { viewModel.dispatch(StatsIntent.PreviousMonth) },
         onClickInProgressNextMonth = { viewModel.dispatch(StatsIntent.NextMonth) },
+        onRetry = { viewModel.dispatch(StatsIntent.Retry) },
         onClickStatsCard = { goalId, destination ->
             val currentDate =
                 when (destination) {
@@ -93,6 +97,7 @@ fun StatsScreen(
     uiState: StatsUiState,
     onClickInProgressPreviousMonth: () -> Unit,
     onClickInProgressNextMonth: () -> Unit,
+    onRetry: () -> Unit,
     onClickStatsCard: (Long, StatsTabDestination) -> Unit,
 ) {
     val pagerState =
@@ -105,13 +110,39 @@ fun StatsScreen(
     ) {
         TitleTopBar(title = stringResource(R.string.stats_top_bar_title))
         StatsTabRow(pagerState)
-        StatsTabPager(
-            uiState = uiState,
-            pagerState = pagerState,
-            onClickPreviousMonth = onClickInProgressPreviousMonth,
-            onClickNextMonth = onClickInProgressNextMonth,
-            onClickStatsCard = onClickStatsCard,
-        )
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+        ) {
+            when {
+                uiState.showLoading -> {
+                    TwixLoadingOverlay()
+                }
+
+                uiState.showError -> {
+                    ErrorScreen(
+                        onClickRetry = onRetry,
+                        showBackButton = false,
+                    )
+                }
+
+                else -> {
+                    StatsTabPager(
+                        uiState = uiState,
+                        pagerState = pagerState,
+                        onClickPreviousMonth = onClickInProgressPreviousMonth,
+                        onClickNextMonth = onClickInProgressNextMonth,
+                        onClickStatsCard = onClickStatsCard,
+                    )
+
+                    if (uiState.showContentLoading) {
+                        TwixLoadingOverlay()
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -220,6 +251,7 @@ fun StatsRoutePreview(
             uiState = uiState,
             onClickInProgressPreviousMonth = {},
             onClickInProgressNextMonth = {},
+            onRetry = {},
             onClickStatsCard = { _, _ -> },
         )
     }

@@ -4,6 +4,8 @@ import com.twix.ui.base.Intent
 import java.time.LocalDate
 
 sealed interface GoalManageIntent : Intent {
+    data object Retry : GoalManageIntent
+
     data class SetSelectedDate(
         val date: LocalDate,
     ) : GoalManageIntent

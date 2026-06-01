@@ -26,6 +26,7 @@
     <string name="word_sting">찌르기</string>
     <string name="word_notification">알림</string>
     <string name="word_new">NEW</string>
+    <string name="word_couple_code">커플코드</string>
 
     <string name="word_daily">매일</string>
     <string name="word_weekly">매주</string>
@@ -56,6 +57,8 @@
     <string name="action_withdraw_account">탈퇴하기</string>
     <string name="action_poke">찌르기</string>
     <string name="action_poke_emphasized">찌르기!</string>
+    <string name="action_unlink_couple">커플 끊기</string>
+    <string name="action_confirm_unlink_couple">연결 끊기</string>
 
     <!-- 홈 화면 -->
     <string name="home_today_goal">오늘 우리 목표</string>
@@ -169,6 +172,8 @@
     <string name="dialog_delete_goal_content">저장된 인증샷은 모두 삭제됩니다.</string>
     <string name="dialog_withdraw_account_title">정말 탈퇴하시겠어요?</string>
     <string name="dialog_withdraw_account_content">커플 연결이 끊어집니다.\n데이터는 전부 삭제되며 복구가 불가능합니다.</string>
+    <string name="dialog_unlink_couple_title">정말 커플을 끊으시겠어요?</string>
+    <string name="dialog_unlink_couple_content">오늘부로 30일 후, 모든 데이터가 삭제됩니다.\n복구 가능 기간은 30일 이내입니다.\n복구 희망시 ttwixteamm@gmail.com로 문의해 주시기 바랍니다.</string>
 
     <!-- 마케팅 다이얼로그 -->
     <string name="marketing_dialog_title">도움이 되는 정보를\n알림으로 받아보시겠어요?</string>

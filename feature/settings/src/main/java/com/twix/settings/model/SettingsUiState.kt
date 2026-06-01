@@ -11,7 +11,7 @@ data class SettingsUiState(
     val marketingNotificationEnabled: Boolean = false,
     val nightMarketingNotificationEnabled: Boolean = false,
     val notificationSettingsUpdating: Boolean = false,
-    override val isLoading: Boolean = false,
+    override val isLoading: Boolean = true,
     val isLoadedUserInfo: Boolean = false,
     val isLoadedNotificationSettings: Boolean = false,
     val isAccountActionInFlight: Boolean = false,

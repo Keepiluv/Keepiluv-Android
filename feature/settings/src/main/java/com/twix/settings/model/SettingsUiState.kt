@@ -6,6 +6,7 @@ import com.twix.ui.base.LoadableState
 data class SettingsUiState(
     val nickName: String = "",
     val email: String = "",
+    val inviteCode: String = "",
     val pokeNotificationEnabled: Boolean = false,
     val marketingNotificationEnabled: Boolean = false,
     val nightMarketingNotificationEnabled: Boolean = false,

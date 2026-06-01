@@ -65,7 +65,7 @@ class SettingsViewModel(
     private fun fetchUserInfo() {
         launchResult(
             block = { userRepository.fetchUserInfo() },
-            onSuccess = { reduce { copy(nickName = it.name, email = it.email) } },
+            onSuccess = { reduce { copy(nickName = it.name, email = it.email, inviteCode = it.inviteCode) } },
         )
     }
 

@@ -215,13 +215,11 @@ fun GoalEditorScreen(
                 Spacer(Modifier.height(44.dp))
 
                 ValidateUnderlineTextField(
-                    modifier =
-                        Modifier
-                            .height(96.dp),
                     value = uiState.goalTitle,
                     onCommit = onCommitTitle,
                     placeholder = stringResource(R.string.goal_editor_text_field_placeholder),
                     guideText = stringResource(R.string.goal_editor_text_filed_guide),
+                    validLengthRange = 2..14,
                 )
 
                 GoalInfoCard(

@@ -1,5 +1,6 @@
 package com.twix.util.extension
 
+import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -17,6 +18,10 @@ fun Context.openExternalUrl(
     val intent =
         Intent(Intent.ACTION_VIEW, url.toUri()).apply {
             addCategory(Intent.CATEGORY_BROWSABLE)
+
+            if (this@openExternalUrl !is Activity) {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
         }
 
     try {

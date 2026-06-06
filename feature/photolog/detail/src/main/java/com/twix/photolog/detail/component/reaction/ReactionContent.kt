@@ -18,6 +18,7 @@ import com.twix.domain.model.enums.GoalReactionType
 @Composable
 internal fun ReactionContent(
     screenHeightPx: Float,
+    modifier: Modifier = Modifier,
     reaction: GoalReactionType? = null,
     onClickReaction: (GoalReactionType) -> Unit,
 ) {
@@ -25,9 +26,8 @@ internal fun ReactionContent(
 
     Box(
         modifier =
-            Modifier
-                .fillMaxSize()
-                .padding(top = 85.dp),
+            modifier
+                .fillMaxSize(),
     ) {
         ReactionBar(
             selectedReaction = reaction,

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -216,22 +218,34 @@ fun PhotologDetailScreen(
                         onBack = onBack,
                         onClickModify = onClickModify,
                     )
-                    Spacer(Modifier.height(103.dp))
+                    BoxWithConstraints(Modifier.fillMaxSize()) {
+                        val cardSize = maxWidth - photologCardHorizontalPadding
+                        val reactionTopPadding =
+                            photologCardTopPadding + cardSize + reactionBarTopSpacing
 
-                    PhotologCardContent(
-                        uiState = uiState,
-                        isPokeDisabled = uiState.isPokeDisabled,
-                        onSwipe = onSwipe,
-                        onClickUpload = onClickUpload,
-                        onPoke = onPoke,
-                    )
+                        Column(Modifier.fillMaxSize()) {
+                            Spacer(Modifier.height(photologCardTopPadding))
 
-                    if (uiState.canReaction) {
-                        ReactionContent(
-                            screenHeightPx = screenHeightPx,
-                            reaction = uiState.partnerPhotolog?.reaction,
-                            onClickReaction = onClickReaction,
-                        )
+                            PhotologCardContent(
+                                uiState = uiState,
+                                isPokeDisabled = uiState.isPokeDisabled,
+                                onSwipe = onSwipe,
+                                onClickUpload = onClickUpload,
+                                onPoke = onPoke,
+                            )
+                        }
+
+                        if (uiState.canReaction) {
+                            ReactionContent(
+                                modifier =
+                                    Modifier
+                                        .align(Alignment.TopCenter)
+                                        .padding(top = reactionTopPadding),
+                                screenHeightPx = screenHeightPx,
+                                reaction = uiState.partnerPhotolog?.reaction,
+                                onClickReaction = onClickReaction,
+                            )
+                        }
                     }
                 }
 
@@ -299,3 +313,7 @@ private fun PhotologDetailScreenPreview(
         )
     }
 }
+
+private val photologCardTopPadding = 103.dp
+private val photologCardHorizontalPadding = 54.dp
+private val reactionBarTopSpacing = 85.dp

@@ -25,17 +25,19 @@ class PokeGoalUseCaseTest {
         runTest {
             // given
             val goalId = 1L
+            val targetDate = "2026-06-07"
             val serverMessage = "서버 응답 메시지"
             fakePokeRepository.pokeGoalResult = AppResult.Success(PokeResult(message = serverMessage))
-            fakePokeRepository.pokeHistory[goalId] = null
+            fakePokeRepository.pokeHistory[FakePokeRepository.PokeHistoryKey(goalId, targetDate)] = null
 
             // when
-            val result = useCase.invoke(goalId)
+            val result = useCase.invoke(goalId, targetDate)
 
             // then
             assertThat(result).isInstanceOf(PokeGoalResult.Success::class.java)
             assertThat((result as PokeGoalResult.Success).message).isEqualTo(serverMessage)
-            assertThat(fakePokeRepository.savedPokeHistory[goalId]).isNotNull()
+            assertThat(fakePokeRepository.savedPokeHistory[FakePokeRepository.PokeHistoryKey(goalId, targetDate)])
+                .isNotNull()
         }
 
     @Test
@@ -43,15 +45,17 @@ class PokeGoalUseCaseTest {
         runTest {
             // given
             val goalId = 2L
+            val targetDate = "2026-06-07"
             fakePokeRepository.pokeGoalResult = AppResult.Error(AppError.Network())
-            fakePokeRepository.pokeHistory[goalId] = null
+            fakePokeRepository.pokeHistory[FakePokeRepository.PokeHistoryKey(goalId, targetDate)] = null
 
             // when
-            val result = useCase.invoke(goalId)
+            val result = useCase.invoke(goalId, targetDate)
 
             // then
             assertThat(result).isEqualTo(PokeGoalResult.Error)
-            assertThat(fakePokeRepository.savedPokeHistory[goalId]).isNull()
+            assertThat(fakePokeRepository.savedPokeHistory[FakePokeRepository.PokeHistoryKey(goalId, targetDate)])
+                .isNull()
         }
 
     @Test
@@ -59,11 +63,12 @@ class PokeGoalUseCaseTest {
         runTest {
             // given
             val goalId = 3L
+            val targetDate = "2026-06-07"
             val recentPokedAt = System.currentTimeMillis() - (PokeGoalUseCase.COOLDOWN_MS / 2)
-            fakePokeRepository.pokeHistory[goalId] = recentPokedAt
+            fakePokeRepository.pokeHistory[FakePokeRepository.PokeHistoryKey(goalId, targetDate)] = recentPokedAt
 
             // when
-            val result = useCase.invoke(goalId)
+            val result = useCase.invoke(goalId, targetDate)
 
             // then
             assertThat(result).isInstanceOf(PokeGoalResult.OnCooldown::class.java)
@@ -76,13 +81,14 @@ class PokeGoalUseCaseTest {
         runTest {
             // given
             val goalId = 4L
+            val targetDate = "2026-06-07"
             val justExpiredPokedAt = System.currentTimeMillis() - PokeGoalUseCase.COOLDOWN_MS - 1
             val serverMessage = "서버 응답 메시지"
-            fakePokeRepository.pokeHistory[goalId] = justExpiredPokedAt
+            fakePokeRepository.pokeHistory[FakePokeRepository.PokeHistoryKey(goalId, targetDate)] = justExpiredPokedAt
             fakePokeRepository.pokeGoalResult = AppResult.Success(PokeResult(message = serverMessage))
 
             // when
-            val result = useCase.invoke(goalId)
+            val result = useCase.invoke(goalId, targetDate)
 
             // then
             assertThat(result).isInstanceOf(PokeGoalResult.Success::class.java)
@@ -94,10 +100,11 @@ class PokeGoalUseCaseTest {
         runTest {
             // given
             val goalId = 10L
-            fakePokeRepository.pokeHistory[goalId] = null
+            val targetDate = "2026-06-07"
+            fakePokeRepository.pokeHistory[FakePokeRepository.PokeHistoryKey(goalId, targetDate)] = null
 
             // when
-            val remaining = useCase.remainingCooldown(goalId)
+            val remaining = useCase.remainingCooldown(goalId, targetDate)
 
             // then
             assertThat(remaining).isEqualTo(0L)
@@ -108,11 +115,12 @@ class PokeGoalUseCaseTest {
         runTest {
             // given
             val goalId = 11L
+            val targetDate = "2026-06-07"
             val recentPokedAt = System.currentTimeMillis() - (PokeGoalUseCase.COOLDOWN_MS / 2)
-            fakePokeRepository.pokeHistory[goalId] = recentPokedAt
+            fakePokeRepository.pokeHistory[FakePokeRepository.PokeHistoryKey(goalId, targetDate)] = recentPokedAt
 
             // when
-            val remaining = useCase.remainingCooldown(goalId)
+            val remaining = useCase.remainingCooldown(goalId, targetDate)
 
             // then
             assertThat(remaining).isGreaterThan(0L)
@@ -123,13 +131,57 @@ class PokeGoalUseCaseTest {
         runTest {
             // given
             val goalId = 12L
+            val targetDate = "2026-06-07"
             val expiredPokedAt = System.currentTimeMillis() - PokeGoalUseCase.COOLDOWN_MS - 100
-            fakePokeRepository.pokeHistory[goalId] = expiredPokedAt
+            fakePokeRepository.pokeHistory[FakePokeRepository.PokeHistoryKey(goalId, targetDate)] = expiredPokedAt
 
             // when
-            val remaining = useCase.remainingCooldown(goalId)
+            val remaining = useCase.remainingCooldown(goalId, targetDate)
 
             // then
             assertThat(remaining).isEqualTo(0L)
+        }
+
+    @Test
+    fun `같은 목표라도 날짜가 다르면 remainingCooldown은 독립적으로 계산된다`() =
+        runTest {
+            // given
+            val goalId = 20L
+            val pokedDate = "2026-06-07"
+            val otherDate = "2026-06-08"
+            val recentPokedAt = System.currentTimeMillis() - (PokeGoalUseCase.COOLDOWN_MS / 2)
+            fakePokeRepository.pokeHistory[FakePokeRepository.PokeHistoryKey(goalId, pokedDate)] = recentPokedAt
+
+            // when
+            val pokedDateRemaining = useCase.remainingCooldown(goalId, pokedDate)
+            val otherDateRemaining = useCase.remainingCooldown(goalId, otherDate)
+
+            // then
+            assertThat(pokedDateRemaining).isGreaterThan(0L)
+            assertThat(otherDateRemaining).isEqualTo(0L)
+        }
+
+    @Test
+    fun `같은 목표의 다른 날짜 쿨타임은 찌르기 요청을 막지 않는다`() =
+        runTest {
+            // given
+            val goalId = 21L
+            val pokedDate = "2026-06-07"
+            val otherDate = "2026-06-08"
+            val serverMessage = "서버 응답 메시지"
+            val recentPokedAt = System.currentTimeMillis() - (PokeGoalUseCase.COOLDOWN_MS / 2)
+            fakePokeRepository.pokeHistory[FakePokeRepository.PokeHistoryKey(goalId, pokedDate)] = recentPokedAt
+            fakePokeRepository.pokeGoalResult = AppResult.Success(PokeResult(message = serverMessage))
+
+            // when
+            val result = useCase.invoke(goalId, otherDate)
+
+            // then
+            assertThat(result).isInstanceOf(PokeGoalResult.Success::class.java)
+            assertThat(fakePokeRepository.pokeGoalCallCount).isEqualTo(1)
+            assertThat(fakePokeRepository.savedPokeHistory[FakePokeRepository.PokeHistoryKey(goalId, otherDate)])
+                .isNotNull()
+            assertThat(fakePokeRepository.savedPokeHistory[FakePokeRepository.PokeHistoryKey(goalId, pokedDate)])
+                .isNull()
         }
 }

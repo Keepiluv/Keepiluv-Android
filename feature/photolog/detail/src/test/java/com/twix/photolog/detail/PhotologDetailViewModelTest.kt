@@ -45,11 +45,13 @@ class PhotologDetailViewModelTest {
             Dispatchers.setMain(dispatcher)
             val goalId = 170L
             val remainingMs = 1_000L
+            val targetDate = LocalDate.of(2026, 6, 7)
             val pokeRepository =
                 FakePokeRepository().apply {
-                    pokeHistory[goalId] = System.currentTimeMillis() - PokeGoalUseCase.COOLDOWN_MS + remainingMs
+                    pokeHistory[PokeHistoryKey(goalId, targetDate.toString())] =
+                        System.currentTimeMillis() - PokeGoalUseCase.COOLDOWN_MS + remainingMs
                 }
-            val viewModel = createViewModel(goalId = goalId, pokeRepository = pokeRepository)
+            val viewModel = createViewModel(goalId = goalId, pokeRepository = pokeRepository, targetDate = targetDate)
 
             runCurrent()
             assertThat(viewModel.uiState.value.pokeCooldownRemaining).isGreaterThan(0L)
@@ -68,12 +70,14 @@ class PhotologDetailViewModelTest {
             val dispatcher = StandardTestDispatcher(testScheduler)
             Dispatchers.setMain(dispatcher)
             val goalId = 171L
+            val targetDate = LocalDate.of(2026, 6, 7)
             val pokeRepository = FakePokeRepository()
-            val viewModel = createViewModel(goalId = goalId, pokeRepository = pokeRepository)
+            val viewModel = createViewModel(goalId = goalId, pokeRepository = pokeRepository, targetDate = targetDate)
             advanceUntilIdle()
             assertThat(viewModel.uiState.value.pokeCooldownRemaining).isEqualTo(0L)
 
-            pokeRepository.pokeHistory[goalId] = System.currentTimeMillis() - (PokeGoalUseCase.COOLDOWN_MS / 2)
+            pokeRepository.pokeHistory[PokeHistoryKey(goalId, targetDate.toString())] =
+                System.currentTimeMillis() - (PokeGoalUseCase.COOLDOWN_MS / 2)
             viewModel.dispatch(PhotologDetailIntent.Poke)
             runCurrent()
 
@@ -106,7 +110,7 @@ class PhotologDetailViewModelTest {
 }
 
 private class FakePokeRepository : PokeRepository {
-    val pokeHistory = mutableMapOf<Long, Long?>()
+    val pokeHistory = mutableMapOf<PokeHistoryKey, Long?>()
     var pokeGoalCallCount = 0
     var pokeGoalResult: AppResult<PokeResult> = AppResult.Success(PokeResult(message = "ok"))
 
@@ -117,13 +121,22 @@ private class FakePokeRepository : PokeRepository {
 
     override suspend fun savePokeHistory(
         goalId: Long,
+        targetDate: String,
         pokedAt: Long,
     ) {
-        pokeHistory[goalId] = pokedAt
+        pokeHistory[PokeHistoryKey(goalId, targetDate)] = pokedAt
     }
 
-    override suspend fun findPokeHistory(goalId: Long): Long? = pokeHistory[goalId]
+    override suspend fun findPokeHistory(
+        goalId: Long,
+        targetDate: String,
+    ): Long? = pokeHistory[PokeHistoryKey(goalId, targetDate)]
 }
+
+private data class PokeHistoryKey(
+    val goalId: Long,
+    val targetDate: String,
+)
 
 private class FakePhotoLogRepository(
     private val goalId: Long,

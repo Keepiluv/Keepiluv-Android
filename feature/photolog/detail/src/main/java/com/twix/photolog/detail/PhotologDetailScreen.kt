@@ -296,10 +296,11 @@ private fun PhotologDetailRefreshContent(
 ) {
     val density = LocalDensity.current
 
-    // Home 화면의 당겨서 새로고침 감각과 맞춘 거리값들이다.
-    // trigger는 새로고침 실행 기준, hold는 새로고침 중 유지 거리, max는 과도한 당김 제한값이다.
+    // 새로고침 실행 기준
     val refreshTriggerPx = with(density) { 88.dp.toPx() }
+    // 새로고침 중 유지 거리
     val refreshingHoldPx = with(density) { 56.dp.toPx() }
+    // 과도한 당김을 제한하는 값
     val maxPullPx = with(density) { 140.dp.toPx() }
 
     var pullOffsetPx by remember { mutableFloatStateOf(0f) }

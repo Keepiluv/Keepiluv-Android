@@ -5,8 +5,8 @@ import com.twix.domain.repository.PokeRepository
 import com.twix.result.AppResult
 
 class FakePokeRepository : PokeRepository {
-    val pokeHistory: MutableMap<Long, Long?> = mutableMapOf()
-    val savedPokeHistory: MutableMap<Long, Long> = mutableMapOf()
+    val pokeHistory: MutableMap<PokeHistoryKey, Long?> = mutableMapOf()
+    val savedPokeHistory: MutableMap<PokeHistoryKey, Long> = mutableMapOf()
     var pokeGoalResult: AppResult<PokeResult> = AppResult.Success(PokeResult(message = ""))
     var pokeGoalCallCount: Int = 0
 
@@ -17,10 +17,19 @@ class FakePokeRepository : PokeRepository {
 
     override suspend fun savePokeHistory(
         goalId: Long,
+        targetDate: String,
         pokedAt: Long,
     ) {
-        savedPokeHistory[goalId] = pokedAt
+        savedPokeHistory[PokeHistoryKey(goalId, targetDate)] = pokedAt
     }
 
-    override suspend fun findPokeHistory(goalId: Long): Long? = pokeHistory[goalId]
+    override suspend fun findPokeHistory(
+        goalId: Long,
+        targetDate: String,
+    ): Long? = pokeHistory[PokeHistoryKey(goalId, targetDate)]
+
+    data class PokeHistoryKey(
+        val goalId: Long,
+        val targetDate: String,
+    )
 }

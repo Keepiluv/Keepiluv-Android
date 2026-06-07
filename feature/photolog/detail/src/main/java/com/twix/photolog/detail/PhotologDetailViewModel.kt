@@ -21,8 +21,8 @@ import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.PhotologRefreshBus
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -167,7 +167,7 @@ class PhotologDetailViewModel(
 
     private fun checkPokeCooldown() {
         viewModelScope.launch {
-            val remaining = pokeGoalUseCase.remainingCooldown(argGoalId)
+            val remaining = pokeGoalUseCase.remainingCooldown(argGoalId, argTargetDate.toString())
             startPokeCooldown(remaining)
         }
     }
@@ -175,7 +175,7 @@ class PhotologDetailViewModel(
     private fun pokeToPartner() {
         viewModelScope.launch {
             reduce { copy(isPoking = true) }
-            handlePokeResult(pokeGoalUseCase.invoke(argGoalId))
+            handlePokeResult(pokeGoalUseCase.invoke(argGoalId, argTargetDate.toString()))
         }
     }
 

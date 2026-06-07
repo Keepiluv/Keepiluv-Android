@@ -1,10 +1,13 @@
 package com.twix.database.poke
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 
-@Entity(tableName = "poke_history")
+@Entity(
+    tableName = "poke_history",
+    primaryKeys = ["goalId", "targetDate"],
+)
 data class PokeHistoryEntity(
-    @PrimaryKey val goalId: Long,
+    val goalId: Long,
+    val targetDate: String,
     val pokedAt: Long,
 )

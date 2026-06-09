@@ -49,6 +49,7 @@ import com.twix.designsystem.components.dialog.CommonDialog
 import com.twix.designsystem.components.error.ErrorScreen
 import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
+import com.twix.designsystem.components.text_field.ValidateUnderlineTextField
 import com.twix.designsystem.components.toast.ToastManager
 import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.components.topbar.CommonTopBar
@@ -63,7 +64,6 @@ import com.twix.domain.model.enums.RepeatCycle
 import com.twix.domain.model.goal.RecommendedGoalPresets
 import com.twix.goal_editor.component.EmojiPicker
 import com.twix.goal_editor.component.GoalInfoCard
-import com.twix.goal_editor.component.GoalTextField
 import com.twix.goal_editor.model.GoalEditorUiState
 import com.twix.ui.extension.dismissKeyboardOnTap
 import com.twix.ui.extension.noRippleClickable
@@ -214,9 +214,12 @@ fun GoalEditorScreen(
 
                 Spacer(Modifier.height(44.dp))
 
-                GoalTextField(
+                ValidateUnderlineTextField(
                     value = uiState.goalTitle,
-                    onCommitTitle = onCommitTitle,
+                    onCommit = onCommitTitle,
+                    placeholder = stringResource(R.string.goal_editor_text_field_placeholder),
+                    guideText = stringResource(R.string.goal_editor_text_filed_guide),
+                    validLengthRange = 2..14,
                 )
 
                 GoalInfoCard(

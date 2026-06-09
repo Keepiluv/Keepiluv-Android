@@ -7,6 +7,7 @@ import com.twix.network.model.response.onboarding.InviteCodeResponse
 import com.twix.network.model.response.onboarding.OnBoardingStatusResponse
 import de.jensklingenberg.ktorfit.http.Body
 import de.jensklingenberg.ktorfit.http.GET
+import de.jensklingenberg.ktorfit.http.PATCH
 import de.jensklingenberg.ktorfit.http.POST
 
 interface OnboardingService {
@@ -30,4 +31,9 @@ interface OnboardingService {
 
     @GET("api/v1/onboarding/status")
     suspend fun fetchOnBoardingStatus(): OnBoardingStatusResponse
+
+    @PATCH("api/v1/onboarding/profile")
+    suspend fun updateProfile(
+        @Body request: ProfileRequest,
+    )
 }

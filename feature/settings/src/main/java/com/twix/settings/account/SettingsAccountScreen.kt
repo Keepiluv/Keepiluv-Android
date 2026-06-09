@@ -13,13 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.twix.designsystem.R
@@ -27,58 +26,49 @@ import com.twix.designsystem.components.dialog.CommonDialog
 import com.twix.designsystem.components.error.ErrorScreen
 import com.twix.designsystem.components.loading.TwixLoadingOverlay
 import com.twix.designsystem.components.text.AppText
-import com.twix.designsystem.components.toast.ToastManager
-import com.twix.designsystem.components.toast.model.ToastData
 import com.twix.designsystem.components.topbar.CommonTopBar
 import com.twix.designsystem.theme.CommonColor
 import com.twix.designsystem.theme.GrayColor
+import com.twix.designsystem.theme.TwixTheme
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.settings.SettingsIntent
-import com.twix.settings.SettingsSideEffect
 import com.twix.settings.SettingsViewModel
 import com.twix.settings.component.SettingsMenuFrame
 import com.twix.settings.component.SettingsMenuItem
 import com.twix.settings.model.SettingsUiState
-import com.twix.ui.base.ObserveAsEvents
 import com.twix.ui.extension.noRippleClickable
-import org.koin.compose.koinInject
 
 @Composable
 fun SettingsAccountRoute(
-    toastManager: ToastManager = koinInject(),
     viewModel: SettingsViewModel,
     popBackStack: () -> Unit,
-    navigateToLogin: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    val currentContext by rememberUpdatedState(context)
-
-    ObserveAsEvents(viewModel.sideEffect) { effect ->
-        when (effect) {
-            SettingsSideEffect.NavigateToLogin -> navigateToLogin()
-            is SettingsSideEffect.ShowToast -> toastManager.show(ToastData(currentContext.getString(effect.resId), effect.type))
-        }
-    }
 
     SettingsAccountScreen(
         uiState = uiState,
+        inviteCode = uiState.inviteCode,
         onBack = popBackStack,
         onRetry = { viewModel.dispatch(SettingsIntent.Retry) },
         onLogout = { viewModel.dispatch(SettingsIntent.Logout) },
         onWithdrawAccount = { viewModel.dispatch(SettingsIntent.WithdrawAccount) },
+        // TODO: 커플 끊기 API 구현 후 SettingsIntent.UnlinkCouple 로 교체
+        onUnlinkCouple = { viewModel.dispatch(SettingsIntent.WithdrawAccount) },
     )
 }
 
 @Composable
 private fun SettingsAccountScreen(
+    inviteCode: String = "",
     uiState: SettingsUiState,
     onBack: () -> Unit,
     onRetry: () -> Unit,
     onLogout: () -> Unit,
     onWithdrawAccount: () -> Unit,
+    onUnlinkCouple: () -> Unit,
 ) {
     var showWithdrawDialog by remember { mutableStateOf(false) }
+    var showUnlinkCoupleDialog by remember { mutableStateOf(false) }
 
     when {
         uiState.showLoading -> TwixLoadingOverlay()
@@ -124,6 +114,26 @@ private fun SettingsAccountScreen(
                     HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
 
                     SettingsMenuItem(
+                        title = stringResource(R.string.word_couple_code),
+                        right = {
+                            AppText(
+                                text = inviteCode,
+                                color = GrayColor.C500,
+                                style = AppTextStyle.B2,
+                            )
+                        },
+                    )
+
+                    HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
+
+                    SettingsMenuItem(
+                        title = stringResource(R.string.action_unlink_couple),
+                        onClick = { showUnlinkCoupleDialog = true },
+                    )
+
+                    HorizontalDivider(thickness = 1.dp, color = GrayColor.C500)
+
+                    SettingsMenuItem(
                         title = stringResource(R.string.action_withdraw_account),
                         onClick = {
                             if (!uiState.isAccountActionInFlight) {
@@ -149,32 +159,96 @@ private fun SettingsAccountScreen(
                 onConfirm = { showWithdrawDialog = false },
                 onDismissRequest = { showWithdrawDialog = false },
                 content = {
-                    Image(
-                        painter = painterResource(R.drawable.ic_warning),
-                        contentDescription = "warning",
-                        modifier =
-                            Modifier
-                                .size(60.dp),
-                    )
+                    WithdrawAccountDialogContent()
+                },
+            )
 
-                    Spacer(Modifier.height(12.dp))
-
-                    AppText(
-                        text = stringResource(R.string.dialog_withdraw_account_title),
-                        color = GrayColor.C500,
-                        style = AppTextStyle.T1,
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    AppText(
-                        text = stringResource(R.string.dialog_withdraw_account_content),
-                        color = GrayColor.C400,
-                        style = AppTextStyle.B2,
-                        textAlign = TextAlign.Center,
-                    )
+            CommonDialog(
+                visible = showUnlinkCoupleDialog,
+                confirmText = stringResource(R.string.word_cancel),
+                dismissText = stringResource(R.string.action_unlink_couple),
+                onDismiss = {
+                    showUnlinkCoupleDialog = false
+                    onUnlinkCouple()
+                },
+                onConfirm = { showUnlinkCoupleDialog = false },
+                onDismissRequest = { showUnlinkCoupleDialog = false },
+                content = {
+                    UnlinkCoupleDialogContent()
                 },
             )
         }
+    }
+}
+
+@Composable
+private fun WithdrawAccountDialogContent() {
+    Image(
+        painter = painterResource(R.drawable.ic_warning),
+        contentDescription = "warning",
+        modifier =
+            Modifier
+                .size(60.dp),
+    )
+
+    Spacer(Modifier.height(12.dp))
+
+    AppText(
+        text = stringResource(R.string.dialog_withdraw_account_title),
+        color = GrayColor.C500,
+        style = AppTextStyle.T1,
+    )
+
+    Spacer(Modifier.height(8.dp))
+
+    AppText(
+        text = stringResource(R.string.dialog_withdraw_account_content),
+        color = GrayColor.C400,
+        style = AppTextStyle.B2,
+        textAlign = TextAlign.Center,
+    )
+}
+
+@Composable
+private fun UnlinkCoupleDialogContent() {
+    Image(
+        painter = painterResource(R.drawable.ic_warning),
+        contentDescription = "warning",
+        modifier =
+            Modifier
+                .size(60.dp),
+    )
+
+    Spacer(Modifier.height(12.dp))
+
+    AppText(
+        text = stringResource(R.string.dialog_unlink_couple_title),
+        color = GrayColor.C500,
+        style = AppTextStyle.T1,
+    )
+
+    Spacer(Modifier.height(8.dp))
+
+    AppText(
+        text = stringResource(R.string.dialog_unlink_couple_content),
+        color = GrayColor.C400,
+        style = AppTextStyle.B2,
+        textAlign = TextAlign.Center,
+    )
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun Preview() {
+    TwixTheme {
+        SettingsAccountScreen(
+            inviteCode = "inviteCode",
+            uiState = SettingsUiState(),
+            onBack = {},
+            onRetry = {},
+            onLogout = {},
+            onWithdrawAccount = {},
+            onUnlinkCouple = {},
+        )
     }
 }

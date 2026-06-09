@@ -1,4 +1,4 @@
-package com.twix.goal_editor.component
+package com.twix.designsystem.components.text_field
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -27,72 +27,81 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.twix.designsystem.R
 import com.twix.designsystem.components.text.AppText
-import com.twix.designsystem.components.text_field.UnderlineTextField
 import com.twix.designsystem.theme.SystemColor
 import com.twix.domain.model.enums.AppTextStyle
 import com.twix.ui.extension.noRippleClickable
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun GoalTextField(
+fun ValidateUnderlineTextField(
     value: String,
-    onCommitTitle: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    textFieldModifier: Modifier = Modifier,
+    placeholder: String,
+    guideText: String,
+    validLengthRange: IntRange = 2..14,
+    maxLength: Int = validLengthRange.last,
+    showGuideWhenValid: Boolean = true,
+    onCommit: (String) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
     val density = LocalDensity.current
+
     var internalValue by rememberSaveable(value) { mutableStateOf(value) }
     var isFocused by remember { mutableStateOf(false) }
     var lastCommitted by remember(value) { mutableStateOf(value.trim()) }
 
     fun commitIfChanged() {
         val trimmed = internalValue.trim()
-        if (trimmed != lastCommitted) {
+
+        if (trimmed.length in validLengthRange && trimmed != lastCommitted) {
             lastCommitted = trimmed
-            onCommitTitle(trimmed)
+            onCommit(trimmed)
         }
     }
 
-    val imeVisibleState =
-        remember {
-            mutableStateOf(false)
-        }
-
+    val imeVisibleState = remember { mutableStateOf(false) }
     imeVisibleState.value = WindowInsets.ime.getBottom(density) > 0
+
     LaunchedEffect(isFocused) {
         var prev = imeVisibleState.value
+
         snapshotFlow { imeVisibleState.value }
             .collect { now ->
                 if (prev && !now && isFocused) {
                     commitIfChanged()
                     focusManager.clearFocus(force = true)
                 }
+
                 prev = now
             }
     }
 
+    val isValidLength = internalValue.length in validLengthRange
+
     Column(
-        modifier =
-            Modifier
-                .height(96.dp),
+        modifier = modifier.height(96.dp),
         verticalArrangement = Arrangement.Top,
     ) {
         UnderlineTextField(
             modifier =
-                Modifier
+                textFieldModifier
                     .padding(horizontal = 20.dp)
                     .fillMaxWidth()
                     .onFocusChanged { state ->
                         isFocused = state.isFocused
-                        if (!state.isFocused) commitIfChanged()
+
+                        if (!state.isFocused) {
+                            commitIfChanged()
+                        }
                     },
             value = internalValue,
-            placeHolder = stringResource(R.string.goal_editor_text_field_placeholder),
-            maxLength = 14,
+            placeHolder = placeholder,
+            maxLength = maxLength,
             showTrailing = internalValue.isNotBlank(),
             onValueChange = { internalValue = it },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
@@ -107,12 +116,15 @@ fun GoalTextField(
                 Image(
                     painter = painterResource(R.drawable.ic_clear_text),
                     contentDescription = null,
-                    modifier = Modifier.noRippleClickable { internalValue = "" },
+                    modifier =
+                        Modifier.noRippleClickable {
+                            internalValue = ""
+                        },
                 )
             },
         )
 
-        if (internalValue.length in 2..14) {
+        if (showGuideWhenValid && isValidLength) {
             Row(
                 modifier =
                     Modifier
@@ -124,13 +136,11 @@ fun GoalTextField(
                 Image(
                     painter = painterResource(R.drawable.ic_check_success),
                     contentDescription = null,
-                    modifier =
-                        Modifier
-                            .size(16.dp),
+                    modifier = Modifier.size(16.dp),
                 )
 
                 AppText(
-                    text = stringResource(R.string.goal_editor_text_filed_guide),
+                    text = guideText,
                     style = AppTextStyle.C2,
                     color = SystemColor.Success,
                 )

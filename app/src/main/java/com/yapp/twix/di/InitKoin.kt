@@ -1,6 +1,7 @@
 package com.yapp.twix.di
 
 import android.content.Context
+import com.twix.analytics.di.analyticsModule
 import com.twix.data.di.dataModule
 import com.twix.datastore.di.dataStoreModule
 import com.twix.network.di.networkModule
@@ -30,6 +31,7 @@ fun initKoin(
                 add(appModule)
                 add(utilModule)
                 add(imageModule)
+                add(analyticsModule)
                 add(notificationModule)
                 add(shareModule)
             },

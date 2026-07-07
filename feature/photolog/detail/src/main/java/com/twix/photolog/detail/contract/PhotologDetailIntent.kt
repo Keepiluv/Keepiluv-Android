@@ -6,6 +6,8 @@ import com.twix.ui.base.Intent
 sealed interface PhotologDetailIntent : Intent {
     data object Retry : PhotologDetailIntent
 
+    data object Refresh : PhotologDetailIntent
+
     data class Reaction(
         val type: GoalReactionType,
     ) : PhotologDetailIntent

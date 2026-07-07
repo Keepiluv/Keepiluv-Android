@@ -72,11 +72,13 @@ class PhotologDetailViewModel(
         checkPokeCooldown()
     }
 
-    private fun fetchPhotolog() {
+    private fun fetchPhotolog(isUserRefresh: Boolean = false) {
         launchResult(
+            onStart = { reduce { copy(isRefreshing = isUserRefresh) } },
+            onFinally = { reduce { copy(isRefreshing = false) } },
+            onError = { handleFetchPhotologError() },
             block = ::fetchPhotologs,
             onSuccess = ::handleFetchPhotologSuccess,
-            onError = { handleFetchPhotologError() },
         )
     }
 
@@ -91,6 +93,7 @@ class PhotologDetailViewModel(
                     argTargetDate,
                     argIsCompleted,
                 ).copy(
+                    currentShow = currentState.currentShow,
                     hasShownMyReaction = currentState.hasShownMyReaction,
                     pokeCooldownRemaining = currentState.pokeCooldownRemaining,
                 )
@@ -152,6 +155,7 @@ class PhotologDetailViewModel(
     override suspend fun handleIntent(intent: PhotologDetailIntent) {
         when (intent) {
             PhotologDetailIntent.Retry -> fetchPhotolog()
+            PhotologDetailIntent.Refresh -> fetchPhotolog(isUserRefresh = true)
             is PhotologDetailIntent.Reaction -> reduceReaction(intent.type)
             PhotologDetailIntent.Poke -> pokeToPartner()
             PhotologDetailIntent.SwipeCard -> reduceShownCard()

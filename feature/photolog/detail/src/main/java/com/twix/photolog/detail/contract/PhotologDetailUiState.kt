@@ -27,6 +27,7 @@ data class PhotologDetailUiState(
      * 내 인증샷에 상대방이 리액션을 남겼을 경우 최초 1회 인터렉션 렌더링을 위한 변수
      */
     val hasShownMyReaction: Boolean = false,
+    val isRefreshing: Boolean = false,
     override val isLoading: Boolean = true,
     override val error: AppError? = null,
     /**
@@ -40,6 +41,9 @@ data class PhotologDetailUiState(
 ) : ContentLoadableState {
     val isPokeDisabled: Boolean
         get() = isPoking || pokeCooldownRemaining > 0
+
+    val showContentLoading: Boolean
+        get() = (showOverlayLoading && !isRefreshing) || isPoking
 
     /**
      * 현재 [currentShow]에 해당하는 사용자의 인증샷 인증 여부
@@ -65,47 +69,6 @@ data class PhotologDetailUiState(
             when (currentShow) {
                 BetweenUs.ME -> myPhotolog?.uploadedAt
                 BetweenUs.PARTNER -> partnerPhotolog?.uploadedAt
-            }
-
-    /**
-     * 현재 [currentShow]에 해당하는 인증샷 URL
-     *
-     * - [BetweenUs.ME]: 내 인증샷 이미지 URL
-     * - [BetweenUs.PARTNER]: 파트너 인증샷 이미지 URL
-     *
-     */
-    val displayedGoalImageUrl: String?
-        get() =
-            when (currentShow) {
-                BetweenUs.ME -> myPhotolog?.imageUrl
-                BetweenUs.PARTNER -> partnerPhotolog?.imageUrl
-            }
-
-    /**
-     * 현재 [currentShow]에 해당하는 인증샷의 코멘트
-     *
-     * - [BetweenUs.ME]: 내 코멘트
-     * - [BetweenUs.PARTNER]: 파트너 코멘트
-     *
-     */
-    val displayedGoalComment: String?
-        get() =
-            when (currentShow) {
-                BetweenUs.ME -> myPhotolog?.comment
-                BetweenUs.PARTNER -> partnerPhotolog?.comment
-            }
-
-    /**
-     * 현재 [currentShow]에 해당하는 사용자의 닉네임
-     *
-     * - [BetweenUs.ME]: 내 닉네임
-     * - [BetweenUs.PARTNER]: 파트너 닉네임
-     */
-    val displayedNickname: String
-        get() =
-            when (currentShow) {
-                BetweenUs.ME -> myNickname
-                BetweenUs.PARTNER -> partnerNickname
             }
 
     /**

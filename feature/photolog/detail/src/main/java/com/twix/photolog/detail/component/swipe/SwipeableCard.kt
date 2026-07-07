@@ -2,7 +2,7 @@ package com.twix.photolog.detail.component.swipe
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -137,16 +137,25 @@ fun SwipeableCard(
                     var totalDragDistance = 0f
                     var lastVelocity = 0f
 
-                    detectDragGestures(
-                        onDrag = { _, dragAmount ->
-                            val horizontalDragAmount = dragAmount.x
-                            totalDragDistance += horizontalDragAmount
-                            lastVelocity = horizontalDragAmount
+                    detectHorizontalDragGestures(
+                        onDragStart = {
+                            totalDragDistance = 0f
+                            lastVelocity = 0f
+                        },
+                        onHorizontalDrag = { _, dragAmount ->
+                            totalDragDistance += dragAmount
+                            lastVelocity = dragAmount
 
                             handleDragMovement(totalDragDistance, abs(lastVelocity))
                         },
                         onDragEnd = {
                             finalizeDrag()
+                            totalDragDistance = 0f
+                            lastVelocity = 0f
+                        },
+                        onDragCancel = {
+                            animateCardToOrigin()
+                            resetCrossingState()
                             totalDragDistance = 0f
                             lastVelocity = 0f
                         },

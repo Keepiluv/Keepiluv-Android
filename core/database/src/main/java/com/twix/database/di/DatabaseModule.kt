@@ -13,7 +13,8 @@ val databaseModule =
                     androidContext(),
                     TwixDatabase::class.java,
                     "twix-database",
-                ).build()
+                ).addMigrations(TwixDatabase.MIGRATION_1_2)
+                .build()
         }
         single { get<TwixDatabase>().pokeHistoryDao() }
     }

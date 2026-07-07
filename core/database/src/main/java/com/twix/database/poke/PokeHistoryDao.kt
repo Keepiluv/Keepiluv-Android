@@ -9,6 +9,9 @@ interface PokeHistoryDao {
     @Upsert
     suspend fun upsert(entity: PokeHistoryEntity)
 
-    @Query("SELECT * FROM poke_history WHERE goalId = :goalId")
-    suspend fun findByGoalId(goalId: Long): PokeHistoryEntity?
+    @Query("SELECT * FROM poke_history WHERE goalId = :goalId AND targetDate = :targetDate")
+    suspend fun findPokeHistoryEntity(
+        goalId: Long,
+        targetDate: String,
+    ): PokeHistoryEntity?
 }

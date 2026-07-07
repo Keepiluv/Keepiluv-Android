@@ -29,7 +29,6 @@ import kotlin.math.roundToInt
 @Composable
 internal fun PhotologCardContent(
     uiState: PhotologDetailUiState,
-    isPokeDisabled: Boolean,
     onSwipe: () -> Unit,
     onClickUpload: () -> Unit,
     onPoke: () -> Unit,
@@ -63,7 +62,7 @@ internal fun PhotologCardContent(
                         if (uiState.isDisplayedMyPhotolog) {
                             onClickUpload
                         } else {
-                            { if (!isPokeDisabled) onPoke() }
+                            { if (!uiState.isPokeDisabled) onPoke() }
                         },
                     showActionButton = uiState.showActionButton,
                 )
@@ -171,7 +170,6 @@ private fun PhotologCardContentPreview(
     TwixTheme {
         PhotologCardContent(
             uiState = uiState.copy(isLoading = true),
-            isPokeDisabled = false,
             onSwipe = {},
             onClickUpload = {},
             onPoke = {},

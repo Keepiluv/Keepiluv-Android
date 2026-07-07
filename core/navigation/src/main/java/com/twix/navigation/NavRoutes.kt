@@ -135,6 +135,8 @@ sealed class NavRoutes(
 
     object SettingsAboutRoute : NavRoutes("settings/about")
 
+    object SettingsNotificationRoute : NavRoutes("settings/notification")
+
     /**
      * StatsGraph
      * */

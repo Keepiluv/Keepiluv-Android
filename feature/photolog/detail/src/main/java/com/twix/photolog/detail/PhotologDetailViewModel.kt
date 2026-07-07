@@ -20,7 +20,9 @@ import com.twix.ui.base.BaseViewModel
 import com.twix.util.bus.GoalRefreshBus
 import com.twix.util.bus.PhotologRefreshBus
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
@@ -55,6 +57,7 @@ class PhotologDetailViewModel(
         savedStateHandle[NavRoutes.PhotologDetailRoute.ARG_IS_COMPLETED] ?: false
 
     private var lastReaction: GoalReactionType? = null
+    private var pokeCooldownJob: Job? = null
 
     private val reactionFlow =
         MutableSharedFlow<GoalReactionType>(
@@ -168,20 +171,18 @@ class PhotologDetailViewModel(
 
     private fun checkPokeCooldown() {
         viewModelScope.launch {
-            val remaining = pokeGoalUseCase.remainingCooldown(argGoalId)
-            if (remaining > 0) reduce { copy(pokeCooldownRemaining = remaining) }
+            val remaining = pokeGoalUseCase.remainingCooldown(argGoalId, argTargetDate.toString())
+            startPokeCooldown(remaining)
         }
     }
 
     private fun pokeToPartner() {
-        viewModelScope.launch {
-            startPokeLoading()
-            handlePokeResult(pokeGoalUseCase.invoke(argGoalId))
-        }
-    }
+        if (currentState.isPokeDisabled) return
 
-    private fun startPokeLoading() {
-        reduce { copy(isPoking = true) }
+        viewModelScope.launch {
+            reduce { copy(isPoking = true) }
+            handlePokeResult(pokeGoalUseCase.invoke(argGoalId, argTargetDate.toString()))
+        }
     }
 
     private suspend fun handlePokeResult(result: PokeGoalResult) {
@@ -193,18 +194,40 @@ class PhotologDetailViewModel(
     }
 
     private fun handlePokeSuccess() {
-        reduce {
-            copy(
-                isPoking = false,
-                pokeCooldownRemaining = PokeGoalUseCase.COOLDOWN_MS,
-            )
-        }
+        startPokeCooldown(PokeGoalUseCase.COOLDOWN_MS)
+        reduce { copy(isPoking = false) }
         tryEmitSideEffect(PhotologDetailSideEffect.ShowPokeToast)
     }
 
     private fun handlePokeCooldown(remainingMs: Long) {
+        startPokeCooldown(remainingMs)
         reduce { copy(isPoking = false) }
         tryEmitSideEffect(PhotologDetailSideEffect.ShowPokeCooldownToast(remainingMs))
+    }
+
+    private fun startPokeCooldown(remainingMs: Long) {
+        pokeCooldownJob?.cancel()
+
+        if (remainingMs <= 0L) {
+            clearPokeCooldown()
+            return
+        }
+
+        reduce { copy(pokeCooldownRemaining = remainingMs) }
+        schedulePokeCooldownClear(remainingMs)
+    }
+
+    private fun clearPokeCooldown() {
+        reduce { copy(pokeCooldownRemaining = 0L) }
+        pokeCooldownJob = null
+    }
+
+    private fun schedulePokeCooldownClear(remainingMs: Long) {
+        pokeCooldownJob =
+            viewModelScope.launch {
+                delay(remainingMs)
+                clearPokeCooldown()
+            }
     }
 
     private suspend fun handlePokeError() {

@@ -26,8 +26,8 @@ android {
 
     defaultConfig {
         applicationId = "com.yapp.twix"
-        versionCode = 9
-        versionName = "1.0.1"
+        versionCode = 10
+        versionName = "1.0.2"
 
         val kakaoKey = properties["kakao_dev_native_app_key"].toString()
         manifestPlaceholders["KAKAO_NATIVE_APP_KEY"] = kakaoKey.trim('"')

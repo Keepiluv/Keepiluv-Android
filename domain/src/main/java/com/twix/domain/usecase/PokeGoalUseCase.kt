@@ -7,21 +7,27 @@ import com.twix.result.AppResult
 class PokeGoalUseCase(
     private val pokeRepository: PokeRepository,
 ) {
-    suspend fun invoke(goalId: Long): PokeGoalResult {
-        val remainingMs = remainingCooldown(goalId)
+    suspend fun invoke(
+        goalId: Long,
+        targetDate: String,
+    ): PokeGoalResult {
+        val remainingMs = remainingCooldown(goalId, targetDate)
         if (remainingMs > 0) return PokeGoalResult.OnCooldown(remainingMs)
 
         return when (val result = pokeRepository.pokeGoal(goalId)) {
             is AppResult.Success -> {
-                pokeRepository.savePokeHistory(goalId, System.currentTimeMillis())
+                pokeRepository.savePokeHistory(goalId, targetDate, System.currentTimeMillis())
                 PokeGoalResult.Success(result.data.message)
             }
             is AppResult.Error -> PokeGoalResult.Error
         }
     }
 
-    suspend fun remainingCooldown(goalId: Long): Long {
-        val pokedAt = pokeRepository.findPokeHistory(goalId) ?: return 0L
+    suspend fun remainingCooldown(
+        goalId: Long,
+        targetDate: String,
+    ): Long {
+        val pokedAt = pokeRepository.findPokeHistory(goalId, targetDate) ?: return 0L
         val currentTime = System.currentTimeMillis()
         val elapsedMs = currentTime - pokedAt
         val remainingMs = COOLDOWN_MS - elapsedMs

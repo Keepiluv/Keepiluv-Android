@@ -220,7 +220,6 @@ fun PhotologDetailScreen(
 
                     PhotologCardContent(
                         uiState = uiState,
-                        isPokeDisabled = uiState.isPokeDisabled,
                         onSwipe = onSwipe,
                         onClickUpload = onClickUpload,
                         onPoke = onPoke,

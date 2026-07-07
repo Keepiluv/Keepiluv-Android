@@ -8,8 +8,12 @@ interface PokeRepository {
 
     suspend fun savePokeHistory(
         goalId: Long,
+        targetDate: String,
         pokedAt: Long,
     )
 
-    suspend fun findPokeHistory(goalId: Long): Long?
+    suspend fun findPokeHistory(
+        goalId: Long,
+        targetDate: String,
+    ): Long?
 }

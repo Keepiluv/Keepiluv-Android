@@ -20,10 +20,20 @@ class DefaultPokeRepository(
 
     override suspend fun savePokeHistory(
         goalId: Long,
+        targetDate: String,
         pokedAt: Long,
     ) {
-        pokeHistoryDao.upsert(PokeHistoryEntity(goalId = goalId, pokedAt = pokedAt))
+        pokeHistoryDao.upsert(
+            PokeHistoryEntity(
+                goalId = goalId,
+                targetDate = targetDate,
+                pokedAt = pokedAt,
+            ),
+        )
     }
 
-    override suspend fun findPokeHistory(goalId: Long): Long? = pokeHistoryDao.findByGoalId(goalId)?.pokedAt
+    override suspend fun findPokeHistory(
+        goalId: Long,
+        targetDate: String,
+    ): Long? = pokeHistoryDao.findPokeHistoryEntity(goalId, targetDate)?.pokedAt
 }

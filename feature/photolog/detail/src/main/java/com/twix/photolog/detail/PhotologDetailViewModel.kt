@@ -173,6 +173,8 @@ class PhotologDetailViewModel(
     }
 
     private fun pokeToPartner() {
+        if (currentState.isPokeDisabled) return
+
         viewModelScope.launch {
             reduce { copy(isPoking = true) }
             handlePokeResult(pokeGoalUseCase.invoke(argGoalId, argTargetDate.toString()))

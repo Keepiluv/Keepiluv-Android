@@ -62,7 +62,7 @@ internal fun PhotologCardContent(
                         if (uiState.isDisplayedMyPhotolog) {
                             onClickUpload
                         } else {
-                            { if (!uiState.isPoking) onPoke() }
+                            { if (!uiState.isPokeDisabled) onPoke() }
                         },
                     showActionButton = uiState.showActionButton,
                 )
